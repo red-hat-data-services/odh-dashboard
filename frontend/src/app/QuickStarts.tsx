@@ -1,18 +1,18 @@
-import "@patternfly/patternfly/base/patternfly-shield-inheritable.css";
-import "@patternfly/patternfly/utilities/Accessibility/accessibility.css";
-import "@patternfly/react-catalog-view-extension/dist/css/react-catalog-view-extension.css";
-import "@cloudmosaic/quickstarts/dist/quickstarts.css";
+import '@patternfly/patternfly/base/patternfly-shield-inheritable.css';
+import '@patternfly/patternfly/utilities/Accessibility/accessibility.css';
+import '@patternfly/react-catalog-view-extension/dist/css/react-catalog-view-extension.css';
+import '@cloudmosaic/quickstarts/dist/quickstarts.css';
 import React from 'react';
 import {
   QuickStartDrawer,
   QuickStartContext,
   useValuesForQuickStartContext,
-  useLocalStorage
+  useLocalStorage,
 } from '@cloudmosaic/quickstarts';
 
 const importAll = (r: any) => {
-    return r.keys().map(r);
-}
+  return r.keys().map(r);
+};
 
 /*
 To load a quick start from a nested component, import and use the QuickStartContext.
