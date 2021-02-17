@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import '@patternfly/react-core/dist/styles/base.css';
+import "@patternfly/patternfly/patternfly.min.css";
 import { Page } from '@patternfly/react-core';
 import { detectUser } from '../redux/actions/actions';
 import Header from './Header';
