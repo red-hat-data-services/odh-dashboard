@@ -34,7 +34,7 @@ spec:
         ### Spawning an environment:
         1. Select a notebook image from the dropdown menu.
         2. Select a container size; small, medium or large based on your computation needs.
-        3. Slick the Start button.
+        3. Click the Start button.
 
         The Spawner Options page will reload and indicate that the system is starting up.   Once the page displays a stop option you may proceed to the next step.
       review:
