@@ -2,7 +2,17 @@ const _ = require('lodash');
 const availableComponents = require('./available-components');
 const componentUtils = require('./componentUtils');
 
-const PICKED_AVAILABLE_FIELDS = ['key', 'label', 'description', 'img', 'docsLink', 'support'];
+const PICKED_AVAILABLE_FIELDS = [
+  'id',
+  'label',
+  'provider',
+  'description',
+  'img',
+  'support',
+  'partner',
+  'docsLink',
+  'quickStart',
+];
 
 module.exports = async function ({ fastify, request }) {
   if (!request.query.installed) {

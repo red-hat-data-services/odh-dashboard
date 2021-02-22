@@ -13,16 +13,15 @@ import {
   Spinner,
   Title,
   EmptyStateBody,
-  ToggleGroup,
-  ToggleGroupItem,
 } from '@patternfly/react-core';
 import { getComponents } from '../../redux/actions/actions';
-import OdhExploreCard from './OdhExploreCard';
+import { ODHAppType } from '../../types';
+import OdhExploreCard from '../../components/OdhExploreCard';
 
 import './ExploreApplications.scss';
 
 interface ConnectedExploreApplicationsProps {
-  components: any[];
+  components: ODHAppType[];
   getComponents: () => void;
   componentsLoading: boolean;
   componentsError: boolean;
@@ -33,29 +32,28 @@ const ConnectedExploreApplications: React.FC<ConnectedExploreApplicationsProps> 
   componentsLoading,
   componentsError,
 }) => {
-  const [supportType, setSupportType] = React.useState<string>('redhat');
-  const [filteredComponents, setFilteredComponents] = React.useState<any[]>([]);
   const [selectedComponent, setSelectedComponent] = React.useState<string>();
 
   React.useEffect(() => {
     getComponents();
   }, []);
 
-  React.useEffect(() => {
-    if (componentsError || componentsLoading) {
-      return;
-    }
-
-    if (!components) {
-      setFilteredComponents([]);
-    } else {
-      setFilteredComponents(
-        components
-          .filter((a) => a && a.support === supportType)
-          .sort((a, b) => a.label.localeCompare(b.label)),
-      );
-    }
-  }, [components, componentsError, componentsLoading, supportType]);
+  const renderComponents = React.useCallback(() => {
+    return (
+      <>
+        {components
+          .sort((a, b) => a.label.localeCompare(b.label))
+          .map((c) => (
+            <OdhExploreCard
+              key={c.id}
+              odhApp={c}
+              isSelected={selectedComponent === c.label}
+              onSelect={() => setSelectedComponent(c.label)}
+            />
+          ))}
+      </>
+    );
+  }, [components]);
 
   const buildComponentList = () => {
     if (componentsError) {
@@ -91,7 +89,7 @@ const ConnectedExploreApplications: React.FC<ConnectedExploreApplicationsProps> 
       );
     }
 
-    if (!filteredComponents || filteredComponents.length === 0) {
+    if (!components || components.length === 0) {
       return (
         <PageSection>
           <EmptyState variant={EmptyStateVariant.full}>
@@ -107,16 +105,7 @@ const ConnectedExploreApplications: React.FC<ConnectedExploreApplicationsProps> 
 
     return (
       <PageSection className="odh-explore-apps__gallery">
-        <Gallery hasGutter>
-          {filteredComponents.map((c) => (
-            <OdhExploreCard
-              key={c.key}
-              odhApp={c}
-              isSelected={selectedComponent === c.label}
-              onSelect={() => setSelectedComponent(c.label)}
-            />
-          ))}
-        </Gallery>
+        <Gallery hasGutter>{renderComponents()}</Gallery>
       </PageSection>
     );
   };
@@ -131,18 +120,6 @@ const ConnectedExploreApplications: React.FC<ConnectedExploreApplicationsProps> 
             Managed Open Data Hub instance.
           </Text>
         </TextContent>
-        <ToggleGroup aria-label="supported applications">
-          <ToggleGroupItem
-            text="Red Hat supported"
-            isSelected={supportType === 'redhat'}
-            onChange={() => setSupportType('redhat')}
-          />
-          <ToggleGroupItem
-            text="Third-party supported"
-            isSelected={supportType === 'other'}
-            onChange={() => setSupportType('other')}
-          />
-        </ToggleGroup>
       </PageSection>
       {buildComponentList()}
     </>

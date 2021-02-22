@@ -1,18 +1,40 @@
 module.exports = [
   {
-    key: 'jupyterhub',
+    id: 'jupyterhub',
     label: 'JupyterHub',
+    provider: 'JupyterHub',
     description:
       'A multi-user version of the notebook designed for companies, classrooms and research labs',
     kfdefApplications: ['jupyterhub', 'notebook-images'],
-    route: 'jupyterhub',
+    route: 'jupyterhub', // Route in OpenShift, name index into body.spec.host
     img: 'images/jupyterhub.svg',
-    docsLink: 'https://jupyter.org/hub',
     support: 'redhat',
+    // partner: 'SaaS partner' || '3rd party software' || ???
+    docsLink: 'https://jupyter.org/hub',
+    // installFile: 'jupyter-install', (name of file we have hard coded and checked into git)
+    quickStart: 'create-jupyter-notebook',
   },
   {
-    key: 'argo',
+    id: 'anaconde-ce',
+    label: 'Anaconda Commercial Edition',
+    provider: 'Anaconda',
+    description: `Anaconda Commercial Edition is the world's most popular open-source package 
+       distribution and management experience, backed by a premium repository optimized and
+       supported for commercial use.`,
+    kfdefApplications: [], // ??
+    route: '', // ??
+    endpoint: '', // ??
+    img: 'images/anacondda-ce.svg', // need an svg version of the logo
+    support: 'other',
+    partner: 'SaaS partner',
+    docsLink: 'https://docs.anaconda.com/',
+    installFile: '', // ??  Very long web page, not easily converted to MD.
+    quickStart: '', // ?? this is generated in a YAML format specific to our Quick Start format.
+  },
+  {
+    id: 'argo',
     label: 'Argo',
+    provider: 'Argo',
     description: 'Kubernetes native workflows, events, CI and CD',
     kfdefApplications: ['odhargo-cluster', 'odhargo'],
     route: 'argo-server',
@@ -21,8 +43,9 @@ module.exports = [
     support: 'other',
   },
   {
-    key: 'superset',
+    id: 'superset',
     label: 'Superset',
+    provider: 'Apache',
     description: 'A modern, enterprise-ready business intelligence web application',
     kfdefApplications: ['superset'],
     route: 'superset',
@@ -31,8 +54,9 @@ module.exports = [
     support: 'other',
   },
   {
-    key: 'prometheus',
+    id: 'prometheus',
     label: 'Prometheus',
+    provider: 'Prometheus',
     description: 'Systems monitoring and alerting toolkit',
     kfdefApplications: ['prometheus-cluster', 'prometheus-operator'],
     route: 'prometheus-portal',
@@ -41,8 +65,9 @@ module.exports = [
     support: 'redhat',
   },
   {
-    key: 'grafana',
+    id: 'grafana',
     label: 'Grafana',
+    provider: 'Grafana',
     description: 'Visualization and analytics software',
     kfdefApplications: ['grafana-cluster', 'grafana-instance'],
     route: 'grafana-route',
@@ -51,8 +76,9 @@ module.exports = [
     support: 'redhat',
   },
   {
-    key: 'spark',
+    id: 'spark',
     label: 'Spark',
+    provider: 'Apache',
     description: 'Unified analytics engine for large-scale data processing',
     kfdefApplications: ['radanalyticsio-spark-cluster'],
     route: null,
@@ -61,18 +87,21 @@ module.exports = [
     support: 'other',
   },
   {
-    key: 'seldon',
+    id: 'seldon',
     label: 'Seldon',
+    provider: 'Seldon',
     description: 'Platform for rapidly deploying machine learning models on Kubernetes.',
     kfdefApplications: ['odhseldon'],
     route: null,
     img: 'images/seldon.svg',
     docsLink: 'https://docs.seldon.io/',
-    support: 'other',
+    support: 'third party',
+    partner: '3rd party support',
   },
   {
-    key: 'kafka',
+    id: 'kafka',
     label: 'Kafka',
+    provider: 'Apache',
     description: 'Distributed event streaming platform',
     kfdefApplications: ['strimzi-operator', 'kafka-cluster'],
     route: null,
@@ -81,28 +110,33 @@ module.exports = [
     support: 'other',
   },
   {
-    key: 'airflow',
+    id: 'airflow',
     label: 'Airflow',
+    provider: 'Apache',
     description: 'Platform to programmatically author, schedule, and monitor workflows',
     kfdefApplications: ['airflow-cluster', 'airflow-operator'],
     route: null,
     img: 'images/airflow.svg',
     docsLink: 'https://airflow.apache.org/',
     support: 'other',
+    partner: 'SaaS partner',
   },
   {
-    key: 'hue',
+    id: 'hue',
     label: 'Hue',
+    provider: 'Hue',
     description: 'Data exploration platform for Hive and S3 storage',
     kfdefApplications: ['hue'],
     route: 'hue',
     img: 'images/hue.svg',
     docsLink: 'https://docs.gethue.com/',
     support: 'other',
+    partner: '3rd party support',
   },
   {
-    key: 'thriftserver',
+    id: 'thriftserver',
     label: 'Spark SQL Thrift Server',
+    provider: 'Apache',
     description: 'Expose Spark data frames modeled as Hive tables through a JDBC connection',
     kfdefApplications: ['thriftserver'],
     route: 'thriftserver',

@@ -12,14 +12,16 @@
     }
   }
 
-  &__card {
-    &__header-brand {
-      height: 50px;
-    }
+  &__gallery {
+    .odh-card {
+      .pf-c-card__header {
+        padding-right: 0;
+      }
 
-    &__footer {
-      display: flex;
-      justify-content: space-between;
+      .pf-c-card__title {
+        display: flex;
+        align-items: center;
+      }
     }
   }
 }

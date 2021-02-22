@@ -13,49 +13,40 @@ import {
   Spinner,
   Title,
   EmptyStateBody,
-  ToggleGroup,
-  ToggleGroupItem,
 } from '@patternfly/react-core';
-import OdhAppCard from './OdhAppCard';
+import { ODHAppType } from '../../types';
+import OdhAppCard from '../../components/OdhAppCard';
 import { getComponents } from '../../redux/actions/actions';
 
-import './InstalledApplications.scss';
+import './EnabledApplications.scss';
 
-interface ConnectedInstalledApplicationsProps {
-  components: any[];
+interface ConnectedEnabledApplicationsProps {
+  components: ODHAppType[];
   getComponents: (installed: boolean) => void;
   componentsLoading: boolean;
   componentsError: { statusCode: number; error: string; message: string };
 }
-const ConnectedInstalledApplications: React.FC<ConnectedInstalledApplicationsProps> = ({
+const ConnectedEnabledApplications: React.FC<ConnectedEnabledApplicationsProps> = ({
   components,
   getComponents,
   componentsLoading,
   componentsError,
 }) => {
-  const [supportType, setSupportType] = React.useState<string>('redhat');
-  const [filteredComponents, setFilteredComponents] = React.useState<any[]>([]);
-
   React.useEffect(() => {
     getComponents(true);
   }, []);
 
-  React.useEffect(() => {
-    if (componentsError || componentsLoading) {
-      return;
-    }
-
-    if (!components) {
-      setFilteredComponents([]);
-    } else {
-      setFilteredComponents(
-        components
-          .filter((a) => a && a.support === supportType)
+  const renderComponents = React.useCallback(() => {
+    return (
+      <>
+        {components
           .sort((a, b) => a.label.localeCompare(b.label))
-          .map((c) => <OdhAppCard key={c.key} odhApp={c} />),
-      );
-    }
-  }, [components, componentsError, componentsLoading, supportType]);
+          .map((c) => (
+            <OdhAppCard key={c.id} odhApp={c} />
+          ))}
+      </>
+    );
+  }, [components]);
 
   const buildComponentList = () => {
     if (componentsError) {
@@ -89,7 +80,7 @@ const ConnectedInstalledApplications: React.FC<ConnectedInstalledApplicationsPro
       );
     }
 
-    if (!filteredComponents || filteredComponents.length === 0) {
+    if (!components || components.length === 0) {
       return (
         <PageSection>
           <EmptyState variant={EmptyStateVariant.full}>
@@ -105,7 +96,7 @@ const ConnectedInstalledApplications: React.FC<ConnectedInstalledApplicationsPro
 
     return (
       <PageSection className="odh-installed-apps__gallery">
-        <Gallery hasGutter>{filteredComponents}</Gallery>
+        <Gallery hasGutter>{renderComponents()}</Gallery>
       </PageSection>
     );
   };
@@ -114,27 +105,11 @@ const ConnectedInstalledApplications: React.FC<ConnectedInstalledApplicationsPro
     <>
       <PageSection className="odh-installed-apps__heading" variant={PageSectionVariants.light}>
         <TextContent className="odh-installed-apps__heading__text">
-          <Text component="h1">Installed</Text>
+          <Text component="h1">Enabled</Text>
           <Text component="p">
-            Open Data Hub (ODH) is an open source project based on Kubeflow that provides opens
-            source AI tools for running large and distributed AI workloads on OpenShift Container
-            Platform. Currently, the Open Data Hub project provides open source tools for data
-            storage, distributed AI and Machine Learning (ML) workflows, Jupyter Notebook
-            development environment and monitoring.
+            Launch your enabled applications or get started with quick start instructions and tasks.
           </Text>
         </TextContent>
-        <ToggleGroup aria-label="supported applications">
-          <ToggleGroupItem
-            text="Red Hat supported"
-            isSelected={supportType === 'redhat'}
-            onChange={() => setSupportType('redhat')}
-          />
-          <ToggleGroupItem
-            text="Third-party supported"
-            isSelected={supportType === 'other'}
-            onChange={() => setSupportType('other')}
-          />
-        </ToggleGroup>
       </PageSection>
       {buildComponentList()}
     </>
@@ -149,4 +124,4 @@ const mapDispatchToProps = (dispatch) => ({
   getComponents: (installed: boolean) => dispatch(getComponents(installed)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(ConnectedInstalledApplications);
+export default connect(mapStateToProps, mapDispatchToProps)(ConnectedEnabledApplications);
