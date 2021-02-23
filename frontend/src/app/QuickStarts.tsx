@@ -4,46 +4,17 @@ import {
   QuickStartContext,
   useValuesForQuickStartContext,
   useLocalStorage,
-  QuickStart,
 } from '@cloudmosaic/quickstarts';
 import '@patternfly/patternfly/base/patternfly-shield-inheritable.css';
 import '@patternfly/patternfly/utilities/Accessibility/accessibility.css';
 import '@patternfly/react-catalog-view-extension/dist/css/react-catalog-view-extension.css';
 import '@cloudmosaic/quickstarts/dist/quickstarts.css';
-import { fetchQuickStarts } from '../services/quickStartsService';
+import { useWatchQuickStarts } from '../utilities/useWatchQuickStarts';
 
 const QuickStarts: React.FC = ({ children }) => {
   const [activeQuickStartID, setActiveQuickStartID] = useLocalStorage('rhodsQuickstartId', '');
   const [allQuickStartStates, setAllQuickStartStates] = useLocalStorage('rhodsQuickstarts', {});
-  const [quickStarts, setQuickStarts] = React.useState<QuickStart[]>([]);
-
-  const updateQuickStarts = React.useCallback(
-    (updatedQuickStarts: any) => {
-      if (JSON.stringify(updatedQuickStarts) !== JSON.stringify(quickStarts)) {
-        setQuickStarts(updatedQuickStarts);
-      }
-    },
-    [quickStarts],
-  );
-
-  React.useEffect(() => {
-    let watchHandle;
-    const watchQuickStarts = () => {
-      fetchQuickStarts().then((response) => {
-        if (response.quickStarts) {
-          updateQuickStarts(response.quickStarts);
-        }
-      });
-      watchHandle = setTimeout(watchQuickStarts, 5000);
-    };
-    watchQuickStarts();
-    return () => {
-      if (watchHandle) {
-        clearTimeout(watchHandle);
-        watchHandle = null;
-      }
-    };
-  }, [updateQuickStarts]);
+  const { quickStarts } = useWatchQuickStarts();
 
   const valuesForQuickStartContext = useValuesForQuickStartContext({
     allQuickStarts: quickStarts || [],

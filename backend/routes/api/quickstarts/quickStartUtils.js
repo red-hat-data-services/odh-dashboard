@@ -1,6 +1,6 @@
-const _ = require('lodash');
-const getQuickStarts = require('../../../quickstarts/getQuickStarts');
 const createError = require('http-errors');
+const constants = require('../../../utils/constants');
+const getMockQuickStarts = require('../../../__mocks__/mock-quickstarts/getMockQuickStarts');
 
 // TODO: Retrieve from the correct group for dashboard quickstarts
 const quickStartsGroup = 'console.openshift.io';
@@ -9,14 +9,14 @@ const quickStartsPlural = 'consolequickstarts';
 
 const getInstalledQuickStarts = async (fastify) => {
   const customObjectsApi = fastify.kube.customObjectsApi;
-  const localQuickStarts = getQuickStarts();
+  const installedQuickStarts = [];
   try {
     const res = await customObjectsApi.listClusterCustomObject(
       quickStartsGroup,
       quickStartsVersion,
       quickStartsPlural,
     );
-    localQuickStarts.push(...res.body.items);
+    installedQuickStarts.push(...res.body.items);
   } catch (e) {
     fastify.log.error(e, 'failed to get quickstarts');
     const error = createError(500, 'failed to get quickstarts');
@@ -27,7 +27,12 @@ const getInstalledQuickStarts = async (fastify) => {
     throw error;
   }
 
-  return localQuickStarts;
+  // TODO: Remove
+  if (constants.DEV_MODE) {
+    const mockQuickStarts = getMockQuickStarts();
+    installedQuickStarts.push(...mockQuickStarts);
+  }
+  return installedQuickStarts;
 };
 
 module.exports = { getInstalledQuickStarts };

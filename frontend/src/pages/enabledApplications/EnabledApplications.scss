@@ -1,17 +1,4 @@
 .odh-installed-apps {
-  &__heading {
-    &__text {
-      margin-bottom: 1rem;
-    }
-  }
-
-  &__error {
-    &__error-body {
-      text-align: left;
-      white-space: pre;
-    }
-  }
-
   &__gallery {
     .odh-card {
       .pf-c-card__header {

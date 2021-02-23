@@ -1,20 +1,5 @@
 module.exports = [
   {
-    id: 'jupyterhub',
-    label: 'JupyterHub',
-    provider: 'JupyterHub',
-    description:
-      'A multi-user version of the notebook designed for companies, classrooms and research labs',
-    kfdefApplications: ['jupyterhub', 'notebook-images'],
-    route: 'jupyterhub', // Route in OpenShift, name index into body.spec.host
-    img: 'images/jupyterhub.svg',
-    support: 'redhat',
-    // partner: 'SaaS partner' || '3rd party software' || ???
-    docsLink: 'https://jupyter.org/hub',
-    // installFile: 'jupyter-install', (name of file we have hard coded and checked into git)
-    quickStart: 'create-jupyter-notebook',
-  },
-  {
     id: 'anaconde-ce',
     label: 'Anaconda Commercial Edition',
     provider: 'Anaconda',
@@ -26,122 +11,59 @@ module.exports = [
     endpoint: '', // ??
     img: 'images/anacondda-ce.svg', // need an svg version of the logo
     support: 'other',
-    partner: 'SaaS partner',
+    partner: '3rd party support',
     docsLink: 'https://docs.anaconda.com/',
     installFile: '', // ??  Very long web page, not easily converted to MD.
     quickStart: '', // ?? this is generated in a YAML format specific to our Quick Start format.
   },
   {
-    id: 'argo',
-    label: 'Argo',
-    provider: 'Argo',
-    description: 'Kubernetes native workflows, events, CI and CD',
-    kfdefApplications: ['odhargo-cluster', 'odhargo'],
-    route: 'argo-server',
-    img: 'images/argo.svg',
-    docsLink: 'https://argoproj.github.io/',
+    id: 'startburst',
+    label: 'Starburst Enterprse',
+    provider: 'Starburst',
+    description: `Starburst Enterprise unlocks the value of all data by making it fast and easy to
+      access anywhere. Starburst queries data across any database, making it instantly actionable for
+      organizations. Teams can lower the total cost of their infrastructure and analytics
+      investments, prevent vendor lock-in, and use the tools that work best for their business.`,
+    kfdefApplications: [], // ??
+    route: '', // ??
+    endpoint: '', // ??
+    img: 'images/starburst.svg', // need an svg version of the logo
     support: 'other',
+    partner: '3rd party support',
+    docsLink: 'https://docs.starburst.com/',
+    installFile: '', // ??  Very long web page, not easily converted to MD.
+    quickStart: '', // ?? this is generated in a YAML format specific to our Quick Start format.
   },
   {
-    id: 'superset',
-    label: 'Superset',
-    provider: 'Apache',
-    description: 'A modern, enterprise-ready business intelligence web application',
-    kfdefApplications: ['superset'],
-    route: 'superset',
-    img: 'images/superset.svg',
-    docsLink: 'https://superset.incubator.apache.org/',
+    id: 'perceptiLabs',
+    label: 'Percepti Labs',
+    provider: 'Starburst',
+    description: `PerceptiLabs is aimed at accelerating machine learning by streamlining the
+      workflow and advancing explainability of the models. To do this, PerceptiLabs created a visual
+      modeling tool which gives full transparency into the process of machine learning development,
+      combined with support functions for debugging and increased interpretability into the models.`,
+    kfdefApplications: [], // ??
+    route: '', // ??
+    endpoint: '', // ??
+    img: 'images/percepti-labs.svg', // need an svg version of the logo
     support: 'other',
-  },
-  {
-    id: 'prometheus',
-    label: 'Prometheus',
-    provider: 'Prometheus',
-    description: 'Systems monitoring and alerting toolkit',
-    kfdefApplications: ['prometheus-cluster', 'prometheus-operator'],
-    route: 'prometheus-portal',
-    img: 'images/prometheus.svg',
-    docsLink: 'https://prometheus.io/docs/',
-    support: 'redhat',
-  },
-  {
-    id: 'grafana',
-    label: 'Grafana',
-    provider: 'Grafana',
-    description: 'Visualization and analytics software',
-    kfdefApplications: ['grafana-cluster', 'grafana-instance'],
-    route: 'grafana-route',
-    img: 'images/grafana.svg',
-    docsLink: 'https://grafana.com/docs/grafana/latest/',
-    support: 'redhat',
-  },
-  {
-    id: 'spark',
-    label: 'Spark',
-    provider: 'Apache',
-    description: 'Unified analytics engine for large-scale data processing',
-    kfdefApplications: ['radanalyticsio-spark-cluster'],
-    route: null,
-    img: 'images/spark.svg',
-    docsLink: 'https://spark.apache.org/docs/latest/',
-    support: 'other',
+    partner: 'Coming soon',
+    docsLink: 'https://docs.starburst.com/',
+    installFile: '', // ??  Very long web page, not easily converted to MD.
+    quickStart: '', // ?? this is generated in a YAML format specific to our Quick Start format.
   },
   {
     id: 'seldon',
-    label: 'Seldon',
+    label: 'Seldon Deploy',
     provider: 'Seldon',
-    description: 'Platform for rapidly deploying machine learning models on Kubernetes.',
+    description: `Seldon Deploy is a specialist set of tools designed to simplify and accelerate the
+      process of deploying and managing your machine learning models. Seldon Deploy bridges the gap
+      between your data science and DevOps teams so you can bring models to market faster.`,
     kfdefApplications: ['odhseldon'],
     route: null,
     img: 'images/seldon.svg',
     docsLink: 'https://docs.seldon.io/',
     support: 'third party',
     partner: '3rd party support',
-  },
-  {
-    id: 'kafka',
-    label: 'Kafka',
-    provider: 'Apache',
-    description: 'Distributed event streaming platform',
-    kfdefApplications: ['strimzi-operator', 'kafka-cluster'],
-    route: null,
-    img: 'images/kafka.svg',
-    docsLink: 'https://kafka.apache.org/documentation/',
-    support: 'other',
-  },
-  {
-    id: 'airflow',
-    label: 'Airflow',
-    provider: 'Apache',
-    description: 'Platform to programmatically author, schedule, and monitor workflows',
-    kfdefApplications: ['airflow-cluster', 'airflow-operator'],
-    route: null,
-    img: 'images/airflow.svg',
-    docsLink: 'https://airflow.apache.org/',
-    support: 'other',
-    partner: 'SaaS partner',
-  },
-  {
-    id: 'hue',
-    label: 'Hue',
-    provider: 'Hue',
-    description: 'Data exploration platform for Hive and S3 storage',
-    kfdefApplications: ['hue'],
-    route: 'hue',
-    img: 'images/hue.svg',
-    docsLink: 'https://docs.gethue.com/',
-    support: 'other',
-    partner: '3rd party support',
-  },
-  {
-    id: 'thriftserver',
-    label: 'Spark SQL Thrift Server',
-    provider: 'Apache',
-    description: 'Expose Spark data frames modeled as Hive tables through a JDBC connection',
-    kfdefApplications: ['thriftserver'],
-    route: 'thriftserver',
-    img: 'images/spark.svg',
-    docsLink: 'https://spark.apache.org/docs/latest/sql-distributed-sql-engine.html',
-    support: 'other',
   },
 ];
