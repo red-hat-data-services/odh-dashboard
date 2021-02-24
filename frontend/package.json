@@ -58,7 +58,9 @@
     "react-router-dom": "^5.2.0",
     "react-scripts": "^4.0.1",
     "redux": "^4.0.5",
-    "redux-thunk": "^2.3.0"
+    "redux-thunk": "^2.3.0",
+    "sanitize-html": "^2.3.2",
+    "showdown": "^1.9.1"
   },
   "devDependencies": {
     "@types/enzyme": "^3.10.7",
