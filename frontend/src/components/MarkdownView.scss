@@ -1,5 +1,6 @@
 .odh-markdown-view {
   padding-bottom: var(--pf-global--spacer--md);
+  word-break: break-word;
 
   > pre {
     display: block;

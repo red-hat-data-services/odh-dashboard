@@ -15,7 +15,7 @@ const MarkdownView: React.FC<MarkdownViewProps & React.HTMLAttributes<HTMLDivEle
   ...props
 }) => (
   <div
-    className={classNames('oh-markdown-view', className)}
+    className={classNames('odh-markdown-view', className)}
     {...props}
     dangerouslySetInnerHTML={{ __html: markdownConverter.makeHtml(markdown) }}
   />

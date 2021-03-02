@@ -1,4 +1,4 @@
-import sanitizeHtml from 'sanitize-html';
+import DOMPurify from 'dompurify';
 import { Converter } from 'showdown';
 
 export const markdownConverter = {
@@ -10,7 +10,16 @@ export const markdownConverter = {
       emoji: true,
     }).makeHtml(markdown);
 
-    return sanitizeHtml(unsafeHtml, {
+    // add hook to transform anchor tags
+    DOMPurify.addHook('beforeSanitizeElements', function (node) {
+      // nodeType 1 = element type
+      if (node.nodeType === 1 && node.nodeName.toLowerCase() === 'a') {
+        node.setAttribute('rel', 'noopener noreferrer');
+        return node;
+      }
+    });
+
+    return DOMPurify.sanitize(unsafeHtml, {
       allowedTags: [
         'b',
         'i',
@@ -37,13 +46,8 @@ export const markdownConverter = {
         'th',
         'td',
       ],
-      allowedAttributes: {
-        a: ['href', 'target', 'rel'],
-      },
-      allowedSchemes: ['http', 'https', 'mailto'],
-      transformTags: {
-        a: sanitizeHtml.simpleTransform('a', { rel: 'noopener noreferrer' }, true),
-      },
+      ALLOWED_ATTR: ['href', 'target', 'rel', 'class'],
+      ALLOWED_URI_REGEXP: /^(?:(?:https?|mailto):|[^a-z]|[a-z+.-]+(?:[^a-z+.\-:]|$))/i,
     });
   },
 };

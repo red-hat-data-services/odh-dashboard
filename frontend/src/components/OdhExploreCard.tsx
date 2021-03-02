@@ -23,7 +23,7 @@ const OdhExploreCard: React.FC<OdhExploreCardProps> = ({ odhApp, isSelected, onS
       isSelectable={!odhApp.spec.comingSoon}
       isSelected={isSelected}
       className={cardClasses}
-      onClick={onSelect}
+      onClick={() => !odhApp.spec.comingSoon && onSelect()}
     >
       <CardHeader>
         <Brand
