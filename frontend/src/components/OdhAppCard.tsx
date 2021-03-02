@@ -36,7 +36,9 @@ const OdhAppCard: React.FC<OdhAppCardProps> = ({ odhApp }) => {
 
   const onQuickStart = (e) => {
     e.preventDefault();
-    qsContext.setActiveQuickStart && qsContext.setActiveQuickStart(odhApp.spec.quickstart);
+    odhApp.spec.quickStart &&
+      qsContext.setActiveQuickStart &&
+      qsContext.setActiveQuickStart(odhApp.spec.quickStart);
   };
 
   const dropdownItems = [
@@ -57,7 +59,7 @@ const OdhAppCard: React.FC<OdhAppCardProps> = ({ odhApp }) => {
     'm-hidden': !odhApp.spec.link,
   });
   const quickStartClasses = classNames('odh-card__footer__link', {
-    'm-hidden': !odhApp.spec.quickstart,
+    'm-hidden': !odhApp.spec.quickStart,
   });
   const cardFooter = (
     <CardFooter className="odh-card__footer">
@@ -67,7 +69,7 @@ const OdhAppCard: React.FC<OdhAppCardProps> = ({ odhApp }) => {
         target="_blank"
         rel="noopener noreferrer"
       >
-        {`Launch `}
+        Launch
         <ExternalLinkAltIcon />
       </a>
       <a className={quickStartClasses} href="#" onClick={onQuickStart}>
@@ -77,10 +79,10 @@ const OdhAppCard: React.FC<OdhAppCardProps> = ({ odhApp }) => {
   );
 
   const supportedImageClasses = classNames('odh-card__supported-image', {
-    'm-hidden': odhApp.spec.support !== 'redhat',
+    'm-hidden': odhApp.spec.category !== 'Red Hat',
   });
   const badgeClasses = classNames('odh-card__partner-badge', {
-    'm-warning': odhApp.spec.support === 'other',
+    'm-warning': odhApp.spec.category === 'Third party support',
   });
 
   return (
@@ -111,9 +113,9 @@ const OdhAppCard: React.FC<OdhAppCardProps> = ({ odhApp }) => {
         </Tooltip>
       </CardTitle>
       <CardBody>
-        {odhApp.spec.offering ? (
+        {odhApp.spec.category && odhApp.spec.category !== 'Red Hat' ? (
           <div className="odh-card__partner-badge-container">
-            <span className={badgeClasses}>{odhApp.spec.offering}</span>
+            <span className={badgeClasses}>{odhApp.spec.category}</span>
           </div>
         ) : null}
         {odhApp.spec.description}
