@@ -56,7 +56,7 @@ const LearningPaths: React.FC = () => {
                 .sort((a, b) => a.odhApp.spec.displayName.localeCompare(b.odhApp.spec.displayName))
                 .map((app) => (
                   <OdhDocCard
-                    key={app.odhApp.metadata.name}
+                    key={`${app.odhApp.metadata.name}_${app.docType}`}
                     odhApp={app.odhApp}
                     docType={app.docType}
                   />

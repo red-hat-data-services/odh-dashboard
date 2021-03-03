@@ -15,6 +15,7 @@ import {
 import { ExternalLinkAltIcon } from '@patternfly/react-icons';
 import { QuickStartContext, QuickStartContextValues } from '@cloudmosaic/quickstarts';
 import { ODHAppType } from '../types';
+import { getQuickStartLabel, launchQuickStart } from '../utilities/quickStartUtils';
 
 import './OdhCard.scss';
 
@@ -36,9 +37,7 @@ const OdhAppCard: React.FC<OdhAppCardProps> = ({ odhApp }) => {
 
   const onQuickStart = (e) => {
     e.preventDefault();
-    odhApp.spec.quickStart &&
-      qsContext.setActiveQuickStart &&
-      qsContext.setActiveQuickStart(odhApp.spec.quickStart);
+    launchQuickStart(odhApp.spec.quickStart, qsContext);
   };
 
   const dropdownItems = [
@@ -61,6 +60,7 @@ const OdhAppCard: React.FC<OdhAppCardProps> = ({ odhApp }) => {
   const quickStartClasses = classNames('odh-card__footer__link', {
     'm-hidden': !odhApp.spec.quickStart,
   });
+
   const cardFooter = (
     <CardFooter className="odh-card__footer">
       <a
@@ -73,7 +73,7 @@ const OdhAppCard: React.FC<OdhAppCardProps> = ({ odhApp }) => {
         <ExternalLinkAltIcon />
       </a>
       <a className={quickStartClasses} href="#" onClick={onQuickStart}>
-        Quick start
+        {getQuickStartLabel(odhApp.spec.quickStart, qsContext)}
       </a>
     </CardFooter>
   );

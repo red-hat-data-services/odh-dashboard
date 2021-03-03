@@ -3,6 +3,7 @@ import { Brand, Card, CardBody, CardFooter, CardHeader, CardTitle } from '@patte
 import { ExternalLinkAltIcon } from '@patternfly/react-icons';
 import { QuickStartContext, QuickStartContextValues } from '@cloudmosaic/quickstarts';
 import { ODHAppType, ODHDocType } from '../types';
+import { getQuickStartLabel, launchQuickStart } from '../utilities/quickStartUtils';
 
 import './OdhCard.scss';
 
@@ -13,18 +14,23 @@ type OdhDocCardProps = {
 
 const OdhDocCard: React.FC<OdhDocCardProps> = ({ odhApp, docType }) => {
   const qsContext = React.useContext<QuickStartContextValues>(QuickStartContext);
+  const quickStart =
+    odhApp.spec.quickStart &&
+    qsContext.allQuickStarts &&
+    qsContext.allQuickStarts.find((qs) => qs.metadata.name === odhApp.spec.quickStart);
 
   const onQuickStart = (e) => {
     e.preventDefault();
-    odhApp.spec.quickStart &&
-      qsContext.setActiveQuickStart &&
-      qsContext.setActiveQuickStart(odhApp.spec.quickStart);
+    launchQuickStart(odhApp.spec.quickStart, qsContext);
   };
 
   const renderDocBadges = () => {
     if (docType === ODHDocType.Documentation) {
       return (
-        <div className="odh-card__partner-badge odh-m-doc odh-m-documentation">Documentation</div>
+        <>
+          <div className="odh-card__partner-badge odh-m-doc odh-m-documentation">Documentation</div>
+          <div className="odh-card__partner-badge odh-m-doc m-hidden">N/A</div>
+        </>
       );
     }
     if (docType === ODHDocType.Tutorial) {
@@ -38,11 +44,14 @@ const OdhDocCard: React.FC<OdhDocCardProps> = ({ odhApp, docType }) => {
       );
     }
     if (docType === ODHDocType.QuickStart) {
+      if (!quickStart) {
+        return null;
+      }
       return (
         <>
           <div className="odh-card__partner-badge odh-m-doc odh-m-quick-start">Quick start</div>
           <div className="odh-card__partner-badge odh-m-doc">
-            {odhApp.spec.quickStartLength} minutes
+            {quickStart.spec.durationMinutes} minutes
           </div>
         </>
       );
@@ -90,7 +99,7 @@ const OdhDocCard: React.FC<OdhDocCardProps> = ({ odhApp, docType }) => {
     if (docType === ODHDocType.QuickStart) {
       return (
         <a className="odh-card__footer__link" href="#" onClick={onQuickStart}>
-          Quick start
+          {getQuickStartLabel(odhApp.spec.quickStart, qsContext)}
         </a>
       );
     }
@@ -102,7 +111,7 @@ const OdhDocCard: React.FC<OdhDocCardProps> = ({ odhApp, docType }) => {
           target="_blank"
           rel="noopener noreferrer"
         >
-          Start the tour
+          How do I?
           <ExternalLinkAltIcon />
         </a>
       );
