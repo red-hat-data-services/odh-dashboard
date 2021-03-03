@@ -7,7 +7,6 @@ const ExploreApplications = React.lazy(
   () => import('../pages/exploreApplication/ExploreApplications'),
 );
 const LearningPathsPage = React.lazy(() => import('../pages/learningPaths/LearningPaths'));
-const QuickStartsPage = React.lazy(() => import('../pages/quickStarts/QuickStartsPage'));
 const NotFound = React.lazy(() => import('../pages/NotFound'));
 
 const Routes: React.FC = () => (
@@ -22,7 +21,6 @@ const Routes: React.FC = () => (
       <Route path="/" exact component={InstalledApplications} />
       <Route path="/explore" exact component={ExploreApplications} />
       <Route path="/learningpaths" exact component={LearningPathsPage} />
-      <Route path="/quickstarts" exact component={QuickStartsPage} />
       <Route component={NotFound} />
     </Switch>
   </React.Suspense>

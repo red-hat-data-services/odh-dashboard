@@ -19,5 +19,4 @@ export const navData: NavDataItem[] = [
     ],
   },
   { id: 'learningpaths', label: 'Learning Paths', href: '/learningpaths' },
-  { id: 'quick-starts', label: 'Quick starts', href: '/quickstarts' },
 ];
