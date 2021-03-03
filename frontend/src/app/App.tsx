@@ -1,5 +1,5 @@
 import React from 'react';
-import { connect } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import '@patternfly/patternfly/patternfly.min.css';
 import { Page } from '@patternfly/react-core';
 import { detectUser } from '../redux/actions/actions';
@@ -9,15 +9,12 @@ import NavSidebar from './NavSidebar';
 
 import './App.scss';
 
-type AppProps = {
-  detectUser: () => void;
-};
-
-const App: React.FC<AppProps> = ({ detectUser }) => {
+const App: React.FC = () => {
   const [isNavOpen, setIsNavOpen] = React.useState(true);
+  const dispatch = useDispatch();
 
   React.useEffect(() => {
-    detectUser();
+    dispatch(detectUser());
   }, [detectUser]);
 
   const onNavToggle = () => {
@@ -35,12 +32,4 @@ const App: React.FC<AppProps> = ({ detectUser }) => {
   );
 };
 
-const mapStateToProps = (state) => {
-  return state.appReducer;
-};
-
-const mapDispatchToProps = (dispatch) => ({
-  detectUser: () => dispatch(detectUser()),
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(App);
+export default App;

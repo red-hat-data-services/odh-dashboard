@@ -15,10 +15,6 @@ type OdhDocCardProps = {
 
 const OdhDocCard: React.FC<OdhDocCardProps> = ({ odhApp, docType }) => {
   const qsContext = React.useContext<QuickStartContextValues>(QuickStartContext);
-  const quickStart =
-    odhApp.spec.quickStart &&
-    qsContext.allQuickStarts &&
-    qsContext.allQuickStarts.find((qs) => qs.metadata.name === odhApp.spec.quickStart);
 
   const onQuickStart = (e) => {
     e.preventDefault();
@@ -46,6 +42,10 @@ const OdhDocCard: React.FC<OdhDocCardProps> = ({ odhApp, docType }) => {
       );
     }
     if (docType === ODHDocType.QuickStart) {
+      const quickStart =
+        odhApp.spec.quickStart &&
+        qsContext.allQuickStarts &&
+        qsContext.allQuickStarts.find((qs) => qs.metadata.name === odhApp.spec.quickStart);
       if (!quickStart) {
         return null;
       }
