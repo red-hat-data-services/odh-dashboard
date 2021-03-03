@@ -19,7 +19,7 @@ const getInstalledQuickStarts = async (fastify) => {
     installedQuickStarts.push(...res.body.items);
   } catch (e) {
     fastify.log.error(e, 'failed to get quickstarts');
-    if (!constants.DEV_MODE && !constants.USE_MOCK_DATA) {
+    if (!constants.USE_MOCK_DATA) {
       const error = createError(500, 'failed to get quickstarts');
       error.explicitInternalServerError = true;
       error.error = 'failed to get quickstarts';
@@ -29,7 +29,7 @@ const getInstalledQuickStarts = async (fastify) => {
     }
   }
 
-  if (constants.DEV_MODE || constants.USE_MOCK_DATA) {
+  if (constants.USE_MOCK_DATA) {
     const mockQuickStarts = getMockQuickStarts();
     installedQuickStarts.push(...mockQuickStarts);
   }
