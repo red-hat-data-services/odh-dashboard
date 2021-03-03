@@ -4,6 +4,7 @@ import { ExternalLinkAltIcon } from '@patternfly/react-icons';
 import { QuickStartContext, QuickStartContextValues } from '@cloudmosaic/quickstarts';
 import { ODHAppType, ODHDocType } from '../types';
 import { getQuickStartLabel, launchQuickStart } from '../utilities/quickStartUtils';
+import { getTextForDocType } from '../pages/learningPaths/learningPathUtils';
 
 import './OdhCard.scss';
 
@@ -25,10 +26,11 @@ const OdhDocCard: React.FC<OdhDocCardProps> = ({ odhApp, docType }) => {
   };
 
   const renderDocBadges = () => {
+    const label = getTextForDocType(docType);
     if (docType === ODHDocType.Documentation) {
       return (
         <>
-          <div className="odh-card__partner-badge odh-m-doc odh-m-documentation">Documentation</div>
+          <div className="odh-card__partner-badge odh-m-doc odh-m-documentation">{label}</div>
           <div className="odh-card__partner-badge odh-m-doc m-hidden">N/A</div>
         </>
       );
@@ -36,7 +38,7 @@ const OdhDocCard: React.FC<OdhDocCardProps> = ({ odhApp, docType }) => {
     if (docType === ODHDocType.Tutorial) {
       return (
         <>
-          <div className="odh-card__partner-badge odh-m-doc odh-m-tutorial">Tutorial</div>
+          <div className="odh-card__partner-badge odh-m-doc odh-m-tutorial">{label}</div>
           <div className="odh-card__partner-badge odh-m-doc">
             {odhApp.spec.tutorialLength} minutes
           </div>
@@ -49,7 +51,7 @@ const OdhDocCard: React.FC<OdhDocCardProps> = ({ odhApp, docType }) => {
       }
       return (
         <>
-          <div className="odh-card__partner-badge odh-m-doc odh-m-quick-start">Quick start</div>
+          <div className="odh-card__partner-badge odh-m-doc odh-m-quick-start">{label}</div>
           <div className="odh-card__partner-badge odh-m-doc">
             {quickStart.spec.durationMinutes} minutes
           </div>
@@ -59,7 +61,7 @@ const OdhDocCard: React.FC<OdhDocCardProps> = ({ odhApp, docType }) => {
     if (docType === ODHDocType.HowDoI) {
       return (
         <>
-          <div className="odh-card__partner-badge odh-m-doc odh-m-how-do-i">How do I</div>
+          <div className="odh-card__partner-badge odh-m-doc odh-m-how-do-i">{label}</div>
           <div className="odh-card__partner-badge odh-m-doc">
             {odhApp.spec.howDoILength} minutes
           </div>
