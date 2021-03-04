@@ -15,7 +15,7 @@ const App: React.FC = () => {
 
   React.useEffect(() => {
     dispatch(detectUser());
-  }, [detectUser]);
+  }, [dispatch]);
 
   const onNavToggle = () => {
     setIsNavOpen(!isNavOpen);

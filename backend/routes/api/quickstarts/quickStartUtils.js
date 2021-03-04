@@ -1,9 +1,4 @@
-const createError = require('http-errors');
-const constants = require('../../../utils/constants');
 const getMockQuickStarts = require('../../../__mocks__/mock-quickstarts/getMockQuickStarts');
-
-// TODO: Don't use local quickstarts
-const USE_LOCAL_QUICK_STARTS = true;
 
 // TODO: Retrieve from the correct group for dashboard quickstarts
 const quickStartsGroup = 'console.openshift.io';
@@ -22,20 +17,10 @@ const getInstalledQuickStarts = async (fastify) => {
     installedQuickStarts.push(...res.body.items);
   } catch (e) {
     fastify.log.error(e, 'failed to get quickstarts');
-    if (!constants.USE_MOCK_DATA || USE_LOCAL_QUICK_STARTS) {
-      const error = createError(500, 'failed to get quickstarts');
-      error.explicitInternalServerError = true;
-      error.error = 'failed to get quickstarts';
-      error.message =
-        'Unable to load Kubeflow resources. Please ensure the Open Data Hub operator has been installed.';
-      throw error;
-    }
   }
 
-  if (USE_LOCAL_QUICK_STARTS || constants.USE_MOCK_DATA) {
-    const mockQuickStarts = getMockQuickStarts();
-    installedQuickStarts.push(...mockQuickStarts);
-  }
+  // TODO: Remove MOCK quick starts when we get the correct quick starts from OpenShift
+  installedQuickStarts.push(...getMockQuickStarts());
 
   return installedQuickStarts;
 };

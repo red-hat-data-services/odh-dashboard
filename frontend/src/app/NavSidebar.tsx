@@ -10,7 +10,7 @@ const NavDataItem: React.FC<{ item: NavDataItem; pathname: string }> = ({ item, 
     group && children ? !!children.find((c) => pathname === c.href) : pathname === item.href;
   const [expanded, setExpanded] = React.useState<boolean>(isGroup && isActive);
 
-  if (group && children && children.length) {
+  if (group && children?.length) {
     return (
       <NavExpandable
         key={group.id}
