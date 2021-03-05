@@ -1,5 +1,6 @@
 import React from 'react';
 import { Route, Switch } from 'react-router-dom';
+import ApplicationsPage from '../pages/ApplicationsPage';
 const InstalledApplications = React.lazy(
   () => import('../pages/enabledApplications/EnabledApplications'),
 );
@@ -11,11 +12,7 @@ const NotFound = React.lazy(() => import('../pages/NotFound'));
 
 const Routes: React.FC = () => (
   <React.Suspense
-    fallback={
-      <div className="route-loading">
-        <h1>Loading...</h1>
-      </div>
-    }
+    fallback={<ApplicationsPage title="" description="" loaded={false} empty={true} />}
   >
     <Switch>
       <Route path="/" exact component={InstalledApplications} />

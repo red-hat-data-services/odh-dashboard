@@ -6,7 +6,12 @@ body {
   background-color: lightblue;
 }
 
+.odh-apps__display-error {
+  white-space: pre-wrap;
+}
+
 .odh-dashboard {
+  // PF Overrides
   .pf-c-page__header {
     .pf-c-brand {
       height: 36px;
@@ -20,10 +25,15 @@ body {
       }
     }
   }
+  // Bootstrap Overrides (Bootstrap pulled in by @cloudmosaic/quickstarts)
+  code {
+    color: initial;
+    background-color: initial;
+  }
 }
 
 // PF Overrides
-@media (min-width: 800px) {
+@media (min-width: 768px) {
   .pf-c-page {
     grid-template-columns: max-content 1fr;
     grid-template-areas: "header header" "nav main";

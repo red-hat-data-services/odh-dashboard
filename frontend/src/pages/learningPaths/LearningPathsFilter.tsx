@@ -89,20 +89,25 @@ const LearningPathsFilter: React.FC<LearningPathsFilterProps> = ({
     [history, typeFilters],
   );
 
-  const filterTypeDropdownItems = Object.entries(docTypes).map(([key, val]) => (
-    <SelectOption key={key} data-key={key} value={val}>
-      <CheckIcon
-        className={`odh-learning-paths-filter__filter-check ${
-          typeFilters.includes(key) ? 'odh-m-filtered' : ''
-        }`}
-        data-key={key}
-      />
-      {val}
-      <span className="odh-learning-paths-filter__filter-count" data-key={key}>
-        ({docTypeStatusCount[key]})
-      </span>
-    </SelectOption>
-  ));
+  const filterTypeDropdownItems = Object.entries(docTypes).reduce((acc, [key, val]) => {
+    if (docTypeStatusCount[key] > 0) {
+      acc.push(
+        <SelectOption key={key} data-key={key} value={val}>
+          <CheckIcon
+            className={`odh-learning-paths-filter__filter-check ${
+              typeFilters.includes(key) ? 'odh-m-filtered' : ''
+            }`}
+            data-key={key}
+          />
+          {val}
+          <span className="odh-learning-paths-filter__filter-count" data-key={key}>
+            ({docTypeStatusCount[key]})
+          </span>
+        </SelectOption>,
+      );
+    }
+    return acc;
+  }, [] as React.ReactElement[]);
 
   const onSortTypeSelect = React.useCallback(
     (e) => {
@@ -124,7 +129,6 @@ const LearningPathsFilter: React.FC<LearningPathsFilterProps> = ({
       {val}
     </SelectOption>
   ));
-
   const onSortOrderSelect = React.useCallback(
     (e) => {
       setIsSortOrderDropdownOpen(false);

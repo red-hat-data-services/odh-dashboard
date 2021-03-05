@@ -1,35 +1,35 @@
 import React from 'react';
+import * as _ from 'lodash';
 import { Gallery, PageSection } from '@patternfly/react-core';
+import { QuickStartContext, QuickStartContextValues } from '@cloudmosaic/quickstarts';
 import { useWatchComponents } from '../../utilities/useWatchComponents';
 import ApplicationsPage from '../ApplicationsPage';
-import { ODHAppType, ODHDocType } from '../../types';
+import { ODHDoc, ODHDocType } from '../../types';
 import QuickStarts from '../../app/QuickStarts';
 import OdhDocCard from '../../components/OdhDocCard';
 import { useQueryParams } from '../../utilities/useQueryParams';
 import {
-  SEARCH_FILTER_KEY,
-  DOC_TYPE_FILTER_KEY,
-  doesDocAppMatch,
   DOC_SORT_KEY,
   DOC_SORT_ORDER_KEY,
-  SORT_TYPE_NAME,
+  DOC_TYPE_FILTER_KEY,
+  doesDocAppMatch,
+  SEARCH_FILTER_KEY,
   SORT_ASC,
   SORT_DESC,
+  SORT_TYPE_NAME,
 } from './learningPathUtils';
 import LearningPathsFilter from './LearningPathsFilter';
-
-type DocAppType = {
-  odhApp: ODHAppType;
-  docType: ODHDocType;
-};
+import { useWatchDocs } from '../../utilities/useWatchDocs';
 
 const description = `Access all learning paths and getting started resources for Red Hat OpenShift
   Data Science and supported programs.`;
 
 const LearningPaths: React.FC = () => {
+  const { docs: odhDocs, loaded: docsLoaded, loadError: docsLoadError } = useWatchDocs();
   const { components, loaded, loadError } = useWatchComponents(false);
-  const [docApps, setDocApps] = React.useState<DocAppType[]>([]);
-  const [filteredDocApps, setFilteredDocApps] = React.useState<DocAppType[]>([]);
+  const qsContext = React.useContext<QuickStartContextValues>(QuickStartContext);
+  const [docApps, setDocApps] = React.useState<ODHDoc[]>([]);
+  const [filteredDocApps, setFilteredDocApps] = React.useState<ODHDoc[]>([]);
   const queryParams = useQueryParams();
   const searchQuery = queryParams.get(SEARCH_FILTER_KEY) || '';
   const filters = queryParams.get(DOC_TYPE_FILTER_KEY);
@@ -38,38 +38,63 @@ const LearningPaths: React.FC = () => {
   }, [filters]);
   const sortType = queryParams.get(DOC_SORT_KEY) || SORT_TYPE_NAME;
   const sortOrder = queryParams.get(DOC_SORT_ORDER_KEY) || SORT_ASC;
-  const isEmpty = !components || components.length === 0;
 
   React.useEffect(() => {
-    if (loaded && !loadError) {
-      const updatedDocApps = components.reduce((acc, component) => {
-        if (component.spec.quickStart) {
-          acc.push({ odhApp: component, docType: ODHDocType.QuickStart });
+    if (loaded && !loadError && docsLoaded && !docsLoadError) {
+      const updatedDocApps = odhDocs.map((odhDoc) => {
+        if (!odhDoc.spec.img || !odhDoc.spec.description) {
+          const odhApp = components.find((c) => c.metadata.name === odhDoc.spec.appName);
+          if (odhApp) {
+            const updatedDoc = _.clone(odhDoc);
+            updatedDoc.spec.img = odhDoc.spec.img || odhApp.spec.img;
+            updatedDoc.spec.description = odhDoc.spec.description || odhApp.spec.description;
+            return updatedDoc;
+          }
         }
-        if (component.spec.howDoI) {
-          acc.push({ odhApp: component, docType: ODHDocType.HowDoI });
-        }
-        if (component.spec.tutorial) {
-          acc.push({ odhApp: component, docType: ODHDocType.Tutorial });
-        }
+        return odhDoc;
+      });
+
+      // Add doc cards for all components' documentation
+      components.forEach((component) => {
         if (component.spec.docsLink) {
-          acc.push({ odhApp: component, docType: ODHDocType.Documentation });
+          const odhDoc: ODHDoc = {
+            metadata: {
+              name: `${component.metadata.name}-doc`,
+              type: ODHDocType.Documentation,
+            },
+            spec: {
+              url: component.spec.docsLink,
+              displayName: component.spec.displayName,
+              description: component.spec.description,
+              img: component.spec.img,
+            },
+          };
+          updatedDocApps.push(odhDoc);
         }
-        return acc;
-      }, [] as DocAppType[]);
+      });
+
+      // Add doc cards for all quick starts
+      qsContext.allQuickStarts?.forEach((quickStart) => {
+        const odhDoc: ODHDoc = _.merge(quickStart, {
+          metadata: { type: ODHDocType.QuickStart },
+        });
+        updatedDocApps.push(odhDoc);
+      });
+
       setDocApps(updatedDocApps);
     }
-  }, [components, loaded, loadError]);
+  }, [components, loaded, loadError, odhDocs, docsLoaded, docsLoadError, qsContext.allQuickStarts]);
 
   React.useEffect(() => {
     setFilteredDocApps(
       docApps
-        .filter((app) => doesDocAppMatch(app, searchQuery, typeFilters))
+        .filter((doc) => doc.metadata.type !== 'getting-started')
+        .filter((doc) => doesDocAppMatch(doc, searchQuery, typeFilters))
         .sort((a, b) => {
           let sortVal =
             sortType === SORT_TYPE_NAME
-              ? a.odhApp.spec.displayName.localeCompare(b.odhApp.spec.displayName)
-              : a.docType.localeCompare(b.docType);
+              ? a.spec.displayName.localeCompare(b.spec.displayName)
+              : a.metadata.type.localeCompare(a.metadata.type);
           if (sortOrder === SORT_DESC) {
             sortVal *= -1;
           }
@@ -81,7 +106,9 @@ const LearningPaths: React.FC = () => {
   const docTypesCount = React.useMemo(() => {
     return docApps.reduce(
       (acc, docApp) => {
-        acc[docApp.docType]++;
+        if (acc[docApp.metadata.type] !== undefined) {
+          acc[docApp.metadata.type]++;
+        }
         return acc;
       },
       {
@@ -94,35 +121,33 @@ const LearningPaths: React.FC = () => {
   }, [docApps]);
 
   return (
-    <QuickStarts>
-      <ApplicationsPage
-        title="Learning paths"
-        description={description}
-        loaded={loaded}
-        empty={isEmpty}
-        loadError={loadError}
-      >
-        <LearningPathsFilter
-          count={filteredDocApps.length}
-          totalCount={docApps.length}
-          docTypeStatusCount={docTypesCount}
-        />
-        {!isEmpty ? (
-          <PageSection>
-            <Gallery className="odh-explore-apps__gallery" hasGutter>
-              {filteredDocApps.map((app) => (
-                <OdhDocCard
-                  key={`${app.odhApp.metadata.name}_${app.docType}`}
-                  odhApp={app.odhApp}
-                  docType={app.docType}
-                />
-              ))}
-            </Gallery>
-          </PageSection>
-        ) : null}
-      </ApplicationsPage>
-    </QuickStarts>
+    <ApplicationsPage
+      title="Learning paths"
+      description={description}
+      loaded={loaded && docsLoaded}
+      loadError={loadError || docsLoadError}
+      empty={false}
+    >
+      <LearningPathsFilter
+        count={filteredDocApps.length}
+        totalCount={docApps.length}
+        docTypeStatusCount={docTypesCount}
+      />
+      <PageSection>
+        <Gallery className="odh-explore-apps__gallery" hasGutter>
+          {filteredDocApps.map((doc) => (
+            <OdhDocCard key={`${doc.metadata.name}`} odhDoc={doc} />
+          ))}
+        </Gallery>
+      </PageSection>
+    </ApplicationsPage>
   );
 };
 
-export default LearningPaths;
+const LearningPathsWrapper: React.FC = () => (
+  <QuickStarts>
+    <LearningPaths />
+  </QuickStarts>
+);
+
+export default LearningPathsWrapper;
