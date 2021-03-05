@@ -4,7 +4,7 @@ import { ExternalLinkAltIcon } from '@patternfly/react-icons';
 import { QuickStartContext, QuickStartContextValues } from '@cloudmosaic/quickstarts';
 import { ODHDoc, ODHDocType } from '../types';
 import { getQuickStartLabel, launchQuickStart } from '../utilities/quickStartUtils';
-import { getTextForDocType } from '../pages/learningPaths/learningPathUtils';
+import { getTextForDocType } from '../pages/learningCenter/learningCenterUtils';
 import BrandImage from './BrandImage';
 
 import './OdhCard.scss';

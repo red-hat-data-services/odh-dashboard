@@ -31,18 +31,18 @@ import {
   SORT_TYPE_NAME,
   SORT_ASC,
   SORT_TYPE_TYPE,
-} from './learningPathUtils';
+} from './learningCenterUtils';
 
-import './LearningPathsFilter.scss';
+import './LearningCenterFilter.scss';
 
-type LearningPathsFilterProps = {
+type LearningCenterFilterProps = {
   count: number;
   totalCount: number;
   docTypeStatusCount: Record<ODHDocType, number>;
   onSearchInputChange?: (value: string) => void;
 };
 
-const LearningPathsFilter: React.FC<LearningPathsFilterProps> = ({
+const LearningCenterFilters: React.FC<LearningCenterFilterProps> = ({
   count,
   totalCount,
   docTypeStatusCount,
@@ -264,4 +264,4 @@ const LearningPathsFilter: React.FC<LearningPathsFilterProps> = ({
   );
 };
 
-export default LearningPathsFilter;
+export default LearningCenterFilters;

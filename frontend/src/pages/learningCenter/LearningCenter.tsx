@@ -17,14 +17,14 @@ import {
   SORT_ASC,
   SORT_DESC,
   SORT_TYPE_NAME,
-} from './learningPathUtils';
-import LearningPathsFilter from './LearningPathsFilter';
+} from './learningCenterUtils';
+import LearningCenterFilters from './LearningCenterFilters';
 import { useWatchDocs } from '../../utilities/useWatchDocs';
 
 const description = `Access all learning paths and getting started resources for Red Hat OpenShift
   Data Science and supported programs.`;
 
-const LearningPaths: React.FC = () => {
+const LearningCenter: React.FC = () => {
   const { docs: odhDocs, loaded: docsLoaded, loadError: docsLoadError } = useWatchDocs();
   const { components, loaded, loadError } = useWatchComponents(false);
   const qsContext = React.useContext<QuickStartContextValues>(QuickStartContext);
@@ -122,13 +122,13 @@ const LearningPaths: React.FC = () => {
 
   return (
     <ApplicationsPage
-      title="Learning paths"
+      title="Learning center"
       description={description}
       loaded={loaded && docsLoaded}
       loadError={loadError || docsLoadError}
       empty={false}
     >
-      <LearningPathsFilter
+      <LearningCenterFilters
         count={filteredDocApps.length}
         totalCount={docApps.length}
         docTypeStatusCount={docTypesCount}
@@ -144,10 +144,10 @@ const LearningPaths: React.FC = () => {
   );
 };
 
-const LearningPathsWrapper: React.FC = () => (
+const LearningCenterWrapper: React.FC = () => (
   <QuickStarts>
-    <LearningPaths />
+    <LearningCenter />
   </QuickStarts>
 );
 
-export default LearningPathsWrapper;
+export default LearningCenterWrapper;
