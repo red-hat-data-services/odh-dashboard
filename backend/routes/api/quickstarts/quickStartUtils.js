@@ -24,7 +24,7 @@ const getInstalledQuickStarts = async (fastify) => {
 
   // TODO: Remove local quick starts when we get the correct quick starts from OpenShift
   const normalizedPath = path.join(__dirname, '../../../../data/quickstarts');
-  fs.readdirSync(normalizedPath).forEach(function (file) {
+  fs.readdirSync(normalizedPath).forEach((file) => {
     if (constants.yamlRegExp.test(file)) {
       try {
         const doc = jsYaml.load(fs.readFileSync(path.join(normalizedPath, file), 'utf8'));

@@ -1,6 +1,6 @@
 const docUtils = require('./docUtils');
 
-module.exports = async function ({ fastify, request }) {
+module.exports = async ({ fastify, request }) => {
   // Fetch the installed quick starts
   let docs = await docUtils.getDocs(fastify);
   if (request.query.type) {

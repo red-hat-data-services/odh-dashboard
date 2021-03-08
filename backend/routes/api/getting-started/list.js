@@ -1,6 +1,6 @@
 const gettingStartedUtils = require('./gettingStartedUtils');
 
-module.exports = async function ({ request }) {
+module.exports = async ({ request }) => {
   if (request.query.appName) {
     return await gettingStartedUtils.getGettingStartedDoc(request.query.appName);
   }

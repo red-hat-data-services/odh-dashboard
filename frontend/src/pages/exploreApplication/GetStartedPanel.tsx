@@ -58,9 +58,9 @@ const GetStartedPanel: React.FC<GetStartedPanelProps> = ({ selectedApp, onClose 
           <Title headingLevel="h5" size="md">
             Error loading getting started information
           </Title>
-          <EmptyStateBody className="odh-apps__error-body">
+          <EmptyStateBody className="odh-dashboard__error-body">
             <div>
-              <code className="odh-apps__display-error">{loadError.message}</code>
+              <code className="odh-dashboard__display-error">{loadError.message}</code>
             </div>
           </EmptyStateBody>
         </EmptyState>

@@ -55,7 +55,7 @@ const getInstalledKfdefs = async (fastify) => {
 const getApplicationDefs = () => {
   const normalizedPath = path.join(__dirname, '../../../../data/applications');
   const applicationDefs = [];
-  fs.readdirSync(normalizedPath).forEach(function (file) {
+  fs.readdirSync(normalizedPath).forEach((file) => {
     if (constants.yamlRegExp.test(file)) {
       try {
         const doc = jsYaml.load(fs.readFileSync(path.join(normalizedPath, file), 'utf8'));

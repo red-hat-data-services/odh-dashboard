@@ -17,9 +17,9 @@ const OdhDocCard: React.FC<OdhDocCardProps> = ({ odhDoc }) => {
   const qsContext = React.useContext<QuickStartContextValues>(QuickStartContext);
 
   if (odhDoc.metadata.type === ODHDocType.QuickStart) {
-    const quickStart =
-      qsContext.allQuickStarts &&
-      qsContext.allQuickStarts.find((qs) => qs.metadata.name === odhDoc.metadata.name);
+    const quickStart = qsContext.allQuickStarts?.find(
+      (qs) => qs.metadata.name === odhDoc.metadata.name,
+    );
     if (!quickStart) {
       return null;
     }

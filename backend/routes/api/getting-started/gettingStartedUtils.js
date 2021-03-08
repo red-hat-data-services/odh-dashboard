@@ -24,7 +24,7 @@ const getGettingStartedDoc = (appName) => {
 const getGettingStartedDocs = () => {
   const normalizedPath = path.join(__dirname, '../../../../data/getting-started');
   const gettingStartedDocs = [];
-  fs.readdirSync(normalizedPath).forEach(function (file) {
+  fs.readdirSync(normalizedPath).forEach((file) => {
     if (constants.mdRegExp.test(file)) {
       try {
         const markdown = fs.readFileSync(path.join(normalizedPath, file), 'utf8');
