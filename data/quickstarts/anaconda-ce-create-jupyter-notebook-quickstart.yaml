@@ -88,7 +88,7 @@ spec:
       review:
         instructions: |-
           #### Verify that you can import TensorFlow
-          1. Inside a notebook, run: import tensorflow as tf
+          1. Inside a notebook, run: `import tensorflow as tf`
         failedTaskHelp:
           This task isn’t verified yet. Try the task again.
       summary:
