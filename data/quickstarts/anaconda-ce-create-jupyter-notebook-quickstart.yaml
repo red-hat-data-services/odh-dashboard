@@ -68,7 +68,7 @@ spec:
       description: |-
         ### To verify that you are subscribed to Anaconda Commercial Edition in the notebook, follow these steps:
         1. Create a notebook or open a terminal
-        2. Run conda info (in a notebook, to run terminal commands, start the line with !. For example: !conda info)
+        2. Run `conda info` (in a notebook, to run terminal commands, start the line with !. For example: `!conda info`)
         3. Verify that the package repositories point to repo.anaconda.cloud rather than repo.anaconda.com
         4. If they do not, run conda token set $ANACONDA_TOKEN (replacing $ANACONDA_TOKEN with your actual token, or the environment variable name you defined earlier if applicable)
       review:
