@@ -17,7 +17,7 @@ spec:
     - title: Launch JupyterHub
       description: |-
         ### To find the JupyterHub Launch action:
-        1. In the **Applications** menu item, go to **Installed** projects.
+        1. In the **Applications** menu item, go to **Enabled** projects.
         2. Find the JupyterHub entry.
         3. Click **Launch** on the JupyterHub card to access the JupyterHub Spawner.
 
