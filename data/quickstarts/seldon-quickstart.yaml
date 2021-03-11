@@ -1,0 +1,13 @@
+kind: ConsoleQuickStart
+metadata:
+  name: deploy-model-seldon
+spec:
+  displayName: Deploying a model using Seldon
+  durationMinutes: 5
+  icon: 'images/seldon.svg'
+  description: This quick start shows you how to deploy a model using Seldon.
+  introduction: |-
+    ### This quick start shows you how to deploy a model using Seldon.
+    Seldon Deploy is a specialist set of tools designed to simplify and accelerate the process of deploying and managing your machine learning models. Seldon Deploy bridges the gap between your data science and DevOps teams so you can bring models to market faster.
+    
+  nextQuickStart: https://deploy-v1-0.seldon.io/docs/demos/seldon-core/canary/
