@@ -84,7 +84,7 @@ spec:
       description: |-
         ### To ensure you can install packages, install the Anaconda Commercial Edition TensorFlow package
         1. Open a notebook or terminal
-        2. Run conda install tensorflow (notebooks will need to prefix this command with !, so !conda install tensorflow)
+        2. Run `conda install tensorflow` (notebooks will need to prefix this command with !, so `!conda install tensorflow`)
       review:
         instructions: |-
           #### Verify that you can import TensorFlow
