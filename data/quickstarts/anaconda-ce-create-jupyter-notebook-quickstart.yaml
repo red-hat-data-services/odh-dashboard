@@ -21,7 +21,7 @@ spec:
         2. Find the JupyterHub entry.
         3. Click **Launch** on the JupyterHub card to access the JupyterHub Spawner.
 
-        A new browser tab window will open displaying the JupyterHub Spawner.
+        A new browser tab will open displaying the JupyterHub Spawner.
       review:
         instructions: |-
           #### To verify you have launched the JupyterHub Spawner:
