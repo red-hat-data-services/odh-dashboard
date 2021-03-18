@@ -4,7 +4,7 @@ metadata:
 spec:
   displayName: Launch a SKLearn model and update model by canarying
   durationMinutes: 10
-  icon: 'images/seldon-deploy.svg'
+  icon: 'images/seldon.svg'
   description: How to perform a canary promotion of a Scikit-Learn model
   prerequisites: [You completed the "Create a Jupyter notebook" quick start.]
   introduction: |-
