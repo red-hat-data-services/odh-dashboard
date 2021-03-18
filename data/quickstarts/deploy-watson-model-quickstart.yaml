@@ -4,7 +4,7 @@ metadata:
 spec:
   displayName: Deploying a Model with Watson Studio
   durationMinutes: 15
-  icon: 'images/IBM Logo.png'
+  icon: 'images/ibm.svg'
   description: This quick start will walk you through importing a Notebook in Watson Studio, deploying a model, and monitoring with Open Scale.
   introduction: |-
     ### This quick start will walk you through importing a Notebook in Watson Studio, deploying a model, and monitoring with Open Scale.
