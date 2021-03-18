@@ -77,4 +77,4 @@ spec:
         success: You have deployed an AutoAI model.  
         failed: Try the steps again  
   conclusion: You are now able to import a notebook in Watson Studio, build, and deploy a model.
-  nextQuickStart: [deploy-python-model]
+  nextQuickStart: []
