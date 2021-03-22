@@ -18,7 +18,7 @@ spec:
         ### Deploy a pretrained sklearn iris model
         1. Open Seldon Console and click create. Deployment creation wizard appears.
         2. Choose type SeldonDeployment and click next.
-        3. Choose toolkit scikit-learn and enter the model url gs://seldon-models/sklearn/iris
+        3. Choose runtime scikit-learn and enter the model url gs://seldon-models/sklearn/iris
         4. Click through wizard to deploy the model
       summary:
         success: You have deployed a pretrained sklearn iris model
