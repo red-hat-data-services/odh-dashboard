@@ -40,5 +40,5 @@ spec:
       summary:
         success: You see anchor-style explanations for income classifier model.
         failed: Try the steps again or see https://deploy.seldon.io/docs/demos/seldon-core/explainer-anchortabular/
-  conclusion: You are now able to understand the predictoins of the model.
+  conclusion: You are now able to understand the predictions of the model.
   nextQuickStart: []
