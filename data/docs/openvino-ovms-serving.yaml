@@ -2,13 +2,10 @@ metadata:
   name: openvino-ovms-serving
   type: how-to
 spec:
-  displayName: How do I serve a model using OpenVINO Model Server
+  displayName: How do I serve a model using OpenVINO Model Server?
   appName: openvino
   description: |-
-    Once you have created an intermediate representation using the OpenVINO model optimizer, you
-    may want to deploy a serving API in your Red Hat OpenShift Data Science environment.
-   
-    This How To highlights how this is made possible through custom resources from the OpenVINO operator
+    Shows how to use OpenVINO custom resources to deploy optimized models with OpenVINO model server.
 
   url: https://github.com/openvinotoolkit/model_server/tree/main/extras/ovms-operator
   durationMinutes: 10

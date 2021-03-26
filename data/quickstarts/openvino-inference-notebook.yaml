@@ -9,11 +9,11 @@ spec:
   introduction: |-
     ### This quick start details how to quantize a model and use the result for inference from a notebook using the OpenVINO toolkit.
 
-The OpenVINO toolkit model optimizer can create lower precision intermediate representations of machine learning models.
+    The OpenVINO toolkit model optimizer can create lower precision intermediate representations of machine learning models.
 
-Using the resulting intermediate representations can reduce the time required to perform an inference operation while maintaining acceptable accuracy.
+    Using the resulting intermediate representations can reduce the time required to perform an inference operation while maintaining acceptable accuracy.
 
-This quick start will walk through how to optimize a ONNX computer vision model using the OpenVINO model optimizer, and use the resulting intermediate representation to perform hardware accelerated inference in-notebook.
+    This quick start will walk through how to optimize a ONNX computer vision model using the OpenVINO model optimizer, and use the resulting intermediate representation to perform hardware accelerated inference in-notebook.
 
   tasks:
     - title: Launch JupyterHub notebook server
