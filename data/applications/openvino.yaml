@@ -5,7 +5,7 @@ spec:
   provider: Intel
   description: |-
     A toolkit to facilitates the optimization of a deep learning model from a framework and deployment using an inference engine onto Intel hardware.
-  kfdefApplications: ['openvino-operator', 'openvino-images']
+  kfdefApplications: []
   img: images/openvino.svg
   category: Self managed
   support: third party support
