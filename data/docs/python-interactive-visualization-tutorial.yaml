@@ -1,6 +1,6 @@
 metadata:
-  name: python-interactive-visualization-how-to
-  type: how-to
+  name: python-interactive-visualization-tutorial
+  type: tutorial
 spec:
   appName: anaconde-ce
   displayName: Build interactive visualizations and dashboards in Python

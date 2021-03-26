@@ -1,6 +1,6 @@
 metadata:
-  name: python-visualization-how-to
-  type: how-to
+  name: python-visualization-tutorial
+  type: tutorial
 spec:
   appName: anaconde-ce
   displayName: Python tools for data visualization
