@@ -8,7 +8,7 @@ spec:
   kfdefApplications: []
   route: ''
   img: images/starburst.svg
-  docsLink: https://docs.starburst.com/
+  docsLink: https://docs.starburst.io/starburst-galaxy/
   category: Partner managed
   support: third party support
   quickStart: ''
