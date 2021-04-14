@@ -31,6 +31,12 @@ const ExploreApplications: React.FC = () => {
       if (selectedId && selection) {
         setQueryArgument(history, 'selectId', selectedId);
         setSelectedComponent(selection);
+        setTimeout(() => {
+          const element = document.getElementById(selectedId);
+          if (element) {
+            element.scrollIntoView({ block: 'nearest' });
+          }
+        }, 100);
         return;
       }
 
@@ -69,6 +75,7 @@ const ExploreApplications: React.FC = () => {
                     .sort((a, b) => a.spec.displayName.localeCompare(b.spec.displayName))
                     .map((c) => (
                       <OdhExploreCard
+                        id={c.metadata.name}
                         key={c.metadata.name}
                         odhApp={c}
                         isSelected={selectedComponent === c}

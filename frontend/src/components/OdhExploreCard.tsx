@@ -9,11 +9,12 @@ import './OdhCard.scss';
 
 type OdhExploreCardProps = {
   odhApp: ODHApp;
+  id: string;
   isSelected: boolean;
   onSelect: () => void;
 };
 
-const OdhExploreCard: React.FC<OdhExploreCardProps> = ({ odhApp, isSelected, onSelect }) => {
+const OdhExploreCard: React.FC<OdhExploreCardProps> = ({ odhApp, id, isSelected, onSelect }) => {
   const cardClasses = classNames('odh-card', { 'm-disabled': odhApp.spec.comingSoon });
   const badgeClasses = classNames('odh-card__partner-badge', {
     'm-warning': odhApp.spec.category === 'Third party support',
@@ -22,6 +23,7 @@ const OdhExploreCard: React.FC<OdhExploreCardProps> = ({ odhApp, isSelected, onS
 
   return (
     <Card
+      id={id}
       isHoverable={!odhApp.spec.comingSoon}
       isSelectable={!odhApp.spec.comingSoon}
       isSelected={isSelected}
