@@ -1,4 +1,4 @@
-- Go to [https://anaconda.cloud/register](https://anaconda.cloud/register)
+- Go to [https://anaconda.cloud/register](https://anaconda.cloud/register?utm_source=redhat-rhods-summit)
 - Create an account
 - Create a profile
 - Purchase Commercial Edition
