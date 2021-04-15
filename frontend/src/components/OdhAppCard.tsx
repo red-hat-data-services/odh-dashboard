@@ -3,22 +3,21 @@ import * as classNames from 'classnames';
 import {
   Card,
   CardHeader,
-  CardTitle,
   CardBody,
   CardFooter,
   Dropdown,
   DropdownItem,
   KebabToggle,
-  Tooltip,
 } from '@patternfly/react-core';
 import { ExternalLinkAltIcon } from '@patternfly/react-icons';
 import { QuickStartContext, QuickStartContextValues } from '@cloudmosaic/quickstarts';
-import { ODHApp } from '../types';
+import { ODHApp, ODHDocType } from '../types';
 import { getQuickStartLabel, launchQuickStart } from '../utilities/quickStartUtils';
-import { isRedHatSupported } from '../utilities/utils';
 import BrandImage from './BrandImage';
+import SupportedAppTitle from './SupportedAppTitle';
 
 import './OdhCard.scss';
+import { makeCardVisible } from '../utilities/utils';
 
 type OdhAppCardProps = {
   odhApp: ODHApp;
@@ -28,17 +27,28 @@ const OdhAppCard: React.FC<OdhAppCardProps> = ({ odhApp }) => {
   const [isOpen, setIsOpen] = React.useState(false);
   const qsContext = React.useContext<QuickStartContextValues>(QuickStartContext);
 
+  const selected = React.useMemo(() => {
+    return qsContext.activeQuickStartID === odhApp.spec.quickStart;
+  }, [odhApp.spec.quickStart, qsContext.activeQuickStartID]);
+
+  React.useEffect(() => {
+    if (selected) {
+      makeCardVisible(odhApp.metadata.name);
+    }
+  }, [odhApp.metadata.name, selected]);
+
   const onToggle = (value) => {
     setIsOpen(value);
   };
 
-  const onSelect = () => {
+  const onOpenKebab = () => {
     setIsOpen(!isOpen);
   };
 
   const onQuickStart = (e) => {
     e.preventDefault();
     launchQuickStart(odhApp.spec.quickStart, qsContext);
+    makeCardVisible(odhApp.metadata.name);
   };
 
   const dropdownItems = [
@@ -79,19 +89,22 @@ const OdhAppCard: React.FC<OdhAppCardProps> = ({ odhApp }) => {
     </CardFooter>
   );
 
-  const supportedImageClasses = classNames('odh-card__supported-image', {
-    'm-hidden': !isRedHatSupported(odhApp),
-  });
   const badgeClasses = classNames('odh-card__partner-badge', {
     'm-warning': odhApp.spec.category === 'Third party support',
   });
 
   return (
-    <Card isHoverable className="odh-card">
+    <Card
+      id={odhApp.metadata.name}
+      isHoverable
+      className="odh-card odh-tourable-card"
+      isSelected={selected}
+      isSelectable
+    >
       <CardHeader>
         <BrandImage src={odhApp.spec.img} alt={odhApp.spec.displayName} />
         <Dropdown
-          onSelect={onSelect}
+          onSelect={onOpenKebab}
           toggle={<KebabToggle onToggle={onToggle} />}
           isOpen={isOpen}
           isPlain
@@ -99,16 +112,7 @@ const OdhAppCard: React.FC<OdhAppCardProps> = ({ odhApp }) => {
           position={'right'}
         />
       </CardHeader>
-      <CardTitle>
-        {odhApp.spec.displayName}
-        <Tooltip content="Red Hat Certified and Supported">
-          <img
-            className={supportedImageClasses}
-            src="../images/CheckStar.svg"
-            alt="Red Hat Certified and Supported"
-          />
-        </Tooltip>
-      </CardTitle>
+      <SupportedAppTitle odhApp={odhApp} />
       <CardBody>
         {odhApp.spec.category && odhApp.spec.category !== 'Red Hat' ? (
           <div className="odh-card__partner-badge-container">
