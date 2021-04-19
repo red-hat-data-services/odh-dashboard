@@ -79,7 +79,7 @@ const getInstalledOperators = async (fastify) => {
 
 const getApplicationEnabledConfigMap = (fastify, appDef) => {
   const namespace = fastify.kube.namespace;
-  const name = appDef.spec.enablee?.validationConfigMap;
+  const name = appDef.spec.enable?.validationConfigMap;
   if (!name) {
     Promise.resolve(null);
   }
@@ -89,7 +89,7 @@ const getApplicationEnabledConfigMap = (fastify, appDef) => {
     .then((result) => result.body)
     .catch((res) => {
       fastify.log.error(
-        `Failed to read config map for ${appDef.metadata.name}: ${res.response?.body?.message}`,
+        `Failed to read config map ${name} for ${appDef.metadata.name}: ${res.response?.body?.message}`,
       );
       Promise.resolve(null);
     });
