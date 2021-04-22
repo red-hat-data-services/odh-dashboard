@@ -2,6 +2,7 @@ kind: ConsoleQuickStart
 metadata:
   name: openvino-inference-notebook
 spec:
+  featureFlag: openvino
   displayName: Optimized Inference Notebook
   durationMinutes: 5
   icon: 'images/openvino.svg'
