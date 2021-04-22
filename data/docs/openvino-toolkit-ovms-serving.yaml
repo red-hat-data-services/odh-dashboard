@@ -2,6 +2,7 @@ metadata:
   name: openvino-ovms-serving
   type: how-to
 spec:
+  featureFlag: openvino
   displayName: How do I serve a model using OpenVINO Model Server?
   appName: openvino
   description: |-
