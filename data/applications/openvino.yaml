@@ -12,3 +12,4 @@ spec:
   docsLink: https://docs.openvinotoolkit.org/latest/index.html
   quickStart: openvino-inference-notebook
   getStartedLink: https://github.com/openvinotoolkit/openvino_notebooks
+  featureFlag: openvino
