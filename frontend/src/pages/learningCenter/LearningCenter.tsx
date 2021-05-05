@@ -4,7 +4,7 @@ import { Gallery, PageSection } from '@patternfly/react-core';
 import { QuickStartContext, QuickStartContextValues } from '@cloudmosaic/quickstarts';
 import { useWatchComponents } from '../../utilities/useWatchComponents';
 import ApplicationsPage from '../ApplicationsPage';
-import { ODHDoc, ODHDocType } from '../../types';
+import { ODHDoc, ODHDocType } from '../../../../common/types';
 import QuickStarts from '../../app/QuickStarts';
 import OdhDocCard from '../../components/OdhDocCard';
 import { useQueryParams } from '../../utilities/useQueryParams';
