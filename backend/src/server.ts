@@ -1,7 +1,5 @@
 import { fastify } from 'fastify';
 import Pino from 'pino';
-import { setupDotenvFilesForEnv } from './utils/dotenv';
-setupDotenvFilesForEnv(process.env && process.env.NODE_ENV);
 import { APP_ENV, PORT, IP, LOG_LEVEL } from './utils/constants';
 import { initializeApp } from './app';
 import { AddressInfo } from 'net';

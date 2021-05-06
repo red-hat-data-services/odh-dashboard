@@ -3,7 +3,7 @@ import * as dotenv from 'dotenv';
 
 const setupDotenvFile = (path: string) => dotenv.config({ path });
 
-export const setupDotenvFilesForEnv = (env: string): void => {
+const setupDotenvFilesForEnv = (env: string): void => {
   const RELATIVE_DIRNAME = path.resolve(__dirname, '..', '..', '..');
 
   if (env) {
@@ -14,3 +14,6 @@ export const setupDotenvFilesForEnv = (env: string): void => {
   setupDotenvFile(path.resolve(RELATIVE_DIRNAME, '.env.local'));
   setupDotenvFile(path.resolve(RELATIVE_DIRNAME, '.env'));
 };
+
+// Auto initialize
+setupDotenvFilesForEnv(process.env && process.env.NODE_ENV);
