@@ -1,5 +1,5 @@
 import { FastifyRequest } from 'fastify';
-import { ODHApp } from '../../../../../common/types';
+import { ODHApp } from '@common/types';
 import { KubeFastifyInstance } from '../../../types';
 import {
   getApplicationDefs,
@@ -63,7 +63,7 @@ export const listComponents = async (
   }, []);
 
   await Promise.all(
-    installedComponents.map(async (installedComponent) => {
+    installedComponents.map(async (installedComponent: ODHApp) => {
       if (installedComponent.spec.route) {
         const csv = getCSVForApp(installedComponent);
         if (csv) {

@@ -7,6 +7,9 @@ type ODHApp = {
     provider: string;
     description: string;
     route: string | null;
+    routeNamespace: string | null;
+    routeSuffix: string | null;
+    serviceName: string | null;
     endpoint: string | null;
     link: string | null;
     img: string;
