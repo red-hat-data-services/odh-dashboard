@@ -82,7 +82,7 @@ const GetStartedPanel: React.FC<GetStartedPanelProps> = ({ selectedApp, onClose 
       );
     }
 
-    return <MarkdownView markdown={odhGettingStarted?.markdown} />;
+    return <MarkdownView markdown={odhGettingStarted?.markDown} />;
   };
 
   const onEnableClose = (success?: boolean) => {

@@ -5,7 +5,7 @@ import { QuickStartContext, QuickStartContextValues } from '@cloudmosaic/quickst
 import { OdhDocument, OdhDocumentType } from '../../types';
 import { useWatchComponents } from '../../utilities/useWatchComponents';
 import ApplicationsPage from '../ApplicationsPage';
-import QuickStarts from '../../App/QuickStarts';
+import QuickStarts from '../../app/QuickStarts';
 import OdhDocCard from '../../components/OdhDocCard';
 import { useQueryParams } from '../../utilities/useQueryParams';
 import {
@@ -156,7 +156,7 @@ const LearningCenter: React.FC = () => {
   React.useEffect(() => {
     setFilteredDocApps(
       docApps
-        .filter((doc) => doc.metadata.type !== 'getting-started')
+        .filter((doc) => doc.spec.type !== 'getting-started')
         .filter((doc) => doesDocAppMatch(doc, searchQuery, typeFilters))
         .sort((a, b) => {
           const aFav = favoriteResources.includes(a.metadata.name);
@@ -170,7 +170,7 @@ const LearningCenter: React.FC = () => {
           let sortVal =
             sortType === SORT_TYPE_NAME
               ? a.spec.displayName.localeCompare(b.spec.displayName)
-              : a.metadata.type.localeCompare(b.metadata.type);
+              : a.spec.type.localeCompare(b.spec.type);
           if (sortOrder === SORT_DESC) {
             sortVal *= -1;
           }
@@ -179,8 +179,8 @@ const LearningCenter: React.FC = () => {
     );
     const docCounts = docApps.reduce(
       (acc, docApp) => {
-        if (acc[docApp.metadata.type] !== undefined) {
-          acc[docApp.metadata.type]++;
+        if (acc[docApp.spec.type] !== undefined) {
+          acc[docApp.spec.type]++;
         }
         return acc;
       },

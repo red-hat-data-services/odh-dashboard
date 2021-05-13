@@ -1,0 +1,203 @@
+---
+apiVersion: applications.console.openshift.io/v1alpha1
+kind: OdhApplication
+metadata:
+  name: anaconda-ce
+spec:
+  displayName: Anaconda Commercial Edition
+  provider: Anaconda
+  description: |-
+    The world's most popular open-source package distribution and management experience. Optimized
+    and supported for commercial use.
+  kfdefApplications: []
+  route: ''
+  img: images/anaconda-ce.svg
+  category: Partner managed
+  support: third party support
+  docsLink: https://docs.anaconda.com/
+  quickStart: ''
+  getStartedLink: https://anaconda.cloud/register?utm_source=redhat-rhods-summit
+  enable:
+    title: Connect Anaconda to JupyterHub
+    actionLabel: Connect
+    description: ''
+    variables:
+      Anaconda_ce_key: password
+    variableDisplayText:
+      Anaconda_ce_key: Anaconda CE Key
+    variableHelpText:
+      Anaconda_ce_key: This key is given to you by Anaconda
+    validationJob: anaconda-ce-periodic-validator
+    validationSecret: anaconda-ce-access
+    validationConfigMap: anaconda-ce-validation-result
+---
+apiVersion: applications.console.openshift.io/v1alpha1
+kind: OdhApplication
+metadata:
+  name: jupyterhub
+spec:
+  displayName: JupyterHub
+  provider: Jupyter
+  description: |-
+    A multi-user version of the notebook designed for companies, classrooms and research labs.
+  kfdefApplications: ['jupyterhub', 'notebook-images']
+  route: jupyterhub
+  img: images/jupyterhub.svg
+  category: Red Hat managed
+  support: red hat
+  docsLink: https://jupyter.org/hub
+  quickStart: create-jupyter-notebook
+  getStartedLink: https://jupyterhub.readthedocs.io/en/stable/getting-started/index.html
+---
+apiVersion: applications.console.openshift.io/v1alpha1
+kind: OdhApplication
+metadata:
+  name: aikit
+spec:
+  displayName: Intel® AI Analytics Toolkit Container
+  provider: Intel
+  description: |-
+    Deliver high-performance deep learning (DL) training on Intel® XPUs and integrate fast inference into your AI development workflow with Intel-optimized DL frameworks: TensorFlow and PyTorch, pretrained models, and low-precision tools. 
+  kfdefApplications: ['jupyterhub', 'notebook-images']
+  route: jupyterhub
+  img: images/oneapi.png
+  category: Intel managed
+  support: Intel
+  docsLink: https://software.intel.com/content/www/us/en/develop/tools/oneapi/ai-analytics-toolkit.html
+  quickStart: create-aikit-notebook
+  getStartedLink: https://software.intel.com/content/www/us/en/develop/documentation/get-started-with-ai-linux/top.html
+---
+apiVersion: applications.console.openshift.io/v1alpha1
+kind: OdhApplication
+metadata:
+  name: openvino
+spec:
+  displayName: OpenVINO
+  provider: Intel
+  description: |-
+    A toolkit to facilitates the optimization of a deep learning model from a framework and deployment using an inference engine onto Intel hardware.
+  kfdefApplications: []
+  img: images/openvino.svg
+  category: Self managed
+  support: third party support
+  docsLink: https://docs.openvinotoolkit.org/latest/index.html
+  quickStart: openvino-inference-notebook
+  getStartedLink: https://github.com/openvinotoolkit/openvino_notebooks
+  featureFlag: openvino
+---
+apiVersion: applications.console.openshift.io/v1alpha1
+kind: OdhApplication
+metadata:
+  name: pachyderm
+spec:
+  displayName: Pachyderm
+  provider: Pachyderm
+  description: |-
+    An enterprise-grade, open source data science platform that makes explainable, repeatable, and
+    scalable ML/AI a reality.
+  kfdefApplications: []
+  route: ''
+  img: images/pachyderm.svg
+  docsLink: https://docs.pachyderm.com/
+  category: Self-managed
+  support: third party support
+  quickStart: ''
+  comingSoon: true
+---
+apiVersion: applications.console.openshift.io/v1alpha1
+kind: OdhApplication
+metadata:
+  name: percepti-labs
+spec:
+  displayName: PerceptiLabs
+  provider: PercetiLabs
+  description: |-
+    Accelerates machine learning by streamlining the workflow and advancing explainability of the
+    models.
+  kfdefApplications: []
+  route: ''
+  img: images/percepti-labs.svg
+  docsLink: https://www.perceptilabs.com/docs/
+  category: Red Hat managed
+  support: third party support
+  quickStart: ''
+  comingSoon: true
+---
+apiVersion: applications.console.openshift.io/v1alpha1
+kind: OdhApplication
+metadata:
+  name: rhosak
+spec:
+  displayName: OpenShift Streams for Apache Kafka
+  provider: Red Hat
+  description: |-
+    A managed cloud service for  streaming data that reduces the operational cost and complexity of delivering real-time applications across hybrid-cloud environments.
+  kfdefApplications: []
+  route: ''
+  img: images/red-hat.svg
+  category: Red Hat managed
+  support: red hat
+  docsLink: https://access.redhat.com/documentation/en-us/red_hat_openshift_streams_for_apache_kafka
+  quickStart: connect-rhosak-notebook
+  getStartedLink: https://cloud.redhat.com/beta/application-services/streams/kafkas
+---
+apiVersion: applications.console.openshift.io/v1alpha1
+kind: OdhApplication
+metadata:
+  name: seldon-deploy
+spec:
+  displayName: Seldon Deploy
+  provider: Seldon
+  description: |-
+    A specialist set of tools designed to simplify and accelerate the process of deploying and
+    managing your machine learning models.
+  csvName: seldon-deploy-operator
+  kfdefApplications: []
+  routeNamespace: 'istio-system'
+  route: 'istio-ingressgateway'
+  routeSuffix: 'seldon-deploy/deployments?ns=seldon'
+  img: images/seldon.svg
+  docsLink: https://deploy-v1-0.seldon.io/docs/
+  category: Self-managed
+  support: third paty support
+  quickStart: 'seldon-deploy-model-canary'
+  getStartedLink: 'https://deploy.seldon.io/docs/getting-started'
+---
+apiVersion: applications.console.openshift.io/v1alpha1
+kind: OdhApplication
+metadata:
+  name: starburst
+spec:
+  displayName: Starburst Galaxy
+  provider: Starburst
+  description: |-
+    Starburst Galaxy is a fully-managed service to run high performance queries across your various data sources using SQL.
+  kfdefApplications: []
+  route: ''
+  img: images/starburst.svg
+  docsLink: https://docs.starburst.io/starburst-galaxy/
+  category: Partner managed
+  support: third party support
+  quickStart: ''
+  getStartedLink: https://www.starburst.io/platform/starburst-galaxy/
+---
+apiVersion: applications.console.openshift.io/v1alpha1
+kind: OdhApplication
+metadata:
+  name: watson-studio
+spec:
+  displayName: IBM Watson Studio
+  provider: IBM
+  description: |-
+    Embed AI and machine learning into your business. Create custom models using your own data.
+  kfdefApplications: []
+  route: ''
+  csvName: 'ibm-cp-data-operator'
+  serviceName: 'ibm-nginx-svc'
+  img: images/ibm.svg
+  docsLink: https://www.ibm.com/support/knowledgecenter/SSQNUZ_3.5.0/svc-welcome/wsl.html
+  category: Self-managed
+  support: third party support
+  quickStart: build-deploy-watson-model
+  getStartedLink: https://developer.ibm.com/series/cloud-pak-for-data-learning-path
+---

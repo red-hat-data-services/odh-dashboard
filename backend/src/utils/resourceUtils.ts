@@ -1,7 +1,4 @@
-import * as jsYaml from 'js-yaml';
 import createError from 'http-errors';
-import fs from 'fs';
-import path from 'path';
 import {
   CSVKind,
   K8sResourceCommon,
@@ -13,7 +10,6 @@ import {
 } from '../types';
 import { ResourceWatcher } from './resourceWatcher';
 import { getComponentFeatureFlags } from './features';
-import { yamlRegExp } from './constants';
 
 let operatorWatcher: ResourceWatcher<CSVKind>;
 let serviceWatcher: ResourceWatcher<K8sResourceCommon>;
@@ -80,60 +76,76 @@ const fetchInstalledKfdefs = async (fastify: KubeFastifyInstance): Promise<KfDef
   return kfdef?.spec?.applications || [];
 };
 
-const fetchApplicationDefs = (): Promise<OdhApplication[]> => {
-  const normalizedPath = path.join(__dirname, '../../../data/applications');
-  const applicationDefs: OdhApplication[] = [];
+const fetchOdhApplications = async (fastify: KubeFastifyInstance): Promise<OdhApplication[]> => {
+  const customObjectsApi = fastify.kube.customObjectsApi;
+  const namespace = fastify.kube.namespace;
   const featureFlags = getComponentFeatureFlags();
-  fs.readdirSync(normalizedPath).forEach((file) => {
-    if (yamlRegExp.test(file)) {
-      try {
-        const doc = jsYaml.load(fs.readFileSync(path.join(normalizedPath, file), 'utf8'));
-        if (!doc.spec.featureFlag || featureFlags[doc.spec.featureFlag]) {
-          applicationDefs.push(doc);
-        }
-      } catch (e) {
-        console.error(`Error loading application definition ${file}: ${e}`);
+
+  let odhApplications: OdhApplication[];
+  try {
+    const res = await customObjectsApi.listNamespacedCustomObject(
+      'applications.console.openshift.io',
+      'v1alpha1',
+      namespace,
+      'odhapplications',
+    );
+    const cas = (res?.body as { items: OdhApplication[] })?.items;
+    odhApplications = cas.reduce((acc, ca) => {
+      if (!ca.spec.featureFlag || featureFlags[ca.spec.featureFlag]) {
+        acc.push(ca);
       }
-    }
-  });
-  return Promise.resolve(applicationDefs);
+      return acc;
+    }, []);
+  } catch (e) {
+    fastify.log.error(e, 'failed to get odhapplications');
+    const error = createError(500, 'failed to get odhapplications');
+    error.explicitInternalServerError = true;
+    error.error = 'failed to get odhapplications';
+    error.message =
+      'Unable to get OdhApplication resources. Please ensure the Open Data Hub operator has been installed.';
+    throw error;
+  }
+  return Promise.resolve(odhApplications);
 };
 
-const fetchDocs = async (): Promise<OdhDocument[]> => {
-  const normalizedPath = path.join(__dirname, '../../../data/docs');
-  const docs: OdhDocument[] = [];
+const fetchOdhDocuments = async (fastify: KubeFastifyInstance): Promise<OdhDocument[]> => {
+  const customObjectsApi = fastify.kube.customObjectsApi;
+  const namespace = fastify.kube.namespace;
   const featureFlags = getComponentFeatureFlags();
-  const appDefs = await fetchApplicationDefs();
 
-  fs.readdirSync(normalizedPath).forEach((file) => {
-    if (yamlRegExp.test(file)) {
-      try {
-        const doc: OdhDocument = jsYaml.load(
-          fs.readFileSync(path.join(normalizedPath, file), 'utf8'),
-        );
-        if (doc.spec.featureFlag) {
-          if (featureFlags[doc.spec.featureFlag]) {
-            docs.push(doc);
-          }
-          return;
-        }
-        if (!doc.spec.appName || appDefs.find((def) => def.metadata.name === doc.spec.appName)) {
-          docs.push(doc);
-        }
-      } catch (e) {
-        console.error(`Error loading doc ${file}: ${e}`);
+  let odhDocuments: OdhDocument[];
+  try {
+    const res = await customObjectsApi.listNamespacedCustomObject(
+      'documents.console.openshift.io',
+      'v1alpha1',
+      namespace,
+      'odhdocuments',
+    );
+    const cas = (res?.body as { items: OdhDocument[] })?.items;
+    odhDocuments = cas.reduce((acc, cd) => {
+      if (!cd.spec.featureFlag || featureFlags[cd.spec.featureFlag]) {
+        acc.push(cd);
       }
-    }
-  });
-  return Promise.resolve(docs);
+      return acc;
+    }, []);
+  } catch (e) {
+    fastify.log.error(e, 'failed to get odhdocuments');
+    const error = createError(500, 'failed to get odhdocuments');
+    error.explicitInternalServerError = true;
+    error.error = 'failed to get odhdocuments';
+    error.message =
+      'Unable to get OdhDocument resources. Please ensure the Open Data Hub operator has been installed.';
+    throw error;
+  }
+  return Promise.resolve(odhDocuments);
 };
 
 export const initializeWatchedResources = (fastify: KubeFastifyInstance): void => {
   operatorWatcher = new ResourceWatcher<CSVKind>(fastify, fetchInstalledOperators);
   serviceWatcher = new ResourceWatcher<K8sResourceCommon>(fastify, fetchServices);
   kfDefWatcher = new ResourceWatcher<KfDefApplication>(fastify, fetchInstalledKfdefs);
-  appWatcher = new ResourceWatcher<OdhApplication>(fastify, fetchApplicationDefs);
-  docWatcher = new ResourceWatcher<OdhDocument>(fastify, fetchDocs);
+  appWatcher = new ResourceWatcher<OdhApplication>(fastify, fetchOdhApplications);
+  docWatcher = new ResourceWatcher<OdhDocument>(fastify, fetchOdhDocuments);
 };
 
 export const getInstalledOperators = (): K8sResourceCommon[] => {
@@ -147,6 +159,7 @@ export const getServices = (): K8sResourceCommon[] => {
 export const getInstalledKfdefs = (): KfDefApplication[] => {
   return kfDefWatcher.getResources();
 };
+
 export const getApplicationDefs = (): OdhApplication[] => {
   return appWatcher.getResources();
 };

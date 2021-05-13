@@ -2,44 +2,59 @@
  * Common types, should be kept up to date with backend types
  */
 
-export type OdhApplication = {
-  metadata: {
-    name: string;
+export interface OdhApplication {
+  apiVersion?: string;
+  kind?: string;
+  metadata?: {
+    [k: string]: unknown;
   };
-  spec: {
-    displayName: string;
-    provider: string;
-    description: string;
-    route: string | null;
-    routeNamespace: string | null;
-    routeSuffix: string | null;
-    serviceName: string | null;
-    endpoint: string | null;
-    link: string | null;
-    img: string;
-    docsLink: string;
-    getStartedLink: string;
-    category: string;
-    support: string;
-    quickStart: string | null;
-    comingSoon: boolean | null;
-    isEnabled: boolean | null;
-    kfdefApplications: string[];
-    csvName: string;
+  spec?: {
+    category?: string;
+    comingSoon?: boolean;
+    csvName?: string;
+    description?: string;
+    displayName?: string;
+    docsLink?: string;
     enable?: {
-      title: string;
-      actionLabel: string;
+      actionLabel?: string;
       description?: string;
-      variables?: { [key: string]: string };
-      variableDisplayText?: { [key: string]: string };
-      variableHelpText?: { [key: string]: string };
-      validationSecret: string;
-      validationJob: string;
+      title?: string;
       validationConfigMap?: string;
+      validationJob?: string;
+      validationSecret?: string;
+      variableDisplayText?: {
+        [k: string]: string;
+      };
+      variableHelpText?: {
+        [k: string]: string;
+      };
+      variables?: {
+        [k: string]: string;
+      };
+      [k: string]: unknown;
     };
+    endPoint?: string;
     featureFlag?: string;
+    getStartedLink?: string;
+    img?: string;
+    isEnabled?: boolean;
+    kfdefApplications: string[];
+    link?: string;
+    provider?: string;
+    quickStart?: string;
+    route?: string;
+    routeNamespace?: string;
+    routeSuffix?: string;
+    serviceName?: string;
+    support?: string;
+    [k: string]: unknown;
   };
-};
+  status?: {
+    enabled?: boolean;
+    [k: string]: unknown;
+  };
+  [k: string]: unknown;
+}
 
 export enum OdhDocumentType {
   Documentation = 'documentation',
@@ -48,26 +63,34 @@ export enum OdhDocumentType {
   Tutorial = 'tutorial',
 }
 
-export type OdhDocument = {
-  metadata: {
-    name: string;
-    type: string;
+export interface OdhDocument {
+  apiVersion?: string;
+  kind?: string;
+  metadata?: {
+    [k: string]: unknown;
   };
-  spec: {
-    displayName: string;
+  spec?: {
     appName?: string;
-    provider?: string;
-    description: string;
-    url: string;
-    img?: string;
-    icon?: string;
-    durationMinutes?: number;
-    markdown?: string;
+    description?: string;
+    displayName?: string;
+    durationMinutes: number;
     featureFlag?: string;
+    icon?: string;
+    img?: string;
+    markDown?: string;
+    provider?: string;
+    type?: string;
+    url?: string;
+    [k: string]: unknown;
   };
-};
+  status?: {
+    enabled?: boolean;
+    [k: string]: unknown;
+  };
+  [k: string]: unknown;
+}
 
 export type OdhGettingStarted = {
   appName: string;
-  markdown: string;
+  markDown: string;
 };

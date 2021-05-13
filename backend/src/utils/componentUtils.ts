@@ -1,13 +1,15 @@
-import { IncomingMessage } from 'http';
+//import { IncomingMessage } from 'http';
 import { V1ConfigMap } from '@kubernetes/client-node/dist/gen/model/v1ConfigMap';
 import { OdhApplication, K8sResourceCommon, KubeFastifyInstance, RouteKind } from '../types';
 
+/*
 type RoutesResponse = {
   body: {
     items: RouteKind[];
   };
   response: IncomingMessage;
 };
+*/
 
 const getURLForRoute = (route: RouteKind, routeSuffix: string): string => {
   const host = route?.spec?.host;
@@ -58,7 +60,10 @@ export const getServiceLink = async (
   try {
     const routes = await customObjectsApi
       .listNamespacedCustomObject('route.openshift.io', 'v1', namespace, 'routes')
-      .then((res: RoutesResponse) => res?.body?.items);
+      .then((res) => {
+        const csvs = (res?.body as { items: RouteKind[] })?.items;
+        return csvs;
+      });
     return getURLForRoute(routes?.[0], routeSuffix);
   } catch (e) {
     fastify.log.error(`failed to get route in namespace ${namespace}`);

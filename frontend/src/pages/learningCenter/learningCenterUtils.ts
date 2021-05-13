@@ -30,7 +30,7 @@ export const doesDocAppMatch = (
   filterText: string,
   typeFilters: string[],
 ): boolean => {
-  if (typeFilters.length && !typeFilters.includes(OdhDocument.metadata.type)) {
+  if (typeFilters.length && !typeFilters.includes(OdhDocument.spec.type)) {
     return false;
   }
   const searchText = filterText.toLowerCase();

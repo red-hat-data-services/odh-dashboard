@@ -10,11 +10,24 @@ A dashboard for Open Data Hub components.
 ## Requirements
 Before developing for ODH, the basic requirements:
 * Your system needs to be running [NodeJS version 12+ and NPM](https://nodejs.org/)
+* You have done an 'oc login' to the OpenShift cluster (see [CONTRIBUTING.md](./CONTRIBUTING.md))
   
 ### Additional tooling requirements
 * [OpenShift CLI, the "oc" command](https://docs.openshift.com/enterprise/3.2/cli_reference/get_started_cli.html#installing-the-cli)
 * [s2i](https://github.com/openshift/source-to-image)
 * [Quay.io](https://quay.io/)
+
+## Deploy OdhApplications, OdhDocuments to the OpenShift cluster
+   1. Deploy the OdhApplications, OdhDocuments CRDS
+      ```
+      oc apply -f install/deploy/base/custom-resource-definition.yaml
+      ```
+
+   2. Deploy the OdhApplications, OdhDocuments Resources to your OC_PROJECT
+      ```
+      oc project $OC_PROJECT
+      cat install/deploy/base/{odh-application.yaml,odh-document.yaml} | oc apply -f -
+      ```
 
 ## Development
    1. Clone the repository

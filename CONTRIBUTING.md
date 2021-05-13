@@ -37,6 +37,17 @@ or
 $ npm run make:login
 ```
 
+## Deploy OdhApplications, OdhDocuments to the OpenShift cluster
+   1. Deploy the OdhApplications, OdhDocuments CRDS 
+      ```
+      oc apply -f install/deploy/base/custom-resource-definition.yaml
+      ```
+
+   2. Deploy the OdhApplications, OdhDocuments Resources to your OC_PROJECT
+      ```
+      oc project $OC_PROJECT
+      cat install/deploy/base/{odh-application.yaml,odh-document.yaml} | oc apply -f -
+      ```
 
 ## Debugging and Testing
 ### Basic testing
