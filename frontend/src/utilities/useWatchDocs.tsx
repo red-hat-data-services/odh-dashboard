@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { OdhDocument, OdhDocumentType } from '../types';
+import { OdhDocumentType } from '../types';
+import { OdhDocument } from '../gen/io.openshift.console.documents.v1alpha1';
 import { POLL_INTERVAL } from './const';
 import { fetchDocs } from '../services/docsService';
 import { useDeepCompareMemoize } from './useDeepCompareMemoize';

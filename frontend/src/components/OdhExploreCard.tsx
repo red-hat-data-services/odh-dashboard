@@ -1,7 +1,7 @@
 import React from 'react';
 import * as classNames from 'classnames';
 import { Card, CardHeader, CardBody } from '@patternfly/react-core';
-import { OdhApplication } from '../types';
+import { OdhApplication } from '../gen/io.openshift.console.applications.v1alpha1';
 import BrandImage from './BrandImage';
 import SupportedAppTitle from './SupportedAppTitle';
 import { makeCardVisible } from '../utilities/utils';

@@ -1,0 +1,11 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: kam-dashboard # {"$openapi":"DASHBOARD_NAME"}
+spec:
+  port:
+    targetPort: http
+  to:
+    kind: Service
+    name: kam-dashboard # {"$openapi":"DASHBOARD_NAME"}
+    weight: 100

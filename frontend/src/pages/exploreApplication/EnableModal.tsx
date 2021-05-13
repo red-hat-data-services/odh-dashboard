@@ -9,7 +9,7 @@ import {
   Spinner,
   TextInputTypes,
 } from '@patternfly/react-core';
-import { OdhApplication } from '../../types';
+import { OdhApplication } from '../../gen/io.openshift.console.applications.v1alpha1';
 import { postValidateIsv } from '../../services/validateIsvService';
 import EnableVariable from './EnableVariable';
 

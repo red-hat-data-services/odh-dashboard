@@ -2,10 +2,10 @@ import * as React from 'react';
 import * as _ from 'lodash';
 import { Gallery, PageSection } from '@patternfly/react-core';
 import { useWatchComponents } from '../../utilities/useWatchComponents';
-import { OdhApplication } from '../../types';
+import { OdhApplication } from '../../gen/io.openshift.console.applications.v1alpha1';
 import ApplicationsPage from '../ApplicationsPage';
 import OdhAppCard from '../../components/OdhAppCard';
-import QuickStarts from '../../App/QuickStarts';
+import QuickStarts from '../../app/QuickStarts';
 
 import './EnabledApplications.scss';
 

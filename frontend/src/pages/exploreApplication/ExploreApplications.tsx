@@ -10,7 +10,7 @@ import {
 import { useWatchComponents } from '../../utilities/useWatchComponents';
 import OdhExploreCard from '../../components/OdhExploreCard';
 import ApplicationsPage from '../ApplicationsPage';
-import { OdhApplication } from '../../types';
+import { OdhApplication } from '../../gen/io.openshift.console.applications.v1alpha1';
 import GetStartedPanel from './GetStartedPanel';
 import { useQueryParams } from '../../utilities/useQueryParams';
 import { removeQueryArgument, setQueryArgument } from '../../utilities/router';

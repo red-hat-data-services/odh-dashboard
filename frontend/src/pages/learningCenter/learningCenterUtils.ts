@@ -1,4 +1,5 @@
-import { OdhDocument, OdhDocumentType } from '../../types';
+import { OdhDocumentType } from '../../types';
+import { OdhDocument } from '../../gen/io.openshift.console.documents.v1alpha1';
 
 export const SEARCH_FILTER_KEY = 'keyword';
 export const DOC_TYPE_FILTER_KEY = 'type';
@@ -30,7 +31,7 @@ export const doesDocAppMatch = (
   filterText: string,
   typeFilters: string[],
 ): boolean => {
-  if (typeFilters.length && !typeFilters.includes(OdhDocument.metadata.type)) {
+  if (typeFilters.length && !typeFilters.includes(OdhDocument.spec.type)) {
     return false;
   }
   const searchText = filterText.toLowerCase();

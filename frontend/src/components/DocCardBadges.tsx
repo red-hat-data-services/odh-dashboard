@@ -3,7 +3,8 @@ import * as classNames from 'classnames';
 import { Tooltip } from '@patternfly/react-core';
 import { SyncAltIcon, CheckCircleIcon } from '@patternfly/react-icons';
 import { QuickStartContext, QuickStartContextValues } from '@cloudmosaic/quickstarts';
-import { OdhDocument, OdhDocumentType } from '../types';
+import { OdhDocumentType } from '../types';
+import { OdhDocument } from '../gen/io.openshift.console.documents.v1alpha1';
 import { isQuickStartComplete, isQuickStartInProgress } from '../utilities/quickStartUtils';
 import { getTextForDocType } from '../pages/learningCenter/learningCenterUtils';
 
@@ -24,7 +25,7 @@ const DocCardBadges: React.FC<DocCardBadgesProps> = ({ odhDoc }) => {
   const qsContext = React.useContext<QuickStartContextValues>(QuickStartContext);
   const [inProgress, setInProgress] = React.useState<boolean>(false);
   const [complete, setComplete] = React.useState<boolean>(false);
-  const docType = odhDoc?.metadata.type as OdhDocumentType;
+  const docType = odhDoc?.spec.type as OdhDocumentType;
   const docName = odhDoc?.metadata.name;
   const duration = odhDoc?.spec.durationMinutes;
 

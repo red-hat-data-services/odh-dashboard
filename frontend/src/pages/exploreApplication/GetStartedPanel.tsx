@@ -15,7 +15,8 @@ import {
   Title,
 } from '@patternfly/react-core';
 import { ExternalLinkAltIcon, WarningTriangleIcon } from '@patternfly/react-icons';
-import { OdhApplication, OdhGettingStarted } from '../../types';
+import { OdhGettingStarted } from '../../types';
+import { OdhApplication } from '../../gen/io.openshift.console.applications.v1alpha1';
 import MarkdownView from '../../components/MarkdownView';
 import { fetchGettingStartedDoc } from '../../services/gettingStartedService';
 import EnableModal from './EnableModal';
@@ -82,7 +83,7 @@ const GetStartedPanel: React.FC<GetStartedPanelProps> = ({ selectedApp, onClose 
       );
     }
 
-    return <MarkdownView markdown={odhGettingStarted?.markdown} />;
+    return <MarkdownView markdown={odhGettingStarted?.markDown} />;
   };
 
   const onEnableClose = (success?: boolean) => {

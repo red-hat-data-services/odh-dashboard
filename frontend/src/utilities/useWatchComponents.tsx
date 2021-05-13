@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { fetchComponents } from '../services/componentsServices';
-import { OdhApplication } from '../types';
+import { OdhApplication } from '../gen/io.openshift.console.applications.v1alpha1';
 import { POLL_INTERVAL } from './const';
 import { useDeepCompareMemoize } from './useDeepCompareMemoize';
 

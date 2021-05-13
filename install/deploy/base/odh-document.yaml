@@ -1,0 +1,367 @@
+---
+apiVersion: documents.console.openshift.io/v1alpha1
+kind: OdhDocument
+metadata:
+  name: anaconda-background
+spec:
+  type: tutorial
+  appName: anaconda-ce
+  displayName: What is Anaconda?
+  description: |-
+    Learn about the Anaconda Distrbution and why Python is so frequently used for Data Science tasks.
+  url: https://anaconda.org/training/anaconda_introduction/notebook
+  durationMinutes: 5
+---
+apiVersion: documents.console.openshift.io/v1alpha1
+kind: OdhDocument
+metadata:
+  name: auto-ai-experiment-model-tutorial
+spec:
+  type: tutorial
+  appName: watson-studio
+  displayName: Run an AutoAI Experiment to Build a Model
+  description: |-
+    Building a binary classification model for a marketing campaign.
+  url: https://video.ibm.com/channel/23952663/video/cpd35-ws-autoai
+  durationMinutes: 8
+---
+apiVersion: documents.console.openshift.io/v1alpha1
+kind: OdhDocument
+metadata:
+  name: build-binary-classification-model-tutorial
+spec:
+  type: tutorial
+  appName: watson-studio
+  displayName: Build a binary classification model
+  description: |-
+    Training a model to predict whether or not a customer is likely to subscribe to a bank promotion.
+  url: https://www.ibm.com/support/knowledgecenter/SSQNUZ_3.5.0/wsj/analyze-data/autoai_example_binary_classifier.html
+  durationMinutes: 10
+---
+apiVersion: documents.console.openshift.io/v1alpha1
+kind: OdhDocument
+metadata:
+  name: jupyter-notebooks-in-watson-studio-tutorial
+spec:
+  type: tutorial
+  appName: watson-studio
+  displayName: Jupyter Notebooks in Watson Studio
+  description: |-
+    This video covers the basics for working with Jupyter notebooks in Watson Studio.
+  url: https://video.ibm.com/channel/23952663/video/cpd35-ws-notebook-basics
+  durationMinutes: 3
+---
+apiVersion: documents.console.openshift.io/v1alpha1
+kind: OdhDocument
+metadata:
+  name: jupyterhub-install-python-packages
+spec:
+  type: how-to
+  displayName: How to install Python packages on your notebook server
+  appName: jupyterhub
+  description: |-
+    Install additional python packages into your notebook server.
+  url: https://access.redhat.com/documentation/en-us/red_hat_openshift_data_science/1/html-single/how_to_install_python_packages_on_your_notebook_server/index
+  durationMinutes: 15
+---
+apiVersion: documents.console.openshift.io/v1alpha1
+kind: OdhDocument
+metadata:
+  name: jupyterhub-update-server-settings
+spec:
+  type: how-to
+  displayName: How to update notebook server settings
+  appName: jupyterhub
+  description: |-
+    Learn how to restart your notebook server with a different notebook image.
+  url: https://access.redhat.com/documentation/en-us/red_hat_openshift_data_science/1/html-single/how_to_update_notebook_server_settings/index
+  durationMinutes: 15
+---
+apiVersion: documents.console.openshift.io/v1alpha1
+kind: OdhDocument
+metadata:
+  name: jupyterhub-use-s3-bucket-data
+spec:
+  type: how-to
+  displayName: How to use data from Amazon S3 buckets
+  appName: jupyterhub
+  description: |-
+    Connect to Data in S3 Storage using environment variables.
+  url: https://access.redhat.com/documentation/en-us/red_hat_openshift_data_science/1/html-single/how_to_use_data_from_amazon_s3_buckets/index
+  durationMinutes: 15
+---
+apiVersion: documents.console.openshift.io/v1alpha1
+kind: OdhDocument
+metadata:
+  name: jupyterhub-view-installed-packages
+spec:
+  type: how-to
+  displayName: How to view installed packages on your notebook server
+  appName: jupyterhub
+  description: |-
+    See which packages are installed into your running notebook server.
+  url: https://access.redhat.com/documentation/en-us/red_hat_openshift_data_science/1/html-single/how_to_view_installed_packages_on_your_notebook_server/index
+  durationMinutes: 15
+---
+apiVersion: documents.console.openshift.io/v1alpha1
+kind: OdhDocument
+metadata:
+  name: openvino-ovms-serving
+spec:
+  type: how-to
+  featureFlag: openvino
+  displayName: How do I serve a model using OpenVINO Model Server?
+  appName: openvino
+  description: |-
+    Shows how to use OpenVINO custom resources to deploy optimized models with OpenVINO model server.
+
+  url: https://github.com/openvinotoolkit/model_server/tree/main/extras/ovms-operator
+  durationMinutes: 10
+---
+apiVersion: documents.console.openshift.io/v1alpha1
+kind: OdhDocument
+metadata:
+  name: python-accelerate-numba-tutorial
+spec:
+  type: tutorial
+  appName: anaconda-ce
+  displayName: Accelerating Scientific Workloads in Python with Numba
+  description: |-
+    If you're interested in making your Python code run faster, this talk is for you.
+  url: https://www.youtube.com/watch?v=6oXedk2tGfk
+  durationMinutes: 42
+---
+apiVersion: documents.console.openshift.io/v1alpha1
+kind: OdhDocument
+metadata:
+  name: python-effective-pandas-tutorial
+spec:
+  type: tutorial
+  appName: anaconda-ce
+  displayName: Data analysis in Python with Pandas
+  description: |-
+    This series is about how to make effective use of pandas, a data analysis library for the Python programming language. It's targeted at an intermediate level: people who have some experience with pandas, but are looking to improve.
+  url: https://github.com/TomAugspurger/effective-pandas
+  durationMinutes: 90
+---
+apiVersion: documents.console.openshift.io/v1alpha1
+kind: OdhDocument
+metadata:
+  name: python-gpu-numba-tutorial
+spec:
+  type: tutorial
+  appName: anaconda-ce
+  displayName: GPU Computing in Python with Numba
+  description: |-
+    Learn how to use Numba to create GPU accelerated functions.
+  url: https://github.com/ContinuumIO/gtc2018-numba
+  durationMinutes: 90
+---
+apiVersion: documents.console.openshift.io/v1alpha1
+kind: OdhDocument
+metadata:
+  name: python-interactive-visualization-tutorial
+spec:
+  type: tutorial
+  appName: anaconda-ce
+  displayName: Build interactive visualizations and dashboards in Python
+  description: |-
+    This tutorial will take you through all of the steps involved in exploring data of many different types and sizes, building simple and complex figures, working with billions of data points, adding interactive behavior, widgets and controls, and deploying full dashboards and applications.
+  url: https://holoviz.org/tutorial/index.html
+  durationMinutes: 210
+---
+apiVersion: documents.console.openshift.io/v1alpha1
+kind: OdhDocument
+metadata:
+  name: python-notebook-generate-results-open-scale-tutorial
+spec:
+  type: tutorial
+  appName: watson-studio
+  displayName: Run a Python notebook to generate results in Watson OpenScale
+  description: |-
+    Run a Python notebook to create, train, and deploy a machine learning model.
+  url: https://www.ibm.com/support/knowledgecenter/SSQNUZ_3.5.0/wsj/model/wos-tutorial-adv.html
+  durationMinutes: 15
+---
+apiVersion: documents.console.openshift.io/v1alpha1
+kind: OdhDocument
+metadata:
+  name: python-scalable-computing-dask-tutorial
+spec:
+  type: tutorial
+  appName: anaconda-ce
+  displayName: Scalable computing in Python with Dask
+  description: |-
+    Dask is a parallel computing library that scales the existing Python ecosystem. This tutorial will introduce Dask and parallel data analysis more generally. Dask can scale down to your laptop and up to a cluster. In this tutorial, we’ll analyze medium sized datasets in parallel.
+  url: https://tutorial.dask.org/
+  durationMinutes: 230
+---
+apiVersion: documents.console.openshift.io/v1alpha1
+kind: OdhDocument
+metadata:
+  name: python-scikit-learn-tutorial
+spec:
+  type: tutorial
+  appName: anaconda-ce
+  displayName: Machine Learning in Python with Scikit-Learn
+  description: |-
+    Learn how to build machine learning models with scikit-learn for supervised learning, unsupervised learning, and classification problems.
+  url: https://scikit-learn.org/stable/tutorial/index.html
+  durationMinutes: 90
+---
+apiVersion: documents.console.openshift.io/v1alpha1
+kind: OdhDocument
+metadata:
+  name: python-visualization-tutorial
+spec:
+  type: tutorial
+  appName: anaconda-ce
+  displayName: Python tools for data visualization
+  description: |-
+    The PyViz.org website is an open platform for helping users decide on the best open-source (OSS) Python data visualization tools for their purposes, with links, overviews, comparisons, and examples.
+  url: https://pyviz.org
+  durationMinutes: 30
+---
+apiVersion: documents.console.openshift.io/v1alpha1
+kind: OdhDocument
+metadata:
+  name: seldon-model-servings-tutorial
+spec:
+  type: tutorial
+  appName: seldon-deploy
+  displayName: Various types of Model Servings
+  description: |-
+    A series of tutorials highlighting natural language, image processing classifiers, KubeFlow
+    integration, and model.
+  url: https://deploy.seldon.io/docs/demos/seldon-core/
+  durationMinutes: 60
+---
+apiVersion: documents.console.openshift.io/v1alpha1
+kind: OdhDocument
+metadata:
+  name: seldon-operation-tasks-how-to
+spec:
+  type: how-to
+  displayName: How to perform operational tasks?
+  appName: seldon-deploy
+  description: |-
+    Best practices for managing a Seldon Deploy cluster.
+  url: https://deploy.seldon.io/docs/operations/
+  durationMinutes: 10
+---
+apiVersion: documents.console.openshift.io/v1alpha1
+kind: OdhDocument
+metadata:
+  name: watson-studio-cleanse-shape-visualize-how-to
+spec:
+  type: how-to
+  appName: watson-studio
+  displayName: How to cleanse, shape, and visualize my data?
+  description: |-
+    Using data refinery to cleanse and shape tabular data.
+  url: https://www.ibm.com/support/knowledgecenter/SSQNUZ_3.5.0/wsj/refinery/refining_data.html
+  durationMinutes: 10
+---
+apiVersion: documents.console.openshift.io/v1alpha1
+kind: OdhDocument
+metadata:
+  name: watson-studio-create-connection-how-to
+spec:
+  type: how-to
+  appName: watson-studio
+  displayName: How to create a connection to access data?
+  description: |-
+    Explains creating connections for various services across the platform.
+  url: https://www.ibm.com/support/knowledgecenter/SSQNUZ_3.5.0/cpd/access/connect-data-sources.html
+  durationMinutes: 10
+---
+apiVersion: documents.console.openshift.io/v1alpha1
+kind: OdhDocument
+metadata:
+  name: watson-studio-create-deployment-space-how-to
+spec:
+  type: how-to
+  appName: watson-studio
+  displayName: How to create a deployment space for deploying my model?
+  description: |-
+    Steps to create a deployment space.
+  url: https://www.ibm.com/support/knowledgecenter/SSQNUZ_3.5.0/wsj/analyze-data/ml-spaces_local.html
+  durationMinutes: 10
+---
+apiVersion: documents.console.openshift.io/v1alpha1
+kind: OdhDocument
+metadata:
+  name: watson-studio-create-notebook-how-to
+spec:
+  type: how-to
+  appName: watson-studio
+  displayName: How to create a notebook in Watson Studio?
+  description: |-
+    Create a basic Jupyter notebook in Watson Studio.
+  url: https://www.ibm.com/support/knowledgecenter/SSQNUZ_3.5.0/wsj/analyze-data/creating-notebooks.html
+  durationMinutes: 3
+---
+apiVersion: documents.console.openshift.io/v1alpha1
+kind: OdhDocument
+metadata:
+  name: watson-studio-create-project-how-to
+spec:
+  type: how-to
+  appName: watson-studio
+  displayName: How to create a Project?
+  description: |-
+    Provides the steps to create an analytics project.
+  url: https://www.ibm.com/support/knowledgecenter/SSQNUZ_3.5.0/wsj/getting-started/projects.html
+  durationMinutes: 5
+---
+apiVersion: documents.console.openshift.io/v1alpha1
+kind: OdhDocument
+metadata:
+  name: watson-studio-integrate-with-github-how-to
+spec:
+  type: how-to
+  appName: watson-studio
+  displayName: How to create a project that's integrated with Github?
+  description: |-
+    How to add assets in the Git repository in a project.
+  url: https://www.ibm.com/support/knowledgecenter/SSQNUZ_3.5.0/wsj/manage-data/git-integration.html
+  durationMinutes: 10
+---
+apiVersion: documents.console.openshift.io/v1alpha1
+kind: OdhDocument
+metadata:
+  name: watson-studio-load-data-how-to
+spec:
+  type: how-to
+  appName: watson-studio
+  displayName: How to load data into Notebook?
+  description: |-
+    How to integrate data sources into a notebook.
+  url: https://www.ibm.com/support/knowledgecenter/SSQNUZ_3.5.0/wsj/analyze-data/load-and-access-data.html
+  durationMinutes: 5
+---
+apiVersion: documents.console.openshift.io/v1alpha1
+kind: OdhDocument
+metadata:
+  name: watson-studio-runtime-env-how-to
+spec:
+  type: how-to
+  appName: watson-studio
+  displayName: What are my choices for notebook runtime environments?
+  description: |-
+    How to configure a notebook runtime environment.
+  url: https://www.ibm.com/support/knowledgecenter/SSQNUZ_3.5.0/wsj/analyze-data/notebook-environments.html
+  durationMinutes: 5
+---
+apiVersion: documents.console.openshift.io/v1alpha1
+kind: OdhDocument
+metadata:
+  name: watson-studio-setup-openscale-how-to
+spec:
+  type: how-to
+  appName: watson-studio
+  displayName: How to set up Watson OpenScale?
+  description: |-
+    Track and measure outcomes from models with OpenScale.
+  url: https://www.ibm.com/support/knowledgecenter/SSQNUZ_3.5.0/wsj/model/getting-started.html
+  durationMinutes: 10
