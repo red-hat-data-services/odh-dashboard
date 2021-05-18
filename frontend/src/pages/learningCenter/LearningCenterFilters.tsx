@@ -36,9 +36,10 @@ import {
   SORT_TYPE_APPLICATION,
   SORT_TYPE_DURATION,
 } from './learningCenterUtils';
+import { CARD_VIEW, LIST_VIEW } from './const';
+import { fireTrackingEvent } from '../../utilities/segmentIOUtils';
 
 import './LearningCenterFilter.scss';
-import { CARD_VIEW, LIST_VIEW } from './const';
 
 type LearningCenterFilterProps = {
   count: number;
@@ -219,6 +220,13 @@ const LearningCenterFilters: React.FC<LearningCenterFilterProps> = ({
             value={searchInputText}
             onChange={handleTextChange}
             onClear={() => handleTextChange('')}
+            onBlur={() => {
+              if (searchInputText) {
+                fireTrackingEvent('Resource Searched', {
+                  term: searchInputText,
+                });
+              }
+            }}
           />
         </ToolbarItem>
         <ToolbarItem>

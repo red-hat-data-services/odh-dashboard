@@ -30,6 +30,14 @@ export type K8sResourceCommon = {
   };
 };
 
+// Minimal type for ClusterVersion
+export type ClusterVersionType = {
+  spec: {
+    clusterID: string;
+    channel?: string;
+  };
+} & K8sResourceCommon;
+
 // Minimal type for routes
 export type RouteKind = {
   spec: {
@@ -69,6 +77,7 @@ export type KubeStatus = {
   currentUser: User;
   namespace: string;
   userName: string | string[];
+  clusterID: string;
 };
 
 export type KubeDecorator = KubeStatus & {
@@ -155,4 +164,8 @@ export type ODHDoc = {
 export type ODHGettingStarted = {
   appName: string;
   markdown: string;
+};
+
+export type ODHSegmentKey = {
+  segmentKey: string;
 };

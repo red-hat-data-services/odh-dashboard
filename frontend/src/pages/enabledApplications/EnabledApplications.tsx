@@ -8,6 +8,7 @@ import OdhAppCard from '../../components/OdhAppCard';
 import QuickStarts from '../../app/QuickStarts';
 
 import './EnabledApplications.scss';
+import { fireTrackingEvent } from '../../utilities/segmentIOUtils';
 
 const description = `Launch your enabled applications or get started with quick start instructions
  and tasks.`;
@@ -20,6 +21,16 @@ type EnabledApplicationsInnerProps = {
 const EnabledApplicationsInner: React.FC<EnabledApplicationsInnerProps> = React.memo(
   ({ loaded, loadError, components }) => {
     const isEmpty = !components || components.length === 0;
+
+    // fire an individual segment.io tracking event for every enabled application
+    if (!isEmpty) {
+      components.forEach((c) => {
+        fireTrackingEvent('Application Enabled', {
+          name: c.metadata.name,
+        });
+      });
+    }
+
     return (
       <QuickStarts>
         <ApplicationsPage
