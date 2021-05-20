@@ -1,6 +1,6 @@
 import axios from 'axios';
-import { getBackendURL } from '../utilities/utils';
 import { ODHApp } from '../types';
+import { getBackendURL } from '../utilities/utils';
 
 export const fetchComponents = (installed: boolean): Promise<ODHApp[]> => {
   const url = getBackendURL('/api/components');

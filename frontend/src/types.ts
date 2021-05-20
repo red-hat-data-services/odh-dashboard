@@ -1,4 +1,8 @@
-type ODHApp = {
+/*
+ * Common types, should be kept up to date with backend types
+ */
+
+export type ODHApp = {
   metadata: {
     name: string;
   };
@@ -7,6 +11,9 @@ type ODHApp = {
     provider: string;
     description: string;
     route: string | null;
+    routeNamespace: string | null;
+    routeSuffix: string | null;
+    serviceName: string | null;
     endpoint: string | null;
     link: string | null;
     img: string;
@@ -17,6 +24,8 @@ type ODHApp = {
     quickStart: string | null;
     comingSoon: boolean | null;
     isEnabled: boolean | null;
+    kfdefApplications: string[];
+    csvName: string;
     enable?: {
       title: string;
       actionLabel: string;
@@ -24,19 +33,22 @@ type ODHApp = {
       variables?: { [key: string]: string };
       variableDisplayText?: { [key: string]: string };
       variableHelpText?: { [key: string]: string };
+      validationSecret: string;
       validationJob: string;
+      validationConfigMap?: string;
     };
+    featureFlag?: string;
   };
 };
 
-enum ODHDocType {
+export enum ODHDocType {
   Documentation = 'documentation',
   HowTo = 'how-to',
   QuickStart = 'quickstart',
   Tutorial = 'tutorial',
 }
 
-type ODHDoc = {
+export type ODHDoc = {
   metadata: {
     name: string;
     type: string;
@@ -51,12 +63,11 @@ type ODHDoc = {
     icon?: string;
     durationMinutes?: number;
     markdown?: string;
+    featureFlag?: string;
   };
 };
 
-type ODHGettingStarted = {
+export type ODHGettingStarted = {
   appName: string;
   markdown: string;
 };
-
-export { ODHApp, ODHDocType, ODHDoc, ODHGettingStarted };
