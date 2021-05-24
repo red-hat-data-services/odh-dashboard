@@ -31,7 +31,7 @@ export default async (fastify: FastifyInstance): Promise<void> => {
     return status(fastify)
       .then((res) => {
         if (request.headers['x-forwarded-user']) {
-          res.kube.currentUser = request.headers['x-forwarded-user'];
+          (res.kube.currentUser as any) = request.headers['x-forwarded-user'];
         }
         if (DEV_MODE) {
           addCORSHeader(request, reply);
