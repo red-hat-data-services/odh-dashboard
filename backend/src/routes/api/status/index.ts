@@ -30,6 +30,9 @@ export default async (fastify: FastifyInstance): Promise<void> => {
   fastify.get('/', async (request, reply) => {
     return status(fastify)
       .then((res) => {
+        if (request.headers['x-forwarded-user']) {
+          res.kube.currentUser = request.headers['x-forwarded-user'];
+        }
         if (DEV_MODE) {
           addCORSHeader(request, reply);
         }
