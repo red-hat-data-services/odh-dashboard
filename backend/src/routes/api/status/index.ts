@@ -4,7 +4,10 @@ import { KubeFastifyInstance, KubeStatus } from '../../../types';
 import { DEV_MODE } from '../../../utils/constants';
 import { addCORSHeader } from '../../../utils/responseUtils';
 
-const status = async (fastify: KubeFastifyInstance, request: FastifyRequest): Promise<{ kube: KubeStatus }> => {
+const status = async (
+  fastify: KubeFastifyInstance,
+  request: FastifyRequest,
+): Promise<{ kube: KubeStatus }> => {
   const kubeContext = fastify.kube.currentContext;
   const { currentContext, namespace, currentUser } = fastify.kube;
   const userName = request.headers['x-forwarded-user'] ?? currentUser.username;
