@@ -1,12 +1,13 @@
 import createError from 'http-errors';
-import { FastifyInstance } from 'fastify';
+import { FastifyInstance, FastifyRequest } from 'fastify';
 import { KubeFastifyInstance, KubeStatus } from '../../../types';
 import { DEV_MODE } from '../../../utils/constants';
 import { addCORSHeader } from '../../../utils/responseUtils';
 
-const status = async (fastify: KubeFastifyInstance): Promise<{ kube: KubeStatus }> => {
+const status = async (fastify: KubeFastifyInstance, request: FastifyRequest): Promise<{ kube: KubeStatus }> => {
   const kubeContext = fastify.kube.currentContext;
   const { currentContext, namespace, currentUser } = fastify.kube;
+  const userName = request.headers['x-forwarded-user'] ?? currentUser.username;
   if (!kubeContext && !kubeContext.trim()) {
     const error = createError(500, 'failed to get kube status');
     error.explicitInternalServerError = true;
@@ -21,6 +22,7 @@ const status = async (fastify: KubeFastifyInstance): Promise<{ kube: KubeStatus 
         currentContext,
         currentUser,
         namespace,
+        userName,
       },
     });
   }
@@ -28,11 +30,8 @@ const status = async (fastify: KubeFastifyInstance): Promise<{ kube: KubeStatus 
 
 export default async (fastify: FastifyInstance): Promise<void> => {
   fastify.get('/', async (request, reply) => {
-    return status(fastify)
+    return status(fastify, request)
       .then((res) => {
-        if (request.headers['x-forwarded-user']) {
-          (res.kube.currentUser as any) = request.headers['x-forwarded-user'];
-        }
         if (DEV_MODE) {
           addCORSHeader(request, reply);
         }
