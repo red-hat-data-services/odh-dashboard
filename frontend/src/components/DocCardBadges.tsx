@@ -3,7 +3,8 @@ import * as classNames from 'classnames';
 import { Tooltip } from '@patternfly/react-core';
 import { SyncAltIcon, CheckCircleIcon } from '@patternfly/react-icons';
 import { QuickStartContext, QuickStartContextValues } from '@cloudmosaic/quickstarts';
-import { ODHDoc, ODHDocType } from '../types';
+import { OdhDocumentType } from '../types';
+import { OdhDocument } from '../gen/io.openshift.console.documents.v1alpha1';
 import { isQuickStartComplete, isQuickStartInProgress } from '../utilities/quickStartUtils';
 import { DOC_TYPE_TOOLTIPS } from '../utilities/const';
 import { getDuration } from '../utilities/utils';
@@ -12,19 +13,19 @@ import { getTextForDocType } from '../pages/learningCenter/learningCenterUtils';
 import './OdhCard.scss';
 
 type DocCardBadgesProps = {
-  odhDoc: ODHDoc;
+  odhDoc: OdhDocument;
 };
 
 const DocCardBadges: React.FC<DocCardBadgesProps> = ({ odhDoc }) => {
   const qsContext = React.useContext<QuickStartContextValues>(QuickStartContext);
   const [inProgress, setInProgress] = React.useState<boolean>(false);
   const [complete, setComplete] = React.useState<boolean>(false);
-  const docType = odhDoc?.metadata.type as ODHDocType;
+  const docType = odhDoc?.spec.type as OdhDocumentType;
   const docName = odhDoc?.metadata.name;
   const duration = odhDoc?.spec.durationMinutes;
 
   React.useEffect(() => {
-    if (docType === ODHDocType.QuickStart && qsContext.allQuickStarts) {
+    if (docType === OdhDocumentType.QuickStart && qsContext.allQuickStarts) {
       const quickStart = qsContext.allQuickStarts.find((qs) => qs.metadata.name === docName);
       if (quickStart) {
         setInProgress(isQuickStartInProgress(quickStart.metadata.name, qsContext));
@@ -35,13 +36,13 @@ const DocCardBadges: React.FC<DocCardBadgesProps> = ({ odhDoc }) => {
 
   const label = getTextForDocType(docType);
   const typeBadgeClasses = classNames('odh-card__partner-badge odh-m-doc', {
-    'odh-m-documentation': docType === ODHDocType.Documentation,
-    'odh-m-tutorial': docType === ODHDocType.Tutorial,
-    'odh-m-quick-start': docType === ODHDocType.QuickStart,
-    'odh-m-how-to': docType === ODHDocType.HowTo,
+    'odh-m-documentation': docType === OdhDocumentType.Documentation,
+    'odh-m-tutorial': docType === OdhDocumentType.Tutorial,
+    'odh-m-quick-start': docType === OdhDocumentType.QuickStart,
+    'odh-m-how-to': docType === OdhDocumentType.HowTo,
   });
   const durationBadgeClasses = classNames('odh-card__partner-badge odh-m-doc odh-m-duration', {
-    'm-hidden': docType === ODHDocType.Documentation || duration === undefined,
+    'm-hidden': docType === OdhDocumentType.Documentation || duration === undefined,
   });
   const progressBadgeClasses = classNames('odh-card__partner-badge odh-m-doc', {
     'm-hidden': !complete && !inProgress,

@@ -1,8 +1,8 @@
 import axios from 'axios';
-import { ODHApp } from '../types';
+import { OdhApplication } from '../gen/io.openshift.console.applications.v1alpha1';
 import { getBackendURL } from '../utilities/utils';
 
-export const fetchComponents = (installed: boolean): Promise<ODHApp[]> => {
+export const fetchComponents = (installed: boolean): Promise<OdhApplication[]> => {
   const url = getBackendURL('/api/components');
   const searchParams = new URLSearchParams();
   if (installed) {

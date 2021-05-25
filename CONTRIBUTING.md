@@ -37,7 +37,6 @@ or
 $ npm run make:login
 ```
 
-
 ## Debugging and Testing
 ### Basic testing
 To run the bare-bones linting checks run

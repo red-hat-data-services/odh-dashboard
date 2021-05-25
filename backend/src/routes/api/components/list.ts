@@ -1,5 +1,6 @@
 import { FastifyRequest } from 'fastify';
-import { KubeFastifyInstance, ODHApp } from '../../../types';
+import { KubeFastifyInstance } from '../../../types';
+import { OdhApplication } from '../../../gen/io.openshift.console.applications.v1alpha1';
 import { getEnabledConfigMaps, getLink, getServiceLink } from '../../../utils/componentUtils';
 import {
   getApplicationDefs,
@@ -11,7 +12,7 @@ import {
 export const listComponents = async (
   fastify: KubeFastifyInstance,
   request: FastifyRequest,
-): Promise<ODHApp[]> => {
+): Promise<OdhApplication[]> => {
   const applicationDefs = getApplicationDefs();
 
   // Fetch the installed kfDefs
@@ -22,9 +23,9 @@ export const listComponents = async (
 
   // Fetch the enabled config maps
   const enabledCMs = await getEnabledConfigMaps(fastify, applicationDefs);
-  const getCSVForApp = (app: ODHApp) =>
+  const getCSVForApp = (app: OdhApplication) =>
     operatorCSVs.find(
-      (operator) => app.spec.csvName && operator.metadata.name.startsWith(app.spec.csvName),
+      (operator) => app.spec?.csvName && operator.metadata?.name?.startsWith(app.spec.csvName),
     );
 
   // Get the components associated with the installed KfDefs or operators
@@ -46,10 +47,10 @@ export const listComponents = async (
 
     if (app.spec.enable) {
       const cm = enabledCMs.find(
-        (enabledCM) => enabledCM?.metadata.name === app.spec.enable?.validationConfigMap,
+        (enabledCM) => enabledCM.metadata.name === app.spec.enable.validationConfigMap,
       );
       if (cm) {
-        if (cm.data?.validation_result === 'true') {
+        if (cm.data.validation_result === 'true') {
           app.spec.isEnabled = true;
           acc.push(app);
           return acc;
@@ -60,14 +61,14 @@ export const listComponents = async (
   }, []);
 
   await Promise.all(
-    installedComponents.map(async (installedComponent: ODHApp) => {
-      if (installedComponent.spec.route) {
+    installedComponents.map(async (installedComponent: OdhApplication) => {
+      if (installedComponent?.spec?.route) {
         const csv = getCSVForApp(installedComponent);
         if (csv) {
           installedComponent.spec.link = await getLink(
             fastify,
             installedComponent.spec.route,
-            installedComponent.spec.routeNamespace || csv.metadata.namespace,
+            installedComponent.spec.routeNamespace || csv?.metadata?.namespace,
             installedComponent.spec.routeSuffix,
           );
         } else {

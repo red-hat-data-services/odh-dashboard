@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as _ from 'lodash';
 import { Gallery, PageSection } from '@patternfly/react-core';
 import { useWatchComponents } from '../../utilities/useWatchComponents';
-import { ODHApp } from '../../types';
+import { OdhApplication } from '../../gen/io.openshift.console.applications.v1alpha1';
 import ApplicationsPage from '../ApplicationsPage';
 import OdhAppCard from '../../components/OdhAppCard';
 import QuickStarts from '../../app/QuickStarts';
@@ -16,11 +16,11 @@ const description = `Launch your enabled applications or get started with quick 
 type EnabledApplicationsInnerProps = {
   loaded: boolean;
   loadError?: Error;
-  components: ODHApp[];
+  components: OdhApplication[];
 };
 
 // use to record the current enabled components
-let enabledComponents: ODHApp[] = [];
+let enabledComponents: OdhApplication[] = [];
 
 const EnabledApplicationsInner: React.FC<EnabledApplicationsInnerProps> = React.memo(
   ({ loaded, loadError, components }) => {

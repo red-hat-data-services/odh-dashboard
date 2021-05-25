@@ -10,11 +10,13 @@ A dashboard for Open Data Hub components.
 ## Requirements
 Before developing for ODH, the basic requirements:
 * Your system needs to be running [NodeJS version 12+ and NPM](https://nodejs.org/)
+* You have done an 'oc login' to the OpenShift cluster (see [CONTRIBUTING.md](./CONTRIBUTING.md))
   
 ### Additional tooling requirements
 * [OpenShift CLI, the "oc" command](https://docs.openshift.com/enterprise/3.2/cli_reference/get_started_cli.html#installing-the-cli)
 * [s2i](https://github.com/openshift/source-to-image)
 * [Quay.io](https://quay.io/)
+
 
 ## Development
    1. Clone the repository
@@ -26,6 +28,11 @@ Before developing for ODH, the basic requirements:
       ```
       $ cd odh-dashboard && npm install
       ```
+
+## Deploy the odh-dashboard to the OpenShift cluster
+   ```
+   make deploy
+   ```
 
 ### Serve development content
 This is the default context for running a local UI

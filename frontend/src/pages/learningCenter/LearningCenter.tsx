@@ -4,7 +4,8 @@ import * as _ from 'lodash';
 import useDimensions from 'react-cool-dimensions';
 import { Gallery, PageSection, PageSectionVariants } from '@patternfly/react-core';
 import { QuickStartContext, QuickStartContextValues } from '@cloudmosaic/quickstarts';
-import { ODHDoc, ODHDocType } from '../../types';
+import { OdhDocumentType } from '../../types';
+import { OdhDocument } from '../../gen/io.openshift.console.documents.v1alpha1';
 import { useWatchComponents } from '../../utilities/useWatchComponents';
 import { useWatchDocs } from '../../utilities/useWatchDocs';
 import { useLocalStorage } from '../../utilities/useLocalStorage';
@@ -40,8 +41,8 @@ type LearningCenterInnerProps = {
   loadError?: Error;
   docsLoadError?: Error;
   docsLoaded: boolean;
-  filteredDocApps: ODHDoc[];
-  docTypeCounts: Record<ODHDocType, number>;
+  filteredDocApps: OdhDocument[];
+  docTypeCounts: Record<OdhDocumentType, number>;
   totalCount: number;
   favorites: string[];
   updateFavorite: (isFavorite: boolean, name: string) => void;
@@ -127,14 +128,14 @@ const LearningCenter: React.FC = () => {
   const { docs: odhDocs, loaded: docsLoaded, loadError: docsLoadError } = useWatchDocs();
   const { components, loaded, loadError } = useWatchComponents(false);
   const qsContext = React.useContext<QuickStartContextValues>(QuickStartContext);
-  const [docApps, setDocApps] = React.useState<ODHDoc[]>([]);
-  const [docTypesCount, setDocTypesCount] = React.useState<Record<ODHDocType, number>>({
-    [ODHDocType.Documentation]: 0,
-    [ODHDocType.HowTo]: 0,
-    [ODHDocType.Tutorial]: 0,
-    [ODHDocType.QuickStart]: 0,
+  const [docApps, setDocApps] = React.useState<OdhDocument[]>([]);
+  const [docTypesCount, setDocTypesCount] = React.useState<Record<OdhDocumentType, number>>({
+    [OdhDocumentType.Documentation]: 0,
+    [OdhDocumentType.HowTo]: 0,
+    [OdhDocumentType.Tutorial]: 0,
+    [OdhDocumentType.QuickStart]: 0,
   });
-  const [filteredDocApps, setFilteredDocApps] = React.useState<ODHDoc[]>([]);
+  const [filteredDocApps, setFilteredDocApps] = React.useState<OdhDocument[]>([]);
   const queryParams = useQueryParams();
   const searchQuery = queryParams.get(SEARCH_FILTER_KEY) || '';
   const filters = queryParams.get(DOC_TYPE_FILTER_KEY);
@@ -154,16 +155,19 @@ const LearningCenter: React.FC = () => {
       // Add doc cards for all components' documentation
       components.forEach((component) => {
         if (component.spec.docsLink) {
-          const odhDoc: ODHDoc = {
+          const odhDoc: OdhDocument = {
+            apiVersion: 'v1alpha1',
+            kind: 'OdhDocument',
             metadata: {
               name: `${component.metadata.name}-doc`,
-              type: ODHDocType.Documentation,
             },
             spec: {
+              type: OdhDocumentType.Documentation,
               appName: component.metadata.name,
               provider: component.spec.provider,
               url: component.spec.docsLink,
               displayName: component.spec.displayName,
+              durationMinutes: 0,
               description: component.spec.description,
             },
           };
@@ -173,8 +177,8 @@ const LearningCenter: React.FC = () => {
 
       // Add doc cards for all quick starts
       qsContext.allQuickStarts?.forEach((quickStart) => {
-        const odhDoc: ODHDoc = _.merge({}, quickStart, {
-          metadata: { type: ODHDocType.QuickStart },
+        const odhDoc: OdhDocument = _.merge({}, quickStart, {
+          metadata: { type: OdhDocumentType.QuickStart },
         });
         docs.push(odhDoc);
       });
@@ -199,7 +203,7 @@ const LearningCenter: React.FC = () => {
   React.useEffect(() => {
     setFilteredDocApps(
       docApps
-        .filter((doc) => doc.metadata.type !== 'getting-started')
+        .filter((doc) => doc.spec.type !== 'getting-started')
         .filter((doc) => doesDocAppMatch(doc, searchQuery, typeFilters))
         .sort((a, b) => {
           const aFav = favoriteResources.includes(a.metadata.name);
@@ -216,7 +220,7 @@ const LearningCenter: React.FC = () => {
               sortVal = a.spec.displayName.localeCompare(b.spec.displayName);
               break;
             case SORT_TYPE_TYPE:
-              sortVal = a.metadata.type.localeCompare(b.metadata.type);
+              sortVal = a.spec.type.localeCompare(b.spec.type);
               break;
             case SORT_TYPE_APPLICATION:
               if (!a.spec.appDisplayName) {
@@ -244,16 +248,16 @@ const LearningCenter: React.FC = () => {
     );
     const docCounts = docApps.reduce(
       (acc, docApp) => {
-        if (acc[docApp.metadata.type] !== undefined) {
-          acc[docApp.metadata.type]++;
+        if (acc[docApp.spec.type] !== undefined) {
+          acc[docApp.spec.type]++;
         }
         return acc;
       },
       {
-        [ODHDocType.Documentation]: 0,
-        [ODHDocType.HowTo]: 0,
-        [ODHDocType.Tutorial]: 0,
-        [ODHDocType.QuickStart]: 0,
+        [OdhDocumentType.Documentation]: 0,
+        [OdhDocumentType.HowTo]: 0,
+        [OdhDocumentType.Tutorial]: 0,
+        [OdhDocumentType.QuickStart]: 0,
       },
     );
     setDocTypesCount(docCounts);

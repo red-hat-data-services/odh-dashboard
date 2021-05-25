@@ -1,8 +1,8 @@
 import axios from 'axios';
 import { getBackendURL } from '../utilities/utils';
-import { ODHDoc } from '../types';
+import { OdhDocument } from '../gen/io.openshift.console.documents.v1alpha1';
 
-export const fetchDocs = (docType?: string): Promise<ODHDoc[]> => {
+export const fetchDocs = (docType?: string): Promise<OdhDocument[]> => {
   const url = getBackendURL('/api/docs');
   const searchParams = new URLSearchParams();
   if (docType) {

@@ -1,0 +1,56 @@
+apiVersion: applications.console.openshift.io/v1alpha1
+kind: OdhApplication
+metadata:
+  name: jupyterhub
+spec:
+  displayName: JupyterHub
+  provider: Jupyter
+  description: |-
+    A multi-user version of the notebook designed for companies, classrooms and research labs.
+  kfdefApplications: ['jupyterhub', 'notebook-images']
+  route: jupyterhub
+  routeNamespace: redhat-ods-applications # {"$openapi":"ROUTE_NAMESPACE"}
+  csvName: opendatahub
+  img: images/jupyterhub.svg
+  category: Red Hat managed
+  support: red hat
+  docsLink: https://jupyter.org/hub
+  quickStart: create-jupyter-notebook
+  getStartedLink: https://jupyterhub.readthedocs.io/en/stable/getting-started/index.html
+---
+apiVersion: applications.console.openshift.io/v1alpha1
+kind: OdhApplication
+metadata:
+  name: aikit
+spec:
+  displayName: Intel® AI Analytics Toolkit Container
+  provider: Intel
+  description: "Deliver high-performance deep learning (DL) training on Intel® XPUs
+    and integrate fast inference into your AI development workflow with Intel-optimized
+    DL frameworks: TensorFlow and PyTorch, pretrained models, and low-precision tools. "
+  kfdefApplications: ['jupyterhub', 'notebook-images']
+  route: jupyterhub
+  img: images/oneapi.png
+  category: Intel managed
+  support: Intel
+  docsLink: https://software.intel.com/content/www/us/en/develop/tools/oneapi/ai-analytics-toolkit.html
+  quickStart: create-aikit-notebook
+  getStartedLink: https://software.intel.com/content/www/us/en/develop/documentation/get-started-with-ai-linux/top.html
+---
+apiVersion: applications.console.openshift.io/v1alpha1
+kind: OdhApplication
+metadata:
+  name: openvino
+spec:
+  displayName: OpenVINO
+  provider: Intel
+  description: |-
+    A toolkit to facilitate the optimization of a deep learning model from a framework and deployment using an inference engine onto Intel hardware.
+  kfdefApplications: []
+  img: images/openvino.svg
+  category: Self managed
+  support: third party support
+  docsLink: https://docs.openvinotoolkit.org/latest/index.html
+  quickStart: openvino-inference-notebook
+  getStartedLink: https://github.com/openvinotoolkit/openvino_notebooks
+  featureFlag: openvino

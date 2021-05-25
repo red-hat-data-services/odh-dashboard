@@ -11,7 +11,7 @@ import {
 } from '@patternfly/react-core';
 import { ExternalLinkAltIcon } from '@patternfly/react-icons';
 import { QuickStartContext, QuickStartContextValues } from '@cloudmosaic/quickstarts';
-import { ODHApp } from '../types';
+import { OdhApplication } from '../gen/io.openshift.console.applications.v1alpha1';
 import { getQuickStartLabel, launchQuickStart } from '../utilities/quickStartUtils';
 import BrandImage from './BrandImage';
 import SupportedAppTitle from './SupportedAppTitle';
@@ -20,7 +20,7 @@ import './OdhCard.scss';
 import { makeCardVisible } from '../utilities/utils';
 
 type OdhAppCardProps = {
-  odhApp: ODHApp;
+  odhApp: OdhApplication;
 };
 
 const OdhAppCard: React.FC<OdhAppCardProps> = ({ odhApp }) => {
@@ -103,10 +103,6 @@ const OdhAppCard: React.FC<OdhAppCardProps> = ({ odhApp }) => {
     </CardFooter>
   );
 
-  const badgeClasses = classNames('odh-card__partner-badge', {
-    'm-warning': odhApp.spec.category === 'Third party support',
-  });
-
   return (
     <Card
       id={odhApp.metadata.name}
@@ -127,14 +123,7 @@ const OdhAppCard: React.FC<OdhAppCardProps> = ({ odhApp }) => {
         />
       </CardHeader>
       <SupportedAppTitle odhApp={odhApp} />
-      <CardBody>
-        {odhApp.spec.category && odhApp.spec.category !== 'Red Hat' ? (
-          <div className="odh-card__partner-badge-container">
-            <span className={badgeClasses}>{odhApp.spec.category}</span>
-          </div>
-        ) : null}
-        {odhApp.spec.description}
-      </CardBody>
+      <CardBody>{odhApp.spec.description}</CardBody>
       {cardFooter}
     </Card>
   );

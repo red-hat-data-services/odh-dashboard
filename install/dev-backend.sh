@@ -7,5 +7,6 @@ cd ${DIR}/../backend
 pwd
 
 PORT=${BACKEND_DEV_PORT}
+LOG_LEVEL=verbose
 npm install
-npm run start:dev
+npm run start:dev --verbose=true

@@ -21,7 +21,7 @@ import {
   PficonSortCommonDescIcon,
   TimesIcon,
 } from '@patternfly/react-icons';
-import { ODHDocType } from '../../types';
+import { OdhDocumentType } from '../../types';
 import { removeQueryArgument, setQueryArgument } from '../../utilities/router';
 import { fireTrackingEvent } from '../../utilities/segmentIOUtils';
 import { useQueryParams } from '../../utilities/useQueryParams';
@@ -44,7 +44,7 @@ import './LearningCenterFilter.scss';
 type LearningCenterFilterProps = {
   count: number;
   totalCount: number;
-  docTypeStatusCount: Record<ODHDocType, number>;
+  docTypeStatusCount: Record<OdhDocumentType, number>;
   onSearchInputChange?: (value: string) => void;
   viewType: string;
   updateViewType: (updatedType: string) => void;
@@ -72,10 +72,10 @@ const LearningCenterFilters: React.FC<LearningCenterFilterProps> = ({
   const sortOrder = queryParams.get(DOC_SORT_ORDER_KEY) || SORT_ASC;
 
   const docTypes = {
-    [ODHDocType.Documentation]: getTextForDocType(ODHDocType.Documentation),
-    [ODHDocType.HowTo]: getTextForDocType(ODHDocType.HowTo),
-    [ODHDocType.Tutorial]: getTextForDocType(ODHDocType.Tutorial),
-    [ODHDocType.QuickStart]: getTextForDocType(ODHDocType.QuickStart),
+    [OdhDocumentType.Documentation]: getTextForDocType(OdhDocumentType.Documentation),
+    [OdhDocumentType.HowTo]: getTextForDocType(OdhDocumentType.HowTo),
+    [OdhDocumentType.Tutorial]: getTextForDocType(OdhDocumentType.Tutorial),
+    [OdhDocumentType.QuickStart]: getTextForDocType(OdhDocumentType.QuickStart),
   };
   const sortTypes = {
     name: SORT_TYPE_NAME,
@@ -175,7 +175,7 @@ const LearningCenterFilters: React.FC<LearningCenterFilterProps> = ({
     setSearchInputText(val);
   };
 
-  const removeFilter = (docType: ODHDocType): void => {
+  const removeFilter = (docType: OdhDocumentType): void => {
     const selectedTypes = typeFilters.filter((status) => status !== docType);
     if (selectedTypes.length > 0) {
       setQueryArgument(history, DOC_TYPE_FILTER_KEY, selectedTypes.join(','));
@@ -188,13 +188,13 @@ const LearningCenterFilters: React.FC<LearningCenterFilterProps> = ({
     updateViewType(viewType === CARD_VIEW ? LIST_VIEW : CARD_VIEW);
   };
 
-  const renderDocLabel = (docType: ODHDocType) => {
+  const renderDocLabel = (docType: OdhDocumentType) => {
     const label = getTextForDocType(docType);
     const badgeClasses = classNames('odh-card__partner-badge odh-m-doc', {
-      'odh-m-documentation': docType === ODHDocType.Documentation,
-      'odh-m-tutorial': docType === ODHDocType.Tutorial,
-      'odh-m-quick-start': docType === ODHDocType.QuickStart,
-      'odh-m-how-to': docType === ODHDocType.HowTo,
+      'odh-m-documentation': docType === OdhDocumentType.Documentation,
+      'odh-m-tutorial': docType === OdhDocumentType.Tutorial,
+      'odh-m-quick-start': docType === OdhDocumentType.QuickStart,
+      'odh-m-how-to': docType === OdhDocumentType.HowTo,
     });
 
     return (
@@ -273,7 +273,7 @@ const LearningCenterFilters: React.FC<LearningCenterFilterProps> = ({
         </ToolbarItem>
         <ToolbarItem>
           <div className="odh-learning-paths-filter__filtered-types">
-            {typeFilters.map((filter) => renderDocLabel(filter as ODHDocType))}
+            {typeFilters.map((filter) => renderDocLabel(filter as OdhDocumentType))}
           </div>
         </ToolbarItem>
         <ToolbarItem

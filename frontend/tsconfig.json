@@ -16,6 +16,7 @@
     "allowJs": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
+    "strictNullChecks": false,
     "strict": true,
     "paths": {
       "@app/*": ["src/app/*"],
