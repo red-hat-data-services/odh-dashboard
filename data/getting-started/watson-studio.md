@@ -10,7 +10,7 @@ Build, run, and manage AI models at scale across any cloud. IBM Watson Studio em
 
 Use open source frameworks like PyTorch, TensorFlow and scikit-learn. Bring together the development tools including popular IDEs, Jupyter notebooks, JupterLab and CLIs — or languages such as Python, R and Scala.
 
-# Subscribe to the operator on Market place
+# Subscribe to the operator on Marketplace
 -  [https://marketplace.redhat.com/en-us/products/ibm-watson-studio](https://marketplace.redhat.com/en-us/products/ibm-watson-studio)
 # Install the operator and validate
 - [https://marketplace.redhat.com/en-us/documentation/operators](https://marketplace.redhat.com/en-us/documentation/operators)

@@ -24,7 +24,7 @@ Seldon Deploy has a Red Hat marketplace listing. That install includes Red Hat v
 
 Documentation on the Seldon Deploy Red Hat marketplace install is at [https://deploy-master.seldon.io/docs/getting-started/redhat-installation/](https://deploy-master.seldon.io/docs/getting-started/redhat-installation/)
 
-### Subscribe to the operator on Market place
+### Subscribe to the operator on Marketplace
 - [https://marketplace.redhat.com/en-us/products/seldon-deploy](https://marketplace.redhat.com/en-us/products/seldon-deploy)
 ### Install the operator and validate
 - [https://marketplace.redhat.com/en-us/documentation/operators](https://marketplace.redhat.com/en-us/documentation/operators)

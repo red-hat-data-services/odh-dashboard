@@ -21,7 +21,7 @@ OpenVINO libraries are provided through PyPi, and can be installed from many exi
 
 OpenVINO Operator has a Red Hat marketplace listing.
 
-### Subscribe to the operator on Market place
+### Subscribe to the operator on Marketplace
 - [https://marketplace.redhat.com/en-us/products/openvino](https://marketplace.redhat.com/en-us/products/openvino)
 ### Install the operator and validate
 - [https://marketplace.redhat.com/en-us/documentation/operators](https://marketplace.redhat.com/en-us/documentation/operators)

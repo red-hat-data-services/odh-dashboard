@@ -16,7 +16,7 @@ spec:
     - title: Create a new GitHub repository using the s2i Flask template
       description: |-
         ### To create a new repository from the s2i Flask template:
-        1. Navigate to `https://github.com/cfchase/s2i-flask-notebook`.
+        1. Navigate to `https://github.com/opendatahub-io/odh-s2i-project-simple`.
         2. Click **Use this template** to create a new repository from this template.
         3. Enter a *Repository name* for your new repository.
         4. Select the **Public** radio button to ensure the repository is visible.
