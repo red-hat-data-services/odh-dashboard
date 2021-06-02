@@ -23,6 +23,7 @@ import {
 } from '@patternfly/react-icons';
 import { ODHDocType } from '../../types';
 import { removeQueryArgument, setQueryArgument } from '../../utilities/router';
+import { fireTrackingEvent } from '../../utilities/segmentIOUtils';
 import { useQueryParams } from '../../utilities/useQueryParams';
 import {
   getTextForDocType,
@@ -37,7 +38,6 @@ import {
   SORT_TYPE_DURATION,
 } from './learningCenterUtils';
 import { CARD_VIEW, LIST_VIEW } from './const';
-import { fireTrackingEvent } from '../../utilities/segmentIOUtils';
 
 import './LearningCenterFilter.scss';
 

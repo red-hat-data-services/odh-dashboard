@@ -2,9 +2,8 @@ import * as React from 'react';
 import { fetchSegmentKey } from 'services/segmentKeyService';
 import { ODHSegmentKey } from '../types';
 import { POLL_INTERVAL } from './const';
-import { useDeepCompareMemoize } from './useDeepCompareMemoize';
 
-export const useSegmentIOTracking = (): {
+export const useWatchSegmentKey = (): {
   segmentKey: string;
   loaded: boolean;
   loadError: Error | undefined;
@@ -18,9 +17,9 @@ export const useSegmentIOTracking = (): {
     const watchSegmentKey = () => {
       fetchSegmentKey()
         .then((updatedSegmentKey: ODHSegmentKey) => {
+          setSegmentKey(updatedSegmentKey.segmentKey);
           setLoaded(true);
           setLoadError(undefined);
-          setSegmentKey(updatedSegmentKey.segmentKey);
         })
         .catch((e) => {
           setLoadError(e);
@@ -34,11 +33,9 @@ export const useSegmentIOTracking = (): {
         clearTimeout(watchHandle);
       }
     };
-    // Don't update when components are updated
+    // Don't update when segment-key is updated
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const retSegmentKey = useDeepCompareMemoize<string>(segmentKey);
-
-  return { segmentKey: retSegmentKey || '', loaded, loadError };
+  return { segmentKey: segmentKey || '', loaded, loadError };
 };

@@ -1,6 +1,6 @@
 import createError from 'http-errors';
 import { FastifyInstance, FastifyRequest } from 'fastify';
-import { ClusterVersionType, KubeFastifyInstance, KubeStatus } from '../../../types';
+import { KubeFastifyInstance, KubeStatus } from '../../../types';
 import { DEV_MODE } from '../../../utils/constants';
 import { addCORSHeader } from '../../../utils/responseUtils';
 
@@ -9,15 +9,8 @@ const status = async (
   request: FastifyRequest,
 ): Promise<{ kube: KubeStatus }> => {
   const kubeContext = fastify.kube.currentContext;
-  const { currentContext, namespace, currentUser, customObjectsApi } = fastify.kube;
+  const { currentContext, namespace, currentUser, clusterID } = fastify.kube;
   const userName = request.headers['x-forwarded-user'] ?? currentUser.name;
-  const clusterVersion = await customObjectsApi.getClusterCustomObject(
-    'config.openshift.io',
-    'v1',
-    'clusterversions',
-    'version',
-  );
-  const clusterID = (clusterVersion.body as ClusterVersionType).spec.clusterID;
   if (!kubeContext && !kubeContext.trim()) {
     const error = createError(500, 'failed to get kube status');
     error.explicitInternalServerError = true;

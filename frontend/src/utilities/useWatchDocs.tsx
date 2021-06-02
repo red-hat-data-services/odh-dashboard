@@ -20,9 +20,9 @@ export const useWatchDocs = (
     const watchQuickStarts = () => {
       fetchDocs(docType)
         .then((updatedDocs: ODHDoc[]) => {
+          setDocs(updatedDocs);
           setLoaded(true);
           setLoadError(undefined);
-          setDocs(updatedDocs);
         })
         .catch((e) => {
           setLoadError(e);

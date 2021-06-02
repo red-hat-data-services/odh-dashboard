@@ -6,9 +6,9 @@ import { ODHApp } from '../../types';
 import ApplicationsPage from '../ApplicationsPage';
 import OdhAppCard from '../../components/OdhAppCard';
 import QuickStarts from '../../app/QuickStarts';
+import { fireTrackingEvent } from '../../utilities/segmentIOUtils';
 
 import './EnabledApplications.scss';
-import { fireTrackingEvent } from '../../utilities/segmentIOUtils';
 
 const description = `Launch your enabled applications or get started with quick start instructions
  and tasks.`;
@@ -18,17 +18,28 @@ type EnabledApplicationsInnerProps = {
   loadError?: Error;
   components: ODHApp[];
 };
+
+// use to record the current enabled components
+let enabledComponents: ODHApp[] = [];
+
 const EnabledApplicationsInner: React.FC<EnabledApplicationsInnerProps> = React.memo(
   ({ loaded, loadError, components }) => {
     const isEmpty = !components || components.length === 0;
 
-    // fire an individual segment.io tracking event for every enabled application
-    if (!isEmpty) {
-      components.forEach((c) => {
+    /*
+     * compare the current enabled applications and new fetched enabled applications
+     * fire an individual segment.io tracking event for every different enabled application
+     */
+    if (loaded) {
+      _.difference(
+        components.map((c) => c.metadata.name),
+        enabledComponents.map((c) => c.metadata.name),
+      ).forEach((name) =>
         fireTrackingEvent('Application Enabled', {
-          name: c.metadata.name,
-        });
-      });
+          name,
+        }),
+      );
+      enabledComponents = components;
     }
 
     return (

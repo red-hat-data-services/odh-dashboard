@@ -30,14 +30,6 @@ export type K8sResourceCommon = {
   };
 };
 
-// Minimal type for ClusterVersion
-export type ClusterVersionType = {
-  spec: {
-    clusterID: string;
-    channel?: string;
-  };
-} & K8sResourceCommon;
-
 // Minimal type for routes
 export type RouteKind = {
   spec: {

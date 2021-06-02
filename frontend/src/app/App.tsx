@@ -1,25 +1,25 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useHistory } from 'react-router';
 import '@patternfly/patternfly/patternfly.min.css';
 import { Page } from '@patternfly/react-core';
 import { detectUser } from '../redux/actions/actions';
 import { useDesktopWidth } from '../utilities/useDesktopWidth';
+import { useWatchSegmentKey } from '../utilities/useWatchSegmentKey';
+import { fireTrackingEvent, initSegment } from '../utilities/segmentIOUtils';
+import { RootState } from '../redux/types';
 import Header from './Header';
 import Routes from './Routes';
 import NavSidebar from './NavSidebar';
 
 import './App.scss';
-import { useHistory } from 'react-router';
-import { useSegmentIOTracking } from '../utilities/useSegmentIOTracking';
-import { fireTrackingEvent, initSegment } from '../utilities/segmentIOUtils';
-import { RootState } from '../redux/types';
 
 const App: React.FC = () => {
   const isDeskTop = useDesktopWidth();
   const [isNavOpen, setIsNavOpen] = React.useState(isDeskTop);
   const dispatch = useDispatch();
   const history = useHistory();
-  const { segmentKey, loaded, loadError } = useSegmentIOTracking();
+  const { segmentKey, loaded, loadError } = useWatchSegmentKey();
   const username = useSelector((state: RootState) => state.appReducer.user);
   const clusterID = useSelector((state: RootState) => state.appReducer.clusterID);
 

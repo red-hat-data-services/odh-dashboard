@@ -26,9 +26,9 @@ export const initSegment = async (props) => {
   if (analytics.initialize) {
     return;
   }
-  if (analytics.invoked)
+  if (analytics.invoked) {
     window.console && console.error && console.error('Segment snippet included twice.');
-  else {
+  } else {
     analytics.invoked = true;
     analytics.methods = [
       'trackSubmit',
