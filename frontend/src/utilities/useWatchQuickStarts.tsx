@@ -18,9 +18,9 @@ export const useWatchQuickStarts = (): {
     const watchQuickStarts = () => {
       fetchQuickStarts()
         .then((updatedQuickStarts: QuickStart[]) => {
-          setQuickStarts(updatedQuickStarts);
           setLoaded(true);
           setLoadError(undefined);
+          setQuickStarts(updatedQuickStarts);
         })
         .catch((e) => {
           setLoadError(e);

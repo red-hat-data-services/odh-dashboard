@@ -26,22 +26,6 @@ const EnabledApplicationsInner: React.FC<EnabledApplicationsInnerProps> = React.
   ({ loaded, loadError, components }) => {
     const isEmpty = !components || components.length === 0;
 
-    /*
-     * compare the current enabled applications and new fetched enabled applications
-     * fire an individual segment.io tracking event for every different enabled application
-     */
-    if (loaded) {
-      _.difference(
-        components.map((c) => c.metadata.name),
-        enabledComponents.map((c) => c.metadata.name),
-      ).forEach((name) =>
-        fireTrackingEvent('Application Enabled', {
-          name,
-        }),
-      );
-      enabledComponents = components;
-    }
-
     return (
       <QuickStarts>
         <ApplicationsPage
@@ -75,6 +59,24 @@ const EnabledApplications: React.FC = () => {
       a.spec.displayName.localeCompare(b.spec.displayName),
     );
   }, [components]);
+
+  React.useEffect(() => {
+    /*
+     * compare the current enabled applications and new fetched enabled applications
+     * fire an individual segment.io tracking event for every different enabled application
+     */
+    if (loaded && components.length) {
+      _.difference(
+        components.map((c) => c.metadata.name),
+        enabledComponents.map((c) => c.metadata.name),
+      ).forEach((name) =>
+        fireTrackingEvent('Application Enabled', {
+          name,
+        }),
+      );
+      enabledComponents = components;
+    }
+  }, [components, loaded]);
 
   return (
     <QuickStarts>

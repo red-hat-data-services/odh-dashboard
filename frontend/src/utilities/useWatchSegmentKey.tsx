@@ -17,9 +17,9 @@ export const useWatchSegmentKey = (): {
     const watchSegmentKey = () => {
       fetchSegmentKey()
         .then((updatedSegmentKey: ODHSegmentKey) => {
-          setSegmentKey(updatedSegmentKey.segmentKey);
           setLoaded(true);
           setLoadError(undefined);
+          setSegmentKey(updatedSegmentKey.segmentKey);
         })
         .catch((e) => {
           setLoadError(e);

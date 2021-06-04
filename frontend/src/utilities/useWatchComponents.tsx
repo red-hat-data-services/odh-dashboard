@@ -16,9 +16,9 @@ export const useWatchComponents = (
     const watchComponents = () => {
       fetchComponents(installed)
         .then((updatedComponents: ODHApp[]) => {
-          setComponents(updatedComponents);
           setLoaded(true);
           setLoadError(undefined);
+          setComponents(updatedComponents);
         })
         .catch((e) => {
           setLoadError(e);
