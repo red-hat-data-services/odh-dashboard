@@ -1,6 +1,8 @@
 metadata:
   name: seldon-model-servings-tutorial
   type: tutorial
+  annotations:
+    opendatahub.io/categories: 'AI/Machine learning,Deployment,Model serving,Python'
 spec:
   appName: seldon-deploy
   displayName: Various types of Model Servings

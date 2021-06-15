@@ -1,6 +1,8 @@
 kind: ConsoleQuickStart
 metadata:
   name: connect-rhosak-notebook
+  annotations:
+    opendatahub.io/categories: 'Data management,Deployment,Jupyter notebook,Model serving,Python'
 spec:
   displayName: Connecting to Red Hat OpenShift Streams for Apache Kafka
   appName: rhosak

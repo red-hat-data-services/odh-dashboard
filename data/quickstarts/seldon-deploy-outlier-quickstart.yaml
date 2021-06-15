@@ -1,6 +1,8 @@
 kind: ConsoleQuickStart
 metadata:
   name: seldon-deploy-model-outlier
+  annotations:
+    opendatahub.io/categories: 'AI/Machine learning,Deployment,Model serving,Monitoring'
 spec:
   displayName: See outlier scores for predictions to deployed model
   appName: seldon-deploy

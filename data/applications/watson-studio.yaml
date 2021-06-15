@@ -1,5 +1,7 @@
 metadata:
   name: watson-studio
+  annotations:
+    opendatahub.io/categories: 'AI/Machine learning,Deployment,Jupyter notebook,Model serving,Python'
 spec:
   displayName: IBM Watson Studio
   provider: IBM

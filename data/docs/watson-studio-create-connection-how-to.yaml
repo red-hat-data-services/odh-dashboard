@@ -1,6 +1,8 @@
 metadata:
   name: watson-studio-create-connection-how-to
   type: how-to
+  annotations:
+    opendatahub.io/categories: 'Data management'
 spec:
   appName: watson-studio
   displayName: How to create a connection to access data

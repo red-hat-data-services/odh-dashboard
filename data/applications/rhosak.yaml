@@ -1,5 +1,7 @@
 metadata:
   name: rhosak
+  annotations:
+    opendatahub.io/categories: 'Data management'
 spec:
   displayName: OpenShift Streams for Apache Kafka
   provider: Red Hat
