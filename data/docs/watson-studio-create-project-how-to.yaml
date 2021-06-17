@@ -1,6 +1,8 @@
 metadata:
   name: watson-studio-create-project-how-to
   type: how-to
+  annotations:
+    opendatahub.io/categories: 'Getting started'
 spec:
   appName: watson-studio
   displayName: How to create a project in Watson Studio

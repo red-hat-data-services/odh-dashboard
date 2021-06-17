@@ -1,6 +1,8 @@
 metadata:
   name: build-binary-classification-model-tutorial
   type: tutorial
+  annotations:
+    opendatahub.io/categories: 'AI/Machine learning,Deployment,Model serving'
 spec:
   appName: watson-studio
   displayName: Build a binary classification model

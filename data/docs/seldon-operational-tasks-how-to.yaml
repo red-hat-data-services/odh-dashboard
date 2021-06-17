@@ -1,6 +1,8 @@
 metadata:
   name: seldon-operation-tasks-how-to
   type: how-to
+  annotations:
+    opendatahub.io/categories: 'Getting started,Model serving'
 spec:
   displayName: How to perform operational tasks
   appName: seldon-deploy

@@ -1,6 +1,8 @@
 kind: ConsoleQuickStart
 metadata:
   name: seldon-deploy-model-drift
+  annotations:
+    opendatahub.io/categories: 'AI/Machine learning,Deployment,Model serving,Monitoring,Python'
 spec:
   displayName: Monitor a deployed model for drift
   appName: seldon-deploy
