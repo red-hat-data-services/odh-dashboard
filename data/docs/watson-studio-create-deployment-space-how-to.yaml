@@ -1,6 +1,8 @@
 metadata:
   name: watson-studio-create-deployment-space-how-to
   type: how-to
+  annotations:
+    opendatahub.io/categories: 'AI/Machine learning,Deployment,Model serving'
 spec:
   appName: watson-studio
   displayName: How to create a deployment space for deploying my model

@@ -1,6 +1,8 @@
 metadata:
   name: python-accelerate-numba-tutorial
   type: tutorial
+  annotations:
+    opendatahub.io/categories: 'Python'
 spec:
   appName: anaconda-ce
   displayName: Accelerating scientific workloads in Python with Numba

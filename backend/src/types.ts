@@ -8,6 +8,7 @@ export declare type QuickStart = {
   kind?: string;
   metadata: {
     name: string;
+    annotations?: { [key: string]: string };
   };
   spec: {
     version?: number;
@@ -69,6 +70,7 @@ export type KubeStatus = {
   currentUser: User;
   namespace: string;
   userName: string | string[];
+  clusterID: string;
 };
 
 export type KubeDecorator = KubeStatus & {
@@ -87,9 +89,10 @@ export type KubeFastifyInstance = FastifyInstance & {
  * Common types, should be kept up to date with frontend types
  */
 
-export type ODHApp = {
+export type OdhApplication = {
   metadata: {
     name: string;
+    annotations?: { [key: string]: string };
   };
   spec: {
     displayName: string;
@@ -126,17 +129,18 @@ export type ODHApp = {
   };
 };
 
-export enum ODHDocType {
+export enum OdhDocumentType {
   Documentation = 'documentation',
   HowTo = 'how-to',
   QuickStart = 'quickstart',
   Tutorial = 'tutorial',
 }
 
-export type ODHDoc = {
+export type OdhDocument = {
   metadata: {
     name: string;
     type: string;
+    annotations?: { [key: string]: string };
   };
   spec: {
     displayName: string;
@@ -152,7 +156,17 @@ export type ODHDoc = {
   };
 };
 
-export type ODHGettingStarted = {
+export type OdhGettingStarted = {
   appName: string;
   markdown: string;
+};
+
+export type BuildStatus = {
+  name: string;
+  status: string;
+  timestamp?: string;
+};
+
+export type ODHSegmentKey = {
+  segmentKey: string;
 };

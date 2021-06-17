@@ -1,6 +1,8 @@
 metadata:
   name: auto-ai-experiment-model-tutorial
   type: tutorial
+  annotations:
+    opendatahub.io/categories: 'AI/Machine learning,Deployment,Model serving,Python'
 spec:
   appName: watson-studio
   displayName: Run an AutoAI experiment to build a model
