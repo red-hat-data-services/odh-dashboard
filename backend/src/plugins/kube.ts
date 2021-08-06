@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import fp from 'fastify-plugin';
 import { FastifyInstance } from 'fastify';
+import * as jsYaml from 'js-yaml';
 import * as k8s from '@kubernetes/client-node';
 import { DEV_MODE } from '../utils/constants';
 import { initializeWatchedResources } from '../utils/resourceUtils';
@@ -33,9 +34,21 @@ export default fp(async (fastify: FastifyInstance) => {
     );
     clusterID = (clusterVersion.body as { spec: { clusterID: string } }).spec.clusterID;
   } catch (e) {
+    fastify.log.error(`Failed to retrieve cluster id: ${e.response?.body?.message || e.message}.`);
+  }
+  let clusterBranding = 'okd';
+  try {
+    const consoleConfig = await coreV1Api
+      .readNamespacedConfigMap('console-config', 'openshift-console')
+      .then((result) => result.body);
+    if (consoleConfig?.data?.['console-config.yaml']) {
+      const consoleConfigData = jsYaml.load(consoleConfig.data['console-config.yaml']);
+      clusterBranding = consoleConfigData.customization?.branding || 'okd';
+      fastify.log.info(`Cluster Branding: ${clusterBranding}`);
+    }
+  } catch (e) {
     fastify.log.error(
-      e,
-      'Failed to retrieve cluster id. Please make sure the ClusterRole you are using has the permission to the ClusterVersion resource',
+      `Failed to retrieve console cluster info: ${e.response?.body?.message || e.message}`,
     );
   }
 
@@ -49,6 +62,7 @@ export default fp(async (fastify: FastifyInstance) => {
     customObjectsApi,
     currentUser,
     clusterID,
+    clusterBranding,
   });
 
   // Initialize the watching of resources
