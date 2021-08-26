@@ -6,6 +6,8 @@ import * as k8s from '@kubernetes/client-node';
 import { DEV_MODE } from '../utils/constants';
 import { initializeWatchedResources } from '../utils/resourceUtils';
 
+const CONSOLE_CONFIG_YAML_FIELD = 'console-config.yaml';
+
 const kc = new k8s.KubeConfig();
 kc.loadFromDefault();
 
@@ -41,8 +43,8 @@ export default fp(async (fastify: FastifyInstance) => {
     const consoleConfig = await coreV1Api
       .readNamespacedConfigMap('console-config', 'openshift-console')
       .then((result) => result.body);
-    if (consoleConfig?.data?.['console-config.yaml']) {
-      const consoleConfigData = jsYaml.load(consoleConfig.data['console-config.yaml']);
+    if (consoleConfig?.data?.[CONSOLE_CONFIG_YAML_FIELD]) {
+      const consoleConfigData = jsYaml.load(consoleConfig.data[CONSOLE_CONFIG_YAML_FIELD]);
       clusterBranding = consoleConfigData.customization?.branding || 'okd';
       fastify.log.info(`Cluster Branding: ${clusterBranding}`);
     }
