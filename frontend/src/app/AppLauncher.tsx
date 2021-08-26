@@ -4,22 +4,66 @@ import {
   ApplicationLauncher,
   ApplicationLauncherGroup,
   ApplicationLauncherItem,
+  ApplicationLauncherSeparator,
 } from '@patternfly/react-core';
 import openshiftLogo from '../images/openshift.svg';
 import { RootState } from '../redux/types';
+import { useWatchConsoleLinks } from '../utilities/useWatchConsoleLinks';
 
+type ApplicationAction = {
+  label: string;
+  href: string;
+  image: React.ReactNode;
+};
+
+type Section = {
+  label: string;
+  actions: ApplicationAction[];
+};
+
+const rhodsConsoleLinkName = 'rhodslink';
 const consolePrefix = 'console-openshift-console';
 
-export const getOCMLink = (clusterID: string): string =>
-  `https://cloud.redhat.com/openshift/details/${clusterID}`;
+export const getOCMAction = (
+  clusterID?: string,
+  clusterBranding?: string,
+): ApplicationAction | null => {
+  if (clusterID && clusterBranding !== 'okd' && clusterBranding !== 'azure') {
+    return {
+      label: 'OpenShift Cluster Manager',
+      href: `https://cloud.redhat.com/openshift/details/${clusterID}`,
+      image: <img src={openshiftLogo} alt="" />,
+    };
+  }
+  return null;
+};
 
-export const getOpenShiftDedicatedLink = (): string => {
+export const getOpenShiftConsoleAction = (): ApplicationAction | null => {
   const { hostname, protocol, port } = window.location;
   const hostParts = hostname.split('.').slice(1);
   if (hostParts.length < 2) {
-    return '';
+    return null;
   }
-  return `${protocol}//${consolePrefix}.${hostParts.join('.')}:${port}`;
+  return {
+    label: 'OpenShift Console',
+    href: `${protocol}//${consolePrefix}.${hostParts.join('.')}:${port}`,
+    image: <img src={openshiftLogo} alt="" />,
+  };
+};
+
+const sectionSortValue = (section: Section): number => {
+  switch (section.label) {
+    case 'Red Hat Applications':
+      return 0;
+    case 'Third Party Applications':
+      return 1;
+    case 'Customer Applications':
+      return 2;
+    case '':
+      return 9; // Items w/o sections go last
+    default:
+      return 3; // Custom groups come after well-known groups
+  }
 };
 
 const AppLauncher: React.FC = () => {
@@ -28,7 +72,50 @@ const AppLauncher: React.FC = () => {
     state.appState.clusterID,
     state.appState.clusterBranding,
   ]);
-  const osDedicatedLink = getOpenShiftDedicatedLink();
+  const { consoleLinks } = useWatchConsoleLinks();
+
+  const applicationLinks = consoleLinks.filter(
+    (link) =>
+      link.spec.location === 'ApplicationMenu' && link.metadata.name !== rhodsConsoleLinkName,
+  );
+
+  const getRHApplications = (): Section[] => {
+    const osConsoleAction = getOpenShiftConsoleAction();
+    const ocmAction = getOCMAction(clusterID, clusterBranding);
+
+    if (!osConsoleAction && !ocmAction) {
+      return [];
+    }
+    const section: Section = {
+      label: 'Red Hat Applications',
+      actions: [],
+    };
+    if (osConsoleAction) {
+      section.actions.push(osConsoleAction);
+    }
+    if (ocmAction) {
+      section.actions.push(ocmAction);
+    }
+    return [section];
+  };
+
+  const sections: Section[] = applicationLinks.reduce((acc, link) => {
+    const action: ApplicationAction = {
+      label: link.spec.text,
+      href: link.spec.href,
+      image: <img src={link.spec.applicationMenu.imageURL} alt="" />,
+    };
+    const section = acc.find((section) => section.label === link.spec.applicationMenu.section);
+    if (section) {
+      section.actions.push(action);
+    } else {
+      acc.push({ label: link.spec.applicationMenu.section, actions: [action] });
+    }
+    return acc;
+  }, getRHApplications());
+
+  sections.forEach((section) => section.actions.sort((a, b) => a.label.localeCompare(b.label)));
+  sections.sort((a, b) => sectionSortValue(a) - sectionSortValue(b));
 
   const onToggle = () => {
     setIsOpen((prev) => !prev);
@@ -38,52 +125,37 @@ const AppLauncher: React.FC = () => {
     setIsOpen(false);
   };
 
-  const appLauncherItems: React.ReactNode[] = [];
-  if (clusterID && clusterBranding !== 'okd' && clusterBranding !== 'azure') {
-    appLauncherItems.push(
-      <ApplicationLauncherItem
-        key="os-cluster-manager"
-        href={getOCMLink(clusterID)}
-        isExternal
-        icon={<img src={openshiftLogo} alt="" />}
-        rel="noopener noreferrer"
-        target="_blank"
-      >
-        OpenShift Cluster Manager
-      </ApplicationLauncherItem>,
-    );
-  }
-  if (osDedicatedLink) {
-    appLauncherItems.push(
-      <ApplicationLauncherItem
-        key="os-dedicated"
-        href={osDedicatedLink}
-        isExternal
-        icon={<img src={openshiftLogo} alt="" />}
-        rel="noopener noreferrer"
-        target="_blank"
-      >
-        OpenShift Dedicated
-      </ApplicationLauncherItem>,
-    );
-  }
-
-  if (appLauncherItems.length === 0) {
+  if (sections.length === 0) {
     return null;
   }
 
   return (
     <ApplicationLauncher
       aria-label="Application launcher"
-      className="co-app-launcher"
       onSelect={onSelect}
       onToggle={onToggle}
       isOpen={isOpen}
-      items={[
-        <ApplicationLauncherGroup key="rh-apps" label="Red Hat Applications">
-          {appLauncherItems}
-        </ApplicationLauncherGroup>,
-      ]}
+      items={sections.map((section, sectionIndex) => (
+        <ApplicationLauncherGroup key={section.label} label={section.label}>
+          {section.actions.map((action) => (
+            <ApplicationLauncherItem
+              key={action.label}
+              href={action.href}
+              isExternal
+              icon={action.image}
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              {action.label}
+            </ApplicationLauncherItem>
+          ))}
+          <>
+            {sectionIndex < sections.length - 1 && (
+              <ApplicationLauncherSeparator key={`separator-${sectionIndex}`} />
+            )}
+          </>
+        </ApplicationLauncherGroup>
+      ))}
       position="right"
       isGrouped
     />
