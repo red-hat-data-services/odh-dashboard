@@ -25,7 +25,7 @@ spec:
     - title: Launch JupyterHub Notebook Server
       description: |-
         ### Important considerations
-        Use the **Intel oneAPI AI Analytics Toolkit** notebook with the **Default** container size.
+        Use the **Intel oneAPI AI Analytics Toolkit** notebook with the **Large** container size.
       review:
         instructions: |-
           #### Launched JupyterHub notebook server
@@ -66,7 +66,7 @@ spec:
       description: |-
         ### Running a Intel® oneAPI AI Analytics Toolkit sample
         1. Run the `IntelPython_XGBoost_daal4pyPrediction.ipynb` notebook cell by cell, taking care not to skip any steps. Once you have completed the entire notebook, you will have learned about some AI Kit optimizations and fundamentals.
-        2. (Optional) You can proceed with this step and the previous step with any of the either samples in the correct AI Kit JupyterHub Kernel environment to learn more about other AI Kit optimizations. Use the `Intel SKLearn, XGBoost, & Modin` JupyterHub Kernel Environment for the `E2E_use_case_with_Intel_Modin_Intel_optimized_scikit-learn.ipynb` notebook example, and the `Intel TensorFlow & Quantization` JupyterHub Kernel Environment for the `E2E_use_case_with_Intel_optimized_Tensorflow_LPOT.ipynb` notebook example.
+        2. (Optional) You can proceed with this step and the previous step with any of the either samples in the correct AI Kit JupyterHub Kernel environment to learn more about other AI Kit optimizations. Use the `Intel SKLearn, XGBoost, & Modin` JupyterHub Kernel Environment for the `IntelPython_XGBoost_daal4pyPrediction.ipynb` notebook example, and the `Intel TensorFlow & Quantization` JupyterHub Kernel Environment for the `lpot_sample_tensorflow.ipynb` notebook example.
       review:
         instructions: |-
           #### Verify that the sample notebook ran successfully
