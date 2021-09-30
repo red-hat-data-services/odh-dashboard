@@ -1,0 +1,10 @@
+The version of nodejs installed to build the last iteration of the package-lock.json file was:
+v14.17.5
+
+Use nvm to install:
+$ nvm install v14.17.5
+
+Also, to ensure that we end up with consistent results across systems
+$ rm -rf node_modules frontend/node_modules backend/node_modules
+$ rm package-lock.json frontend/package-lock.json backedn/package-lock.json
+$ npm install
