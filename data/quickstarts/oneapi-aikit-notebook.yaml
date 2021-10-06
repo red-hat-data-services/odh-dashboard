@@ -13,7 +13,7 @@ spec:
   description: This quick start details how to use the Intel® oneAPI AI Analytics Toolkit.
   introduction: |-
     ### This quick start details how to develop using the Intel® oneAPI AI Analytics Toolkit.
- 
+
     The Intel® oneAPI AI Analytics Toolkit (AI Kit) gives data scientists, AI developers, and researchers familiar Python tools and frameworks to accelerate end-to-end data science and machine learning pipelines on Intel® architectures.
 
     The components are built using oneAPI libraries for low-level compute optimizations.
