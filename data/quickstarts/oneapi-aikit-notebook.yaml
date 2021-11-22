@@ -10,7 +10,7 @@ spec:
   appName: aikit
   durationMinutes: 15
   icon: 'images/oneapi-aikit.png'
-  description: Run a data science notebook sample with the AI Kit and load your own notebook.
+  description: Run a data science notebook sample with the Intel® oneAPI AI Analytics Toolkit.
   introduction: |-
     ### This quick start details how to develop using the Intel® oneAPI AI Analytics Toolkit.
 
