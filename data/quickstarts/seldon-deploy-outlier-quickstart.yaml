@@ -4,7 +4,7 @@ metadata:
   annotations:
     opendatahub.io/categories: 'AI/Machine learning,Deployment,Model serving,Monitoring'
 spec:
-  displayName: See outlier scores for predictions to deployed model
+  displayName: Detecting outlier scores for predictions to a deployed model
   appName: seldon-deploy
   durationMinutes: 10
   icon: 'images/seldon.svg'
