@@ -5,7 +5,7 @@ metadata:
     opendatahub.io/categories: 'AI/Machine learning,Getting started,Jupyter notebook,TensorFlow,Python,PyTorch'
 
 spec:
-  displayName: Optimized Inference Notebook
+  displayName: Using the OpenVINO toolkit 
   appName: openvino
   durationMinutes: 5
   icon: 'images/openvino.svg'
