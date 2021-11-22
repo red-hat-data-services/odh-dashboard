@@ -4,7 +4,7 @@ metadata:
   annotations:
     opendatahub.io/categories: 'AI/Machine learning,Deployment,Model serving,Monitoring,Python'
 spec:
-  displayName: Monitor a deployed model for drift
+  displayName: Monitoring a deployed model for drift 
   appName: seldon-deploy
   durationMinutes: 10
   icon: 'images/seldon.svg'
