@@ -9,4 +9,4 @@
 * Support: 24x7 support from the Trino experts; in a fully-managed environment.
 * Get started in a matter of minutes: Starburst Galaxy improves the time to value in your data and analytics.
 
-[Sign up](https://www.starburst.io/platform/starburst-galaxy/) for the beta access and Starburst will reach out to you to grant you access to the Galaxy. Galaxy SaaS subscription is free till GA.
+Sign up [here](https://www.starburst.io/platform/starburst-galaxy/) to get started with Starburst Galaxy. Starburst is currently offering a free trial of $500, so you can try before you buy.
