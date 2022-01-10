@@ -26,7 +26,7 @@ import './GetStartedPanel.scss';
 
 const DEFAULT_BETA_TEXT =
   'This application is available for early access prior to official ' +
-  " release. It won’t appear in the *Enabled* view, but you can access it by" +
+  ' release. It won’t appear in the *Enabled* view, but you can access it by' +
   ' [signing up for beta access.](https://www.starburst.io/platform/starburst-galaxy/).';
 
 type GetStartedPanelProps = {
