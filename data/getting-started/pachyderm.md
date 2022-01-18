@@ -29,10 +29,8 @@ Additionally, you will interact with Pachyderm using `pachctl` (Pachyderm's comm
 ### Install The Operator
 Pachyderm Operator has a **Red Hat marketplace listing**.
 
-- Subscribe to the operator on Marketplace
-  https://marketplace.redhat.com/en-us/products/pachyderm
-- Install the operator and validate
-  https://marketplace.redhat.com/en-us/documentation/operators
+- [Subscribe to the operator on Marketplace](https://marketplace.redhat.com/en-us/products/pachyderm)
+- [Install the operator and validate](https://marketplace.redhat.com/en-us/documentation/operators)
 
 ### Post Deployment
 
