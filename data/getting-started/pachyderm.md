@@ -25,8 +25,85 @@ Read about how our Customers leveraged Pachyderm to face their ML/AI challenges 
 
 ## Installing Pachyderm Operator
 ### Prerequisites
-Before installing Pachyderm's Operator, read about Pachyderm's [main concepts](https://docs.pachyderm.com/latest/concepts/) in our documentation.
-Additionally, you will interact with Pachyderm using `pachctl` (Pachyderm's command-line tool) from the cells of your notebooks. Read through our written demo [Open CV](https://docs.pachyderm.com/latest/getting_started/beginner_tutorial/) to familiarize yourself with the main commands. 
+
+Please read the Prerequisites carefully before proceeding with the installation.
+Before you start the operator installation process, you will need to:
+
+- Familiarize yourself with Pachyderm's **[main concepts](https://docs.pachyderm.com/latest/concepts/)**, and Pachyderm's command-line tool `pachctl`. You will interact with Pachyderm using `pachctl` from the cells of your notebooks. Read through our written demo [Open CV](https://docs.pachyderm.com/latest/getting_started/beginner_tutorial/) to get used to the main commands. 
+- Prepare the installation of Pachyderm by creating an **external object store** (Pachyderm supports all s3-compatible storage solutions) for your data. Make sure to match your cluster's region.
+
+    * Ceph Nano users: Retrieve the `Cluster IP` of your service (in Networking > Services),  your `AWS_ACCESS_KEY_ID` (base 64), and `AWS_SECRET_ACCESS_KEY` (base 64).
+    
+    * AWS users: Retrieve the `arn` of your S3 bucket, create a User, then add an inline policy to grant this user a set of permissions on this bucket.
+
+    Copy/Paste the following in the JSON tab of the policy. Replace <arn:AWS:...> with the arn of your bucket.
+    ``` yaml
+        {
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Effect": "Allow",
+                    "Action": [
+                        "s3:ListBucket"
+                    ],
+                    "Resource": [
+                        "<arn:aws:...>"
+                    ]
+                },
+                {
+                    "Effect": "Allow",
+                    "Action": [
+                        "s3:PutObject",
+                        "s3:GetObject",
+                        "s3:DeleteObject"
+                    ],
+                    "Resource": [
+                        "<arn:aws:...>/*"
+                    ]
+                }
+            ]
+        }
+    ```
+
+
+- In Red Hat OpenShift Console, we will guide you through the creation of a new namespace for your cluster as well as a secret holding your Bucket's credentials.
+
+    * **A- Create a Project**
+
+    On the left menu, select Operator > OperatorHub.
+    On the top of the page, click on the Project Dropdown.
+    Choose a project name, then click Create.
+
+    * **B- Create the Namespace in which you will deploy Pachyderm**        
+    On the left menu, select Administration > Namespaces, then create a new namespace for your cluster.
+
+    * **C- Create the Secret that will hold your user credentials and bucket name**, granting your cluster access to your bucket.
+  
+     Select Workloads > Secrets > Create a secret from YAML on the left menu.
+      Choose your secret name, then fill in:
+
+     - your namespace
+     - your IAM user access key and IAM user secret
+     - your bucket's name
+     - your bucket's region.
+
+     **Attention Ceph Users!** You need to add an endpoint to the stringData section of your secret:
+      `custom-endpoint:”http://ClusterIP:80”`
+	
+		```yaml 
+		apiVersion: v1
+		kind: Secret
+		metadata:
+		name: <name-your-secret>
+		namespace: <your-namespace>
+		type: Opaque
+		stringData:
+			access-id: <IAM-user-access-key>
+		access-secret: <IAM-user-secret>
+		bucket: <bucket-name>
+		region: <bucket-region>
+		```
+		For more information on creating a namespace, see [Red Hat Marketplace Docs](https://marketplace.redhat.com/en-us/documentation/clusters).
 
 ### Install The Operator
 Pachyderm Operator has a **Red Hat marketplace listing**.
@@ -36,6 +113,22 @@ Pachyderm Operator has a **Red Hat marketplace listing**.
 - Install the operator and validate
   https://marketplace.redhat.com/en-us/documentation/operators
 
+### Deploy Pachyderm
+
+Make sure to select the project you created above on the top of the screen. 
+
+On the Operator:
+
+- Click *Create an instance*.
+- Select the *YAML view* and insert the following values:
+
+    - Your namespace in `metadata.namespace`.
+    - Your secret name in `storage.amazon.credentialSecretName`.
+
+- Click *Create*. 
+- On the left menu, select *Workloads > Pods*.
+After a couple of minutes, all the pods of your project should be running. You just installed Pachyderm.
+ 
 ### Post Deployment
 
 1. Reach Red Hat OpenShift Data Science Platform from your **Cluster Management Console** by clicking on the multi-squared icon, then select **Red Hat OpenShift Data Science** in OpenShift Managed Services.
