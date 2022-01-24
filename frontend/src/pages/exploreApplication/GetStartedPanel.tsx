@@ -22,6 +22,7 @@ import { useWatchDashboardConfig } from '../../utilities/useWatchDashboardConfig
 import { useGettingStarted } from '../../utilities/useGettingStarted';
 import MarkdownView from '../../components/MarkdownView';
 import { markdownConverter } from '../../utilities/markdown';
+import { fireTrackingEvent } from '../../utilities/segmentIOUtils';
 
 import './GetStartedPanel.scss';
 
@@ -125,6 +126,11 @@ const GetStartedPanel: React.FC<GetStartedPanelProps> = ({ selectedApp, onClose,
               href={selectedApp.spec.getStartedLink}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() =>
+                fireTrackingEvent('Explore card get started clicked', {
+                  name: selectedApp.metadata.name,
+                })
+              }
             >
               <span className="odh-get-started__get-started-text">Get started</span>
               <ExternalLinkAltIcon />
