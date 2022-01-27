@@ -1,11 +1,7 @@
 # Pachyderm
-
-# Pachyderm
-
 [Pachyderm](https://www.pachyderm.com/) provides the data layer that allows data science teams to productionize and scale their machine learning lifecycle. With Pachyderm’s industry-leading data versioning, pipelines, and lineage, teams gain data-driven automation, petabyte scalability, and end-to-end reproducibility. Teams using Pachyderm get their ML projects to market faster, lower data processing and storage costs, and can more easily meet regulatory compliance requirements.
 
-Read about how our Customers leveraged Pachyderm to face their ML/AI challenges and operationalize their pipelines: [Case studies](https://www.pachyderm.com/case-studies/)
-
+Read about how our Customers leveraged Pachyderm to face their ML/AI challenges and operationalize their pipelines: [Case studies](https://www.pachyderm.com/case-studies/).
 ## Features include
 
 - **Data-driven pipelines**
@@ -23,10 +19,8 @@ Read about how our Customers leveraged Pachyderm to face their ML/AI challenges 
     - We track every version of your code, models, and data and manage relationships between historical data states so you can maintain the reproducibility of data and code for compliance
     - Our Global IDs feature makes it easy for teams to track any result all the way back to its raw input, including all analysis, parameters, code, and intermediate results
 
-## Installing Pachyderm Operator
-### Prerequisites
+## Before Installing Pachyderm Operator
 
-Please read the Prerequisites carefully before proceeding with the installation.
 Before you start the operator installation process, you will need to:
 
 - Familiarize yourself with Pachyderm's **[main concepts](https://docs.pachyderm.com/latest/concepts/)**, and Pachyderm's command-line tool `pachctl`. You will interact with Pachyderm using `pachctl` from the cells of your notebooks. Read through our written demo [Open CV](https://docs.pachyderm.com/latest/getting_started/beginner_tutorial/) to get used to the main commands. 
@@ -36,40 +30,39 @@ Before you start the operator installation process, you will need to:
     
     * AWS users: Retrieve the `arn` of your S3 bucket, create a User, then add an inline policy to grant this user a set of permissions on this bucket.
 
-    Copy/Paste the following in the JSON tab of the policy. Replace <arn:AWS:...> with the arn of your bucket.
-    ``` yaml
-        {
-            "Version": "2012-10-17",
-            "Statement": [
-                {
-                    "Effect": "Allow",
-                    "Action": [
-                        "s3:ListBucket"
-                    ],
-                    "Resource": [
-                        "<arn:aws:...>"
-                    ]
-                },
-                {
-                    "Effect": "Allow",
-                    "Action": [
-                        "s3:PutObject",
-                        "s3:GetObject",
-                        "s3:DeleteObject"
-                    ],
-                    "Resource": [
-                        "<arn:aws:...>/*"
-                    ]
-                }
-            ]
-        }
-    ```
+        Copy/Paste the following in the JSON tab of the policy. Replace <arn:AWS:...> with the arn of your bucket.
+        ``` yaml
+            {
+                "Version": "2012-10-17",
+                "Statement": [
+                    {
+                        "Effect": "Allow",
+                        "Action": [
+                            "s3:ListBucket"
+                        ],
+                        "Resource": [
+                            "<arn:aws:...>"
+                        ]
+                    },
+                    {
+                        "Effect": "Allow",
+                        "Action": [
+                            "s3:PutObject",
+                            "s3:GetObject",
+                            "s3:DeleteObject"
+                        ],
+                        "Resource": [
+                            "<arn:aws:...>/*"
+                        ]
+                    }
+                ]
+            }
+        ```
 
 
 - In Red Hat OpenShift Console, we will guide you through the creation of a new namespace for your cluster as well as a secret holding your Bucket's credentials.
 
     * **A- Create a Project**
-
     On the left menu, select Operator > OperatorHub.
     On the top of the page, click on the Project Dropdown.
     Choose a project name, then click Create.
@@ -79,33 +72,33 @@ Before you start the operator installation process, you will need to:
 
     * **C- Create the Secret that will hold your user credentials and bucket name**, granting your cluster access to your bucket.
   
-     Select Workloads > Secrets > Create a secret from YAML on the left menu.
-      Choose your secret name, then fill in:
+         Select Workloads > Secrets > Create a secret from YAML on the left menu.
+         
+         Choose your secret name, then fill in:
 
-     - your namespace
-     - your IAM user access key and IAM user secret
-     - your bucket's name
-     - your bucket's region.
+         - your namespace
+         - your IAM user access key and IAM user secret
+         - your bucket's name
+         - your bucket's region.
 
-     **Attention Ceph Users!** You need to add an endpoint to the stringData section of your secret:
-      `custom-endpoint:”http://ClusterIP:80”`
+         **Attention Ceph Users!** You need to add an endpoint to the stringData section of your secret: `custom-endpoint:”http://ClusterIP:80”`
 	
-		```yaml 
-		apiVersion: v1
-		kind: Secret
-		metadata:
-		name: <name-your-secret>
-		namespace: <your-namespace>
-		type: Opaque
-		stringData:
+		 ```yaml 
+		 apiVersion: v1
+		 kind: Secret
+		 metadata:
+		 name: <name-your-secret>
+		 namespace: <your-namespace>
+		 type: Opaque
+		 stringData:
 			access-id: <IAM-user-access-key>
-		access-secret: <IAM-user-secret>
-		bucket: <bucket-name>
-		region: <bucket-region>
-		```
-		For more information on creating a namespace, see [Red Hat Marketplace Docs](https://marketplace.redhat.com/en-us/documentation/clusters).
+		 access-secret: <IAM-user-secret>
+		 bucket: <bucket-name>
+		 region: <bucket-region>
+		 ```
+		 For more information on creating a namespace, see [Red Hat Marketplace Docs](https://marketplace.redhat.com/en-us/documentation/clusters).
 
-### Install The Operator
+## Install The Operator
 Pachyderm Operator has a **Red Hat marketplace listing**.
 
 - Subscribe to the operator on Marketplace
@@ -113,7 +106,7 @@ Pachyderm Operator has a **Red Hat marketplace listing**.
 - Install the operator and validate
   https://marketplace.redhat.com/en-us/documentation/operators
 
-### Deploy Pachyderm
+## Deploy Pachyderm
 
 Make sure to select the project you created above on the top of the screen. 
 
@@ -129,7 +122,7 @@ On the Operator:
 - On the left menu, select *Workloads > Pods*.
 After a couple of minutes, all the pods of your project should be running. You just installed Pachyderm.
  
-### Post Deployment
+## Post Deployment
 
 1. Reach Red Hat OpenShift Data Science Platform from your **Cluster Management Console** by clicking on the multi-squared icon, then select **Red Hat OpenShift Data Science** in OpenShift Managed Services.
 
