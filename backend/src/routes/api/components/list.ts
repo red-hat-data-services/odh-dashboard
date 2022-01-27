@@ -37,7 +37,7 @@ export const removeComponent = async (
 ): Promise<{ success: boolean; error: string }> => {
   const query = request.query as { [key: string]: string };
   const coreV1Api = fastify.kube.coreV1Api;
-  const enabledAppsConfigMapName = 'odh-enabled-applications-config';
+  const enabledAppsConfigMapName = process.env.ENABLED_APPS_CM;
   const namespace = fastify.kube.namespace;
   try {
     const enabledAppsCM = await coreV1Api

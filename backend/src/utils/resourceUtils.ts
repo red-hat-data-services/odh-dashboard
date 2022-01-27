@@ -30,7 +30,7 @@ const dashboardConfigMapName = 'odh-dashboard-config';
 const consoleLinksGroup = 'console.openshift.io';
 const consoleLinksVersion = 'v1';
 const consoleLinksPlural = 'consolelinks';
-const enabledAppsConfigMapName = 'odh-enabled-applications-config';
+const enabledAppsConfigMapName = process.env.ENABLED_APPS_CM;
 
 let dashboardConfigWatcher: ResourceWatcher<V1ConfigMap>;
 let operatorWatcher: ResourceWatcher<CSVKind>;
