@@ -15,4 +15,5 @@ spec:
   category: Self-managed
   support: third party support
   quickStart: pachyderm-beginner-tutorial-notebook
+  getStartedLink: https://docs.pachyderm.com/latest/getting_started/
   csvName: pachyderm-operator
