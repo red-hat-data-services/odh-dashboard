@@ -1,3 +1,4 @@
+
 # Pachyderm
 [Pachyderm](https://www.pachyderm.com/) provides the data layer that allows data science teams to productionize and scale their machine learning lifecycle. With Pachyderm’s industry-leading data versioning, pipelines, and lineage, teams gain data-driven automation, petabyte scalability, and end-to-end reproducibility. Teams using Pachyderm get their ML projects to market faster, lower data processing and storage costs, and can more easily meet regulatory compliance requirements.
 
@@ -81,20 +82,20 @@ Before you start the operator installation process, you will need to:
          - your bucket's name
          - your bucket's region.
 
-         **Attention Ceph Users!** You need to add an endpoint to the stringData section of your secret: `custom-endpoint:”http://ClusterIP:80”`
+         **Attention Ceph Users!** You need to add an endpoint to the stringData section of your secret: `custom-endpoint:"http://ClusterIP:80"`
 	
 		 ```yaml 
 		 apiVersion: v1
 		 kind: Secret
 		 metadata:
-		 name: <name-your-secret>
-		 namespace: <your-namespace>
+		    name: <name-your-secret>
+		    namespace: <your-namespace>
 		 type: Opaque
 		 stringData:
 			access-id: <IAM-user-access-key>
-		 access-secret: <IAM-user-secret>
-		 bucket: <bucket-name>
-		 region: <bucket-region>
+		    access-secret: <IAM-user-secret>
+		    bucket: <bucket-name>
+		    region: <bucket-region>
 		 ```
 		 For more information on creating a namespace, see [Red Hat Marketplace Docs](https://marketplace.redhat.com/en-us/documentation/clusters).
 
@@ -120,8 +121,16 @@ On the Operator:
 
 - Click *Create*. 
 - On the left menu, select *Workloads > Pods*.
-After a couple of minutes, all the pods of your project should be running. You just installed Pachyderm.
- 
+After a couple of minutes, all the pods of your project should be running. At a minimum, you should see a pod for pachd alongside etcd, and postgres:
+
+    ```
+    NAME                           READY   STATUS    RESTARTS   AGE
+    etcd-0                         1/1     Running   0          18h
+    pachd-5db79fb9dd-b2gdq         1/1     Running   2          18h
+    postgres-0                     1/1     Running   0          18h
+    ```
+
+You just installed Pachyderm.
 ## Post Deployment
 
 1. Reach Red Hat OpenShift Data Science Platform from your **Cluster Management Console** by clicking on the multi-squared icon, then select **Red Hat OpenShift Data Science** in OpenShift Managed Services.
@@ -138,7 +147,7 @@ After a couple of minutes, all the pods of your project should be running. You j
         At a minimum, you should always use the identical major & minor versions of `pachctl` and Pachyderm (`pachd`). Note that the following package `/v2.0.2/pachctl_2.0.2_linux_amd64.tar.gz` (see command line below) refers to version 2.0.2 of Pachyderm. Depending on the version currently deployed by the Operator, you might need to update the version of `pachctl` (i.e.change `2.0.2` to `2.1.0` for example) in the command line.
 
         ```shell
-        ! curl -o /tmp/pachctl.tar.gz -L https://github.com/pachyderm/pachyderm/releases/download/v2.0.2/pachctl_2.0.2_linux_amd64.tar.gz && tar -xvf /tmp/pachctl.tar.gz  -C /tmp && cp /tmp/pachctl_2.0.2_linux_amd64/pachctl  /opt/app-root/bin/
+        ! curl -o /tmp/pachctl.tar.gz -L https://github.com/pachyderm/pachyderm/releases/download/v2.0.4/pachctl_2.0.4_linux_amd64.tar.gz && tar -xvf /tmp/pachctl.tar.gz  -C /tmp && cp /tmp/pachctl_2.0.4_linux_amd64/pachctl  /opt/app-root/bin/
         ```
 
     - Create a new context for your CLI to connect to your cluster:
@@ -167,8 +176,8 @@ After a couple of minutes, all the pods of your project should be running. You j
         For example:
         ```
         COMPONENT           VERSION             
-        pachctl             2.0.2             
-        pachd               2.0.2
+        pachctl             2.0.4             
+        pachd               2.0.4
         ```
 
 You are ready to run your first pipelines in a notebook. Check our **Quick Start** in the `Enabled` Menu of your OpenShift Data Science Console. You can later extend this first notebook by following the steps in this written [tutorial](https://docs.pachyderm.com/latest/getting_started/beginner_tutorial/) on our documentation website.

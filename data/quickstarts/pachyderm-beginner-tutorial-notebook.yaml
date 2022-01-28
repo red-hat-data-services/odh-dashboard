@@ -19,7 +19,7 @@ spec:
     - title: Launching JupyterHub notebook server
       description: |-
         ### Important considerations
-        Use the **Minimal Python** notebook with a **Large** container size.
+        Use the **Standard Data Science** notebook with a **Medium** container size.
 
       review:
         instructions: |-
