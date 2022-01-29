@@ -1,4 +1,5 @@
 
+
 # Pachyderm
 [Pachyderm](https://www.pachyderm.com/) provides the data layer that allows data science teams to productionize and scale their machine learning lifecycle. With Pachyderm’s industry-leading data versioning, pipelines, and lineage, teams gain data-driven automation, petabyte scalability, and end-to-end reproducibility. Teams using Pachyderm get their ML projects to market faster, lower data processing and storage costs, and can more easily meet regulatory compliance requirements.
 
@@ -61,6 +62,7 @@ Before you start the operator installation process, you will need to:
         ```
 
 
+
 - In Red Hat OpenShift Console, we will guide you through the creation of a new namespace for your cluster as well as a secret holding your Bucket's credentials.
 
     * **A- Create a Project**
@@ -92,7 +94,7 @@ Before you start the operator installation process, you will need to:
 		    namespace: <your-namespace>
 		 type: Opaque
 		 stringData:
-			access-id: <IAM-user-access-key>
+			  access-id: <IAM-user-access-key>
 		    access-secret: <IAM-user-secret>
 		    bucket: <bucket-name>
 		    region: <bucket-region>
@@ -102,10 +104,9 @@ Before you start the operator installation process, you will need to:
 ## Install The Operator
 Pachyderm Operator has a **Red Hat marketplace listing**.
 
-- Subscribe to the operator on Marketplace
-  https://marketplace.redhat.com/en-us/products/pachyderm
-- Install the operator and validate
-  https://marketplace.redhat.com/en-us/documentation/operators
+- [Subscribe to the operator on Marketplace.](https://marketplace.redhat.com/en-us/products/pachyderm)
+  
+- [Install the operator and validate.](https://marketplace.redhat.com/en-us/documentation/operators)
 
 ## Deploy Pachyderm
 
@@ -133,9 +134,9 @@ After a couple of minutes, all the pods of your project should be running. At a 
 You just installed Pachyderm.
 ## Post Deployment
 
-1. Reach Red Hat OpenShift Data Science Platform from your **Cluster Management Console** by clicking on the multi-squared icon, then select **Red Hat OpenShift Data Science** in OpenShift Managed Services.
+1. Launch the **JupyterHub** application: From the `Enabled` menu, click `Launch application` from the **JupyterHub** tile.
 
-1. **Run a Jupyter Lab server**: Select the Image and Container size of your choice (At a minimum, we recommend the *Standard Data Science* Image and *Medium* container size.) then start your Jupyter Lab server.
+1. Run a **Jupyter Lab server**: Select the Image and Container size of your choice (At a minimum, we recommend the *Standard Data Science* Image and *Medium* container size.) then start your Jupyter Lab server.
 
 1. Configure your Notebook to connect to your cluster:
 
@@ -180,7 +181,7 @@ You just installed Pachyderm.
         pachd               2.0.4
         ```
 
-You are ready to run your first pipelines in a notebook. Check our **Quick Start** in the `Enabled` Menu of your OpenShift Data Science Console. You can later extend this first notebook by following the steps in this written [tutorial](https://docs.pachyderm.com/latest/getting_started/beginner_tutorial/) on our documentation website.
+You are ready to run your first pipelines in a notebook. Check our **Quick Start** in the `Enabled` menu of your OpenShift Data Science Console. You can later extend this first notebook by following the steps in this written [tutorial](https://docs.pachyderm.com/latest/getting_started/beginner_tutorial/) on our documentation website.
 
 Note that you might need to install additional libraries depending on the notebook you chose. For example, our [Housing prices notebook](https://github.com/pachyderm/examples/blob/master/housing-prices-intermediate/housing-prices.ipynb) requires the additional installation of [Pachyderm's python client](https://python-pachyderm.readthedocs.io/en/stable/): `pip install python-pachyderm`.
 
