@@ -9,4 +9,5 @@
 * Support: 24x7 support from the Trino experts; in a fully-managed environment.
 * Get started in a matter of minutes: Starburst Galaxy improves the time to value in your data and analytics.
 
-Sign up [here](https://www.starburst.io/platform/starburst-galaxy/) to get started with Starburst Galaxy. Starburst is currently offering a free trial of $500 in usage, so you can try before you buy.
+You can access Starburst Galaxy by signing up here [here](https://www.starburst.io/platform/starburst-galaxy/). Starburst is currently offering a free trial of $500 in usage, so you can try before you buy.
+

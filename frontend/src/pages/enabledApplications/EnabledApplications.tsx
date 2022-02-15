@@ -10,8 +10,7 @@ import { fireTrackingEvent } from '../../utilities/segmentIOUtils';
 
 import './EnabledApplications.scss';
 
-const description = `Launch your enabled applications or get started with quick start instructions
- and tasks.`;
+const description = `Launch your enabled applications, view documentation, or get started with quick start instructions and tasks.`;
 
 type EnabledApplicationsInnerProps = {
   loaded: boolean;
@@ -67,8 +66,10 @@ const EnabledApplications: React.FC = () => {
      */
     if (loaded && components.length) {
       _.difference(
-        components.map((c) => c.metadata.name),
-        enabledComponents.map((c) => c.metadata.name),
+        components.filter((component) => component.spec.isEnabled).map((c) => c.metadata.name),
+        enabledComponents
+          .filter((component) => component.spec.isEnabled)
+          .map((c) => c.metadata.name),
       ).forEach((name) =>
         fireTrackingEvent('Application Enabled', {
           name,
