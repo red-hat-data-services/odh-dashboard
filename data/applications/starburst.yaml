@@ -15,7 +15,7 @@ spec:
   support: third party support
   quickStart: ''
   getStartedLink: https://www.starburst.io/platform/starburst-galaxy/
-  beta: true
+  beta: false
   betaText: |-
     This application is available for early access prior to official
     release. It won’t appear in the *Enabled* view, but you can access it by
