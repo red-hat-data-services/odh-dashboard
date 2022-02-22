@@ -16,4 +16,8 @@ spec:
   quickStart: ''
   getStartedLink: https://www.starburst.io/platform/starburst-galaxy/
   beta: true
-  
+  betaText: |-
+    This application is available for early access prior to official
+    release. It won’t appear in the *Enabled* view, but you can access it by
+    [signing up for beta access.](https://www.starburst.io/platform/starburst-galaxy/).
+

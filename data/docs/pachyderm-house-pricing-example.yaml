@@ -6,7 +6,7 @@ metadata:
 spec:
   appName: pachyderm
   displayName: Training a regression model in Pachyderm
-  description: |- 
-    Train a regression model on the Boston Housing Dataset in Pachyderm and predict houses' value. See the Getting Started page to connect your notebook to your cluster.
+  description: |-
+    Learn how to create a sample housing data repo using a Pachyderm cluster to run experiments, analyze data, and set up regression.
   url: https://github.com/pachyderm/examples/blob/master/housing-prices-intermediate/housing-prices.ipynb
   durationMinutes: 30

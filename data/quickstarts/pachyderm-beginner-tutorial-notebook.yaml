@@ -9,12 +9,12 @@ spec:
   appName: pachyderm
   durationMinutes: 30
   icon: 'images/pachyderm.svg'
-  description: Load Pachyderm's beginner tutorial notebook and learn about Pachyderm's main concepts such as data repositories, pipelines, and using the pachctl CLI from your cells.  
+  description: Load Pachyderm's beginner tutorial notebook and learn about Pachyderm's main concepts such as data repositories, pipelines, and using the pachctl CLI from your cells.
   introduction: |-
     ### This quick start shows you how to import Pachyderm Tutorial notebook
- 
+
     Pachyderm provides industry leading data versioning, pipelines, and lineage that allow data science teams
-    to automate and optimize their machine learning operations (MLOps). 
+    to automate and optimize their machine learning operations (MLOps).
   tasks:
     - title: Launching JupyterHub notebook server
       description: |-
@@ -55,7 +55,7 @@ spec:
         1. Install Pachyderm’s CLI (`pachchtl`) from a top new cell in your notebook. 
         2. In another cell, create a new context for your CLI to connect to your cluster. 
         3. Set the pachctl context to your newly created context.
-        4. Verify that your active context is the new context. 
+        4. Verify that your active context is the new context.
 
       review:
         instructions: |-
@@ -70,3 +70,4 @@ spec:
 
   conclusion: You can complete the rest of the quick start inside the notebook itself. Proceed cell by cell, taking care not to skip any. Once you have completed the entire notebook, you will have learned about Pachyderm's main concepts.
   nextQuickStart: []
+
