@@ -15,7 +15,7 @@ import { fireTrackingEvent } from '../utilities/segmentIOUtils';
 import { useQuickStartCardSelected } from './useQuickStartCardSelected';
 
 import './OdhCard.scss';
-import { QuickStartContextValues } from '@cloudmosaic/quickstarts';
+import { QuickStartContextValues } from '@patternfly/quickstarts';
 
 type OdhDocCardProps = {
   odhDoc: OdhDocument;
