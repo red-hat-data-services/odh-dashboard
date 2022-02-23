@@ -95,6 +95,8 @@ Array [
     "./frontend/public/7*js.map",
     "./frontend/public/8*js",
     "./frontend/public/8*js.map",
+    "./frontend/public/9*js",
+    "./frontend/public/9*js.map",
     "./frontend/public/app*js",
     "./frontend/public/app*js*txt",
     "./frontend/public/app*js.map",
