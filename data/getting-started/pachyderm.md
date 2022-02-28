@@ -173,6 +173,7 @@ You just installed Pachyderm.
         ```shell
         !pachctl version 
         ```
+        
         This should print the versions of pachctl and Pachyderm deployed. 
         For example:
         ```
