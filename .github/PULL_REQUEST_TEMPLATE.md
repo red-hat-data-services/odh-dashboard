@@ -4,3 +4,4 @@
 - [ ] The Jira story is acked
 - [ ] An entry has been added to the latest build document in [Build Announcements Folder](https://drive.google.com/drive/folders/1sgkK1WZgGo9CXsLizNe0GbAzVKuSKrZL).
 - [ ] Testing instructions have been added in the PR body (for PRs involving changes that are not immediately obvious)
+- [ ] The developer has manually tested the changes and verified that the changes work.
