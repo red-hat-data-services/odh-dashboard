@@ -67,7 +67,7 @@ Before you start the operator installation process, you will need to:
 
     * **A- Create a Project/Namespace**
     On the top of the page, click on the Project Dropdown.
-    Choose a project name, then click Create.
+    Enter a project name, then click Create Project.
     A namespace named after the project name is automatically created.
 
     * **B- Create the Secret that will hold your user credentials and bucket name**, granting your cluster access to your bucket.
