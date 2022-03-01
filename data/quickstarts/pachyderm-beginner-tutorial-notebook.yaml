@@ -51,7 +51,7 @@ spec:
         ### Before experimenting, you will need to "connect" your notebook to Pachyderm
         To connect your notebook to a cluster, follow those steps:
         ALL COMMANDS AND STEPS REFERENCED BELOW ARE DETAILED IN THE GETTING STARTED SECTION:
-        *OpenShift Data Science Dashboard* > *Explore* > *Pachyderm* > *Get started button*
+        *OpenShift Data Science Dashboard* > *Explore* > *Pachyderm* 
         1. Install Pachyderm’s CLI (`pachchtl`) from a top new cell in your notebook. 
         2. In another cell, create a new context for your CLI to connect to your cluster. 
         3. Set the pachctl context to your newly created context.

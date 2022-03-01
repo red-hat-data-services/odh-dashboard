@@ -63,23 +63,21 @@ Before you start the operator installation process, you will need to:
 
 
 
-- In Red Hat OpenShift Console, we will guide you through the creation of a new namespace for your cluster as well as a secret holding your Bucket's credentials.
+- In Red Hat OpenShift Console, we will guide you through the creation of a new namespace for your cluster as well as a secret holding your bucket's credentials.
 
-    * **A- Create a Project**
+    * **A- Create a Project/Namespace**
     On the left menu, select Operator > OperatorHub.
     On the top of the page, click on the Project Dropdown.
     Choose a project name, then click Create.
+    A namespace named after the project name is automatically created.
 
-    * **B- Create the Namespace in which you will deploy Pachyderm**        
-    On the left menu, select Administration > Namespaces, then create a new namespace for your cluster.
-
-    * **C- Create the Secret that will hold your user credentials and bucket name**, granting your cluster access to your bucket.
+    * **B- Create the Secret that will hold your user credentials and bucket name**, granting your cluster access to your bucket.
   
          Select Workloads > Secrets > Create a secret from YAML on the left menu.
          
          Choose your secret name, then fill in:
 
-         - your namespace
+         - your namespace/project name
          - your IAM user access key and IAM user secret
          - your bucket's name
          - your bucket's region.
@@ -112,7 +110,8 @@ Pachyderm Operator has a **Red Hat marketplace listing**.
 
 Make sure to select the project you created above on the top of the screen. 
 
-On the Operator:
+On the left menu, select Operator > Installed Operators.
+Find Pachyderm's Operator then:
 
 - Click *Create an instance*.
 - Select the *YAML view* and insert the following values:
@@ -173,7 +172,7 @@ You just installed Pachyderm.
         ```shell
         !pachctl version 
         ```
-        
+
         This should print the versions of pachctl and Pachyderm deployed. 
         For example:
         ```
