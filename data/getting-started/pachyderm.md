@@ -66,7 +66,7 @@ Before you start the operator installation process, you will need to:
 - In Red Hat OpenShift Console, we will guide you through the creation of a new namespace for your cluster as well as a secret holding your bucket's credentials.
 
     * **A- Create a Project/Namespace**
-    On the top of the page, click on the Project Dropdown.
+    On the top of the Home page, click on the Project Dropdown.
     Enter a project name, then click Create Project.
     A namespace named after the project name is automatically created.
 
