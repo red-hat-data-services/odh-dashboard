@@ -62,13 +62,11 @@ Before you start the operator installation process, you will need to:
         ```
 
 
-
 - In Red Hat OpenShift Console, we will guide you through the creation of a new namespace for your cluster as well as a secret holding your bucket's credentials.
 
     * **A- Create a Project/Namespace**
-    On the top of the Home page, click on the Project Dropdown.
-    Enter a project name, then click Create Project.
-    A namespace named after the project name is automatically created.
+    In the Administrator view, in the left menu, click on Home > Project.
+    Enter a project name then click the Create Project button.
 
     * **B- Create the Secret that will hold your user credentials and bucket name**, granting your cluster access to your bucket.
   
@@ -91,7 +89,7 @@ Before you start the operator installation process, you will need to:
 		    namespace: <your-namespace>
 		 type: Opaque
 		 stringData:
-			  access-id: <IAM-user-access-key>
+			access-id: <IAM-user-access-key>
 		    access-secret: <IAM-user-secret>
 		    bucket: <bucket-name>
 		    region: <bucket-region>
@@ -112,7 +110,9 @@ Make sure to select the project you created above on the top of the screen.
 On the left menu, select Operator > Installed Operators.
 Find Pachyderm's Operator then:
 
-- Click *Create an instance*.
+- Click on Pachyderm operator from the list
+- Move to *Pachyderm* tab
+- Click on *Create Pachyderm*
 - Select the *YAML view* and insert the following values:
 
     - Your namespace in `metadata.namespace`.
@@ -120,13 +120,14 @@ Find Pachyderm's Operator then:
 
 - Click *Create*. 
 - On the left menu, select *Workloads > Pods*.
-After a couple of minutes, all the pods of your project should be running. At a minimum, you should see a pod for pachd alongside etcd, and postgres:
+After a couple of minutes, all the pods of your project should be running. At a minimum, you should see a pod for pachd alongside etcd, postgres, and pg-bouncer:
 
     ```
     NAME                           READY   STATUS    RESTARTS   AGE
     etcd-0                         1/1     Running   0          18h
     pachd-5db79fb9dd-b2gdq         1/1     Running   2          18h
     postgres-0                     1/1     Running   0          18h
+    pg-bouncer-76d9cd855c-nfnhx    1/1     Running   0          18h
     ```
 
 You just installed Pachyderm.
@@ -142,11 +143,11 @@ You just installed Pachyderm.
 
         The command installs Pachyderm’s CLI (`pachchtl`) in your notebook environment.
 
-        **Note**: The version of `pachctl` must match the version of Pachyderm deployed by the Operator. Pachyderm’s version is available on the Operator’s description. 
-        At a minimum, you should always use the identical major & minor versions of `pachctl` and Pachyderm (`pachd`). Note that the following package `/v2.0.2/pachctl_2.0.2_linux_amd64.tar.gz` (see command line below) refers to version 2.0.2 of Pachyderm. Depending on the version currently deployed by the Operator, you might need to update the version of `pachctl` (i.e.change `2.0.2` to `2.1.0` for example) in the command line.
+        **Note**: The version of `pachctl` must match the version of Pachyderm deployed by the Operator. You can find Pachyderm’s version by clicking on the tab *Pachyderm*  in the Operator details page. 
+        At a minimum, you should always use the identical major & minor versions of `pachctl` and Pachyderm (`pachd`). Note that the following package `/v2.0.5/pachctl_2.0.5_linux_amd64.tar.gz` (see command line below) refers to version 2.0.5 of Pachyderm. Depending on the version currently deployed by the Operator, you might need to update the version of `pachctl` (i.e.change `2.0.5` to `2.1.0` for example) in the command line.
 
         ```shell
-        ! curl -o /tmp/pachctl.tar.gz -L https://github.com/pachyderm/pachyderm/releases/download/v2.0.4/pachctl_2.0.4_linux_amd64.tar.gz && tar -xvf /tmp/pachctl.tar.gz  -C /tmp && cp /tmp/pachctl_2.0.4_linux_amd64/pachctl  /opt/app-root/bin/
+        ! curl -o /tmp/pachctl.tar.gz -L https://github.com/pachyderm/pachyderm/releases/download/v2.0.5/pachctl_2.0.5_linux_amd64.tar.gz && tar -xvf /tmp/pachctl.tar.gz  -C /tmp && cp /tmp/pachctl_2.0.5_linux_amd64/pachctl  /opt/app-root/bin/
         ```
 
     - Create a new context for your CLI to connect to your cluster:
