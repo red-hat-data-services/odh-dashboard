@@ -65,8 +65,7 @@ Before you start the operator installation process, you will need to:
 - In Red Hat OpenShift Console, we will guide you through the creation of a new namespace for your cluster as well as a secret holding your bucket's credentials.
 
     * **A- Create a Project/Namespace**
-    In the Administrator view, in the left menu, click on Home > Project.
-    Enter a project name then click the Create Project button.
+    In the Administrator view, on the left menu, create a new project from the Home > Project page.
 
     * **B- Create the Secret that will hold your user credentials and bucket name**, granting your cluster access to your bucket.
   
@@ -177,8 +176,8 @@ You just installed Pachyderm.
         For example:
         ```
         COMPONENT           VERSION             
-        pachctl             2.0.4             
-        pachd               2.0.4
+        pachctl             2.0.5          
+        pachd               2.0.5
         ```
 
 You are ready to run your first pipelines in a notebook. Check our **Quick Start** in the `Enabled` menu of your OpenShift Data Science Console. You can later extend this first notebook by following the steps in this written [tutorial](https://docs.pachyderm.com/latest/getting_started/beginner_tutorial/) on our documentation website.
