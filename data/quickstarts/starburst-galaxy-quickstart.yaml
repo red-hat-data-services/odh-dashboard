@@ -63,7 +63,7 @@ spec:
         2. Find the JupyterHub card.
         3. Click **Launch** on the JupyterHub card to access the JupyterHub **Start a notebook server** page.  A new browser tab will open displaying the **Start a notebook server** page.
         4. Select the **Standard Data Science** notebook image and the **Default** container size.
-        5. Add the environment variables for **TRINO_USERNAME**, *TRINO_PASSWORD**, **TRINO_HOSTNAME**, and **TRINO_PORT** using the connection details you obtained in the previous task.
+        5. Add the environment variables for **TRINO_USERNAME**, **TRINO_PASSWORD**, **TRINO_HOSTNAME**, and **TRINO_PORT** using the connection details you obtained in the previous task.
         6. Click on **Start server** to launch JupyterHub.
 
         If you have not previously authorized the jupyterhub-hub service account to access your account, the **Authorize Access** page appears prompting you to provide authorization. Inspect the permissions selected by default, and click the **Allow selected permissions** button.
