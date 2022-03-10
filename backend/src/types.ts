@@ -106,7 +106,12 @@ export type KubeStatus = {
   userName: string | string[];
   clusterID: string;
   clusterBranding: string;
+  isAdmin: boolean;
 };
+
+export type ClusterSettings = {
+  userTrackingEnabled: boolean
+}
 
 export type KubeDecorator = KubeStatus & {
   config: k8s.KubeConfig;
@@ -114,6 +119,7 @@ export type KubeDecorator = KubeStatus & {
   batchV1beta1Api: k8s.BatchV1beta1Api;
   batchV1Api: k8s.BatchV1Api;
   customObjectsApi: k8s.CustomObjectsApi;
+  rbac: k8s.RbacAuthorizationV1Api;
 };
 
 export type KubeFastifyInstance = FastifyInstance & {
