@@ -12,6 +12,7 @@ const status = async (
   fastify: KubeFastifyInstance,
   request: FastifyRequest,
 ): Promise<{ kube: KubeStatus }> => {
+  const adminGroup = process.env.ADMIN_GROUP;
   const kubeContext = fastify.kube.currentContext;
   const { currentContext, namespace, currentUser, clusterID, clusterBranding } = fastify.kube;
   const currentUserName =
@@ -26,21 +27,20 @@ const status = async (
 
   try {
     const configGroupName = (await coreV1Api.readNamespacedConfigMap('groups-config', namespace))
-      .body.data['groups-config'];
-    const adminGroup = (await coreV1Api.readNamespacedConfigMap(configGroupName, namespace)).body
-      .data['admin_groups'];
-    const adminGroupResponse = await customObjectsApi.getClusterCustomObject(
-      'user.openshift.io',
-      'v1',
-      'groups',
-      adminGroup,
-    );
-    const adminUsers = (adminGroupResponse.body as groupObjResponse).users;
-    isAdmin = adminUsers.includes(userName);
+    .body.data['groups-config'];
+  const adminGroup = (await coreV1Api.readNamespacedConfigMap(configGroupName, namespace)).body
+    .data['admin_groups'];
+  const adminGroupResponse = await customObjectsApi.getClusterCustomObject(
+    'user.openshift.io',
+    'v1',
+    'groups',
+    adminGroup,
+  );
+  const adminUsers = (adminGroupResponse.body as groupObjResponse).users;
+  isAdmin = adminUsers.includes(userName);
   } catch (e) {
     console.log('Failed to get groups: ' + e.toString());
   }
-
   fastify.kube.coreV1Api.getAPIResources();
   if (!kubeContext && !kubeContext.trim()) {
     const error = createError(500, 'failed to get kube status');

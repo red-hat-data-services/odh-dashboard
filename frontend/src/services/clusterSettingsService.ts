@@ -14,11 +14,15 @@ export const fetchClusterSettings = (): Promise<ClusterSettings> => {
     });
 };
 
-export const updateClusterSettings = (settings: ClusterSettings): Promise<ClusterSettings> => {
+export const updateClusterSettings = (
+  settings: ClusterSettings,
+): Promise<{ success: boolean; error: string }> => {
   const url = getBackendURL('/api/cluster-settings/update');
   const updateParams = new URLSearchParams();
 
   updateParams.set('userTrackingEnabled', JSON.stringify(settings.userTrackingEnabled));
+  updateParams.set('pvcSize', `${settings.pvcSize}`);
+
 
   const options = { params: updateParams };
   return axios
