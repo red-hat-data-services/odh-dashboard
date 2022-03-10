@@ -145,6 +145,10 @@ export type ODHSegmentKey = {
   segmentKey: string;
 };
 
+export type ClusterSettings = {
+  userTrackingEnabled: boolean;
+};
+
 export type TrackingEventProperties = {
   name?: string;
   anonymousID?: string;
