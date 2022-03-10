@@ -6,7 +6,7 @@ spec:
   displayName: Pachyderm
   provider: Pachyderm
   description: |-
-      Pachyderm is the data foundation for machine learning. It provides industry-leading data versioning, pipelines, and lineage for data science teams to automate the machine learning lifecycle and optimize machine learning operations (MLOps).
+      Pachyderm is the data foundation for machine learning. It provides industry-leading pipelines, data versioning, and lineage for data science teams to automate the machine learning lifecycle.
   kfdefApplications: []
   route: ''
   img: images/pachyderm.svg
@@ -14,5 +14,5 @@ spec:
   category: Self-managed
   support: third party support
   quickStart: pachyderm-beginner-tutorial-notebook
-  getStartedLink: https://marketplace.redhat.com/en-us/products/pachyderm
+  getStartedLink: https://docs.pachyderm.com/latest/getting_started/
   csvName: pachyderm-operator
