@@ -3,7 +3,7 @@ import { scaleDeploymentConfig } from '../../../utils/deployment';
 import { KubeFastifyInstance, ClusterSettings } from '../../../types';
 
 const juypterhubCfg = 'jupyterhub-cfg';
-const setgmentKeyCfg = 'rhods-segment-key-config';
+const segmentKeyCfg = 'rhods-segment-key-config';
 
 export const updateClusterSettings = async (
   fastify: KubeFastifyInstance,
@@ -13,9 +13,9 @@ export const updateClusterSettings = async (
   const namespace = fastify.kube.namespace;
   const query = request.query as { [key: string]: string };
   try {
-    if (query.userTrackingEnabled && query.pvcSize) {
+    if (query.userTrackingEnabled) {
       await coreV1Api.patchNamespacedConfigMap(
-        setgmentKeyCfg,
+        segmentKeyCfg,
         namespace,
         {
           data: { segmentKeyEnabled: query.userTrackingEnabled },
@@ -68,7 +68,7 @@ export const getClusterSettings = async (
   const coreV1Api = fastify.kube.coreV1Api;
   const namespace = fastify.kube.namespace;
   try {
-    const segmentEnabledRes = await coreV1Api.readNamespacedConfigMap(setgmentKeyCfg, namespace);
+    const segmentEnabledRes = await coreV1Api.readNamespacedConfigMap(segmentKeyCfg, namespace);
     const pvcResponse = await coreV1Api.readNamespacedConfigMap(juypterhubCfg, namespace);
 
     return {

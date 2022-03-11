@@ -12,7 +12,6 @@ const status = async (
   fastify: KubeFastifyInstance,
   request: FastifyRequest,
 ): Promise<{ kube: KubeStatus }> => {
-  const adminGroup = process.env.ADMIN_GROUP;
   const kubeContext = fastify.kube.currentContext;
   const { currentContext, namespace, currentUser, clusterID, clusterBranding } = fastify.kube;
   const currentUserName =

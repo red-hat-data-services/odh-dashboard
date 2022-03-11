@@ -180,7 +180,7 @@ const ClusterSettings: React.FC = () => {
                     <Checkbox
                       label="Allow collection of usage data"
                       isChecked={clusterSettings.userTrackingEnabled}
-                      onChange={async () => {
+                      onChange={() => {
                         setUserTrackingEnabled(!userTrackingEnabled);
                         submitClusterSettings({ pvcSize, userTrackingEnabled });
                       }}
