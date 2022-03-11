@@ -40,7 +40,6 @@ const status = async (
   } catch (e) {
     console.log('Failed to get groups: ' + e.toString());
   }
-
   fastify.kube.coreV1Api.getAPIResources();
   if (!kubeContext && !kubeContext.trim()) {
     const error = createError(500, 'failed to get kube status');

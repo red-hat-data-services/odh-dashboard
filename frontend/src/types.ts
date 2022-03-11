@@ -9,6 +9,11 @@ export type DashboardConfig = {
   disableClusterManager: boolean;
 };
 
+export type ClusterSettings = {
+  userTrackingEnabled: boolean;
+  pvcSize: number;
+};
+
 export type OdhApplication = {
   metadata: {
     name: string;
@@ -143,10 +148,6 @@ declare global {
 
 export type ODHSegmentKey = {
   segmentKey: string;
-};
-
-export type ClusterSettings = {
-  userTrackingEnabled: boolean;
 };
 
 export type TrackingEventProperties = {

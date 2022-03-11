@@ -9,6 +9,11 @@ export type DashboardConfig = {
   disableClusterManager: boolean;
 };
 
+export type ClusterSettings = {
+  pvcSize: number;
+  userTrackingEnabled: boolean
+}
+
 // Add a minimal QuickStart type here as there is no way to get types without pulling in frontend (React) modules
 export declare type QuickStart = {
   apiVersion?: string;
@@ -108,10 +113,6 @@ export type KubeStatus = {
   clusterBranding: string;
   isAdmin: boolean;
 };
-
-export type ClusterSettings = {
-  userTrackingEnabled: boolean
-}
 
 export type KubeDecorator = KubeStatus & {
   config: k8s.KubeConfig;
