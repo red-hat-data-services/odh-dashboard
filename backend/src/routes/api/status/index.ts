@@ -27,17 +27,17 @@ const status = async (
 
   try {
     const configGroupName = (await coreV1Api.readNamespacedConfigMap('groups-config', namespace))
-    .body.data['groups-config'];
-  const adminGroup = (await coreV1Api.readNamespacedConfigMap(configGroupName, namespace)).body
-    .data['admin_groups'];
-  const adminGroupResponse = await customObjectsApi.getClusterCustomObject(
-    'user.openshift.io',
-    'v1',
-    'groups',
-    adminGroup,
-  );
-  const adminUsers = (adminGroupResponse.body as groupObjResponse).users;
-  isAdmin = adminUsers.includes(userName);
+      .body.data['groups-config'];
+    const adminGroup = (await coreV1Api.readNamespacedConfigMap(configGroupName, namespace)).body
+      .data['admin_groups'];
+    const adminGroupResponse = await customObjectsApi.getClusterCustomObject(
+      'user.openshift.io',
+      'v1',
+      'groups',
+      adminGroup,
+    );
+    const adminUsers = (adminGroupResponse.body as groupObjResponse).users;
+    isAdmin = adminUsers.includes(userName);
   } catch (e) {
     console.log('Failed to get groups: ' + e.toString());
   }

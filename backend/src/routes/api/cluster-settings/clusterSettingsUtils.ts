@@ -1,5 +1,9 @@
 import { FastifyRequest } from 'fastify';
+import { scaleDeploymentConfig } from '../../../utils/deployment';
 import { KubeFastifyInstance, ClusterSettings } from '../../../types';
+
+const juypterhubCfg = 'jupyterhub-cfg';
+const setgmentKeyCfg = 'rhods-segment-key-config';
 
 export const updateClusterSettings = async (
   fastify: KubeFastifyInstance,
@@ -9,9 +13,9 @@ export const updateClusterSettings = async (
   const namespace = fastify.kube.namespace;
   const query = request.query as { [key: string]: string };
   try {
-    if (query.userTrackingEnabled) {
+    if (query.userTrackingEnabled && query.pvcSize) {
       await coreV1Api.patchNamespacedConfigMap(
-        'rhods-segment-key-config',
+        setgmentKeyCfg,
         namespace,
         {
           data: { segmentKeyEnabled: query.userTrackingEnabled },
@@ -27,9 +31,10 @@ export const updateClusterSettings = async (
         },
       );
     }
+    const jupyterhubCM = await coreV1Api.readNamespacedConfigMap(juypterhubCfg, namespace);
     if (query.pvcSize) {
       await coreV1Api.patchNamespacedConfigMap(
-        'jupyterhub-cfg',
+        juypterhubCfg,
         namespace,
         {
           data: { singleuser_pvc_size: `${query.pvcSize}Gi` },
@@ -44,6 +49,9 @@ export const updateClusterSettings = async (
           },
         },
       );
+      if (jupyterhubCM.body.data.singleuser_pvc_size.replace('Gi', '') !== query.pvcSize) {
+        await scaleDeploymentConfig(fastify, 'jupyterhub', 0);
+      }
     }
     return { success: true, error: null };
   } catch (e) {
@@ -60,11 +68,9 @@ export const getClusterSettings = async (
   const coreV1Api = fastify.kube.coreV1Api;
   const namespace = fastify.kube.namespace;
   try {
-    const segmentEnabledRes = await coreV1Api.readNamespacedConfigMap(
-      'rhods-segment-key-config',
-      namespace,
-    );
-    const pvcResponse = await coreV1Api.readNamespacedConfigMap('jupyterhub-cfg', namespace);
+    const segmentEnabledRes = await coreV1Api.readNamespacedConfigMap(setgmentKeyCfg, namespace);
+    const pvcResponse = await coreV1Api.readNamespacedConfigMap(juypterhubCfg, namespace);
+
     return {
       pvcSize: Number(pvcResponse.body.data.singleuser_pvc_size.replace('Gi', '')),
       userTrackingEnabled: segmentEnabledRes.body.data.segmentKeyEnabled === 'true',

@@ -26,11 +26,12 @@ import './ClusterSettings.scss';
 
 const description = `Update global settings for all users.`;
 
+const DEFAULT_USER_TRACKING = false;
 const DEFAULT_PVC_SIZE = 20;
 const MIN_PVC_SIZE = 1;
 const MAX_PVC_SIZE = 16384;
 const DEFAULT_CONFIG: ClusterSettings = {
-  userTrackingEnabled: false,
+  userTrackingEnabled: DEFAULT_USER_TRACKING,
   pvcSize: DEFAULT_PVC_SIZE,
 };
 
@@ -40,6 +41,8 @@ const ClusterSettings: React.FC = () => {
   const [loadError, setLoadError] = React.useState<Error>();
   const [clusterSettings, setClusterSettings] = React.useState(DEFAULT_CONFIG);
   const [pvcSize, setPvcSize] = React.useState<number>(DEFAULT_PVC_SIZE);
+  const [userTrackingEnabled, setUserTrackingEnabled] =
+    React.useState<boolean>(DEFAULT_USER_TRACKING);
   const pvcDefaultBtnRef = React.useRef<HTMLButtonElement>();
   const dispatch = useDispatch();
 
@@ -98,7 +101,6 @@ const ClusterSettings: React.FC = () => {
     >
       {!isEmpty ? (
         <div className="odh-cluster-settings">
-
           <PageSection variant={PageSectionVariants.light} padding={{ default: 'noPadding' }}>
             <Flex direction={{ default: 'column' }}>
               <FlexItem>
@@ -126,7 +128,7 @@ const ClusterSettings: React.FC = () => {
                         aria-label="PVC Size Input"
                         value={pvcSize}
                         pattern="[0-9]+"
-                        onBlur={() => submitClusterSettings({ pvcSize })}
+                        onBlur={() => submitClusterSettings({ pvcSize, userTrackingEnabled })}
                         onKeyPress={(event) => {
                           if (event.key === 'Enter') {
                             if (pvcDefaultBtnRef.current) pvcDefaultBtnRef.current.focus();
@@ -152,51 +154,42 @@ const ClusterSettings: React.FC = () => {
                       variant={ButtonVariant.secondary}
                       onClick={() => {
                         setPvcSize(DEFAULT_PVC_SIZE);
-                        submitClusterSettings({ pvcSize: DEFAULT_PVC_SIZE });
+                        submitClusterSettings({ pvcSize: DEFAULT_PVC_SIZE, userTrackingEnabled });
                       }}
                     >
                       Restore Defaults
                     </Button>
                   </FormGroup>
                   <FormGroup
-                fieldId="usage-data"
-                label="Usage Data Collection"
-                helperText={
-                  <Text component={TextVariants.small}>
-                    For more information see the{' '}
-                    <Text
-                      component={TextVariants.a}
-                      href="https://access.redhat.com/documentation/en-us/red_hat_openshift_data_science/1/html/managing_users_and_user_resources/usage-data-collection#usage-data-collection-notice-for-openshift-data-science"
-                      target="_blank"
-                    >
-                      documentation
-                    </Text>
-                    .
-                  </Text>
-                }
-              >
-                <Checkbox
-                  label="Allow collection of usage data"
-                  isChecked={clusterSettings.userTrackingEnabled}
-                  onChange={async () => {
-                    try {
-                      const updatedClusterSettings = {
-                        userTrackingEnabled: !clusterSettings.userTrackingEnabled,
-                      };
-                      const response: ClusterSettings = await updateClusterSettings(
-                        updatedClusterSettings,
-                      );
-                      setClusterSettings(response);
-                    } catch (e) {
-                      console.log('Error changing data collection');
+                    fieldId="usage-data"
+                    label="Usage Data Collection"
+                    helperText={
+                      <Text component={TextVariants.small}>
+                        For more information see the{' '}
+                        <Text
+                          component={TextVariants.a}
+                          href="https://access.redhat.com/documentation/en-us/red_hat_openshift_data_science/1/html/managing_users_and_user_resources/usage-data-collection#usage-data-collection-notice-for-openshift-data-science"
+                          target="_blank"
+                        >
+                          documentation
+                        </Text>
+                        .
+                      </Text>
                     }
-                  }}
-                  aria-label="usageData"
-                  id="usage-data-checkbox"
-                  name="usageDataCheckbox"
-                />
-              </FormGroup>
-                </Form> 
+                  >
+                    <Checkbox
+                      label="Allow collection of usage data"
+                      isChecked={clusterSettings.userTrackingEnabled}
+                      onChange={async () => {
+                        setUserTrackingEnabled(!userTrackingEnabled);
+                        submitClusterSettings({ pvcSize, userTrackingEnabled });
+                      }}
+                      aria-label="usageData"
+                      id="usage-data-checkbox"
+                      name="usageDataCheckbox"
+                    />
+                  </FormGroup>
+                </Form>
               </FlexItem>
             </Flex>
           </PageSection>

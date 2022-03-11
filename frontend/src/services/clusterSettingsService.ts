@@ -23,7 +23,6 @@ export const updateClusterSettings = (
   updateParams.set('userTrackingEnabled', JSON.stringify(settings.userTrackingEnabled));
   updateParams.set('pvcSize', `${settings.pvcSize}`);
 
-
   const options = { params: updateParams };
   return axios
     .get(url, options)
