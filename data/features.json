@@ -1,5 +1,4 @@
 {
   "example-feature-app-name": true,
-  "gpu-computing": false,
-  "watson": false
+  "gpu-computing": false
 }
