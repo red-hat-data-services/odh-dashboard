@@ -23,6 +23,7 @@ import { ClusterSettings } from '../../types';
 import { useDispatch } from 'react-redux';
 import { addNotification } from '../../redux/actions/actions';
 import './ClusterSettings.scss';
+import { ExclamationCircleIcon } from '@patternfly/react-icons';
 
 const description = `Update global settings for all users.`;
 
@@ -40,7 +41,7 @@ const ClusterSettings: React.FC = () => {
   const [loaded, setLoaded] = React.useState<boolean>(false);
   const [loadError, setLoadError] = React.useState<Error>();
   const [clusterSettings, setClusterSettings] = React.useState(DEFAULT_CONFIG);
-  const [pvcSize, setPvcSize] = React.useState<number>(DEFAULT_PVC_SIZE);
+  const [pvcSize, setPvcSize] = React.useState<number | string>(DEFAULT_PVC_SIZE);
   const [userTrackingEnabled, setUserTrackingEnabled] =
     React.useState<boolean>(DEFAULT_USER_TRACKING);
   const pvcDefaultBtnRef = React.useRef<HTMLButtonElement>();
@@ -53,6 +54,7 @@ const ClusterSettings: React.FC = () => {
         setLoadError(undefined);
         setClusterSettings(clusterSettings);
         setPvcSize(clusterSettings.pvcSize);
+        setUserTrackingEnabled(clusterSettings.userTrackingEnabled);
       })
       .catch((e) => {
         setLoadError(e);
@@ -61,31 +63,33 @@ const ClusterSettings: React.FC = () => {
 
   const submitClusterSettings = (newClusterSettings: ClusterSettings) => {
     if (!_.isEqual(clusterSettings, newClusterSettings)) {
-      updateClusterSettings(newClusterSettings)
-        .then((response) => {
-          if (response.success) {
-            setClusterSettings(newClusterSettings);
+      if (Number(newClusterSettings?.pvcSize) !== 0) {
+        updateClusterSettings(newClusterSettings)
+          .then((response) => {
+            if (response.success) {
+              setClusterSettings(newClusterSettings);
+              dispatch(
+                addNotification({
+                  status: 'success',
+                  title: 'Cluster settings updated successfully.',
+                  timestamp: new Date(),
+                }),
+              );
+            } else {
+              throw new Error(response.error);
+            }
+          })
+          .catch((e) => {
             dispatch(
               addNotification({
-                status: 'success',
-                title: 'Cluster settings updated successfully.',
+                status: 'danger',
+                title: 'Error',
+                message: e.message,
                 timestamp: new Date(),
               }),
             );
-          } else {
-            throw new Error(response.error);
-          }
-        })
-        .catch((e) => {
-          dispatch(
-            addNotification({
-              status: 'danger',
-              title: 'Error',
-              message: e.message,
-              timestamp: new Date(),
-            }),
-          );
-        });
+          });
+      }
     }
   };
 
@@ -113,7 +117,10 @@ const ClusterSettings: React.FC = () => {
                   <FormGroup
                     fieldId="pvc-size"
                     label="PVC size"
-                    helperText="Note: The default size is 20 GiB."
+                    helperText="Note: PVC size must be between 1 GiB and 16384 GiB."
+                    helperTextInvalid="Note: PVC size must be between 1 GiB and 16384 GiB."
+                    helperTextInvalidIcon={<ExclamationCircleIcon />}
+                    validated={pvcSize !== '' ? 'success' : 'error'}
                   >
                     <Text>
                       Changing the PVC size changes the storage size attached to the new notebook
@@ -127,22 +134,31 @@ const ClusterSettings: React.FC = () => {
                         type="text"
                         aria-label="PVC Size Input"
                         value={pvcSize}
-                        pattern="[0-9]+"
-                        onBlur={() => submitClusterSettings({ pvcSize, userTrackingEnabled })}
+                        pattern="/^(\s*|\d+)$/"
+                        onBlur={() => {
+                          submitClusterSettings({ pvcSize: Number(pvcSize), userTrackingEnabled });
+                        }}
                         onKeyPress={(event) => {
                           if (event.key === 'Enter') {
                             if (pvcDefaultBtnRef.current) pvcDefaultBtnRef.current.focus();
                           }
                         }}
                         onChange={async (value: string) => {
-                          let newValue = isNaN(Number(value)) ? pvcSize : Number(value);
-                          newValue =
-                            newValue > MAX_PVC_SIZE
-                              ? MAX_PVC_SIZE
-                              : newValue < MIN_PVC_SIZE
-                              ? MIN_PVC_SIZE
-                              : newValue;
-                          setPvcSize(newValue);
+                          const modifiedValue = value.replace(/ /g, '');
+                          if (modifiedValue !== '') {
+                            let newValue = Number.isInteger(Number(modifiedValue))
+                              ? Number(modifiedValue)
+                              : pvcSize;
+                            newValue =
+                              newValue > MAX_PVC_SIZE
+                                ? MAX_PVC_SIZE
+                                : newValue < MIN_PVC_SIZE
+                                ? MIN_PVC_SIZE
+                                : newValue;
+                            setPvcSize(newValue);
+                          } else {
+                            setPvcSize(modifiedValue);
+                          }
                         }}
                       />
                       <InputGroupText id="plain-example" variant={InputGroupTextVariant.plain}>
@@ -153,11 +169,11 @@ const ClusterSettings: React.FC = () => {
                       innerRef={pvcDefaultBtnRef}
                       variant={ButtonVariant.secondary}
                       onClick={() => {
-                        setPvcSize(DEFAULT_PVC_SIZE);
                         submitClusterSettings({ pvcSize: DEFAULT_PVC_SIZE, userTrackingEnabled });
+                        setPvcSize(DEFAULT_PVC_SIZE);
                       }}
                     >
-                      Restore Defaults
+                      Restore Default
                     </Button>
                   </FormGroup>
                   <FormGroup
@@ -179,10 +195,13 @@ const ClusterSettings: React.FC = () => {
                   >
                     <Checkbox
                       label="Allow collection of usage data"
-                      isChecked={clusterSettings.userTrackingEnabled}
+                      isChecked={userTrackingEnabled}
                       onChange={() => {
+                        submitClusterSettings({
+                          pvcSize: Number(pvcSize),
+                          userTrackingEnabled: !userTrackingEnabled,
+                        });
                         setUserTrackingEnabled(!userTrackingEnabled);
-                        submitClusterSettings({ pvcSize, userTrackingEnabled });
                       }}
                       aria-label="usageData"
                       id="usage-data-checkbox"
