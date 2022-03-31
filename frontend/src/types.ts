@@ -10,8 +10,9 @@ export type DashboardConfig = {
 };
 
 export type ClusterSettings = {
+  pvcSize: number | string;
+  cullerTimeout: number;
   userTrackingEnabled: boolean;
-  pvcSize: number;
 };
 
 export type OdhApplication = {

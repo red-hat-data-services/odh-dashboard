@@ -22,6 +22,7 @@ export const updateClusterSettings = (
 
   updateParams.set('userTrackingEnabled', JSON.stringify(settings.userTrackingEnabled));
   updateParams.set('pvcSize', `${settings.pvcSize}`);
+  updateParams.set('cullerTimeout', `${settings.cullerTimeout}`);
 
   const options = { params: updateParams };
   return axios

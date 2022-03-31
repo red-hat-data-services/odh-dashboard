@@ -2,7 +2,7 @@ import { FastifyRequest } from 'fastify';
 import { scaleDeploymentConfig } from '../../../utils/deployment';
 import { KubeFastifyInstance, ClusterSettings } from '../../../types';
 
-const juypterhubCfg = 'jupyterhub-cfg';
+const name = 'jupyterhub-cfg';
 const segmentKeyCfg = 'rhods-segment-key-config';
 
 export const updateClusterSettings = async (
@@ -31,13 +31,13 @@ export const updateClusterSettings = async (
         },
       );
     }
-    const jupyterhubCM = await coreV1Api.readNamespacedConfigMap(juypterhubCfg, namespace);
-    if (query.pvcSize) {
+    const jupyterhubCM = await coreV1Api.readNamespacedConfigMap(name, namespace);
+    if (query.pvcSize && query.cullerTimeout) {
       await coreV1Api.patchNamespacedConfigMap(
-        juypterhubCfg,
+        name,
         namespace,
         {
-          data: { singleuser_pvc_size: `${query.pvcSize}Gi` },
+          data: { singleuser_pvc_size: `${query.pvcSize}Gi`, culler_timeout: query.cullerTimeout },
         },
         undefined,
         undefined,
@@ -51,6 +51,11 @@ export const updateClusterSettings = async (
       );
       if (jupyterhubCM.body.data.singleuser_pvc_size.replace('Gi', '') !== query.pvcSize) {
         await scaleDeploymentConfig(fastify, 'jupyterhub', 0);
+      }
+      if (jupyterhubCM.body.data['culler_timeout'] !== query.cullerTimeout) {
+        // scale down to 0 and scale it up to 1
+        await scaleDeploymentConfig(fastify, 'jupyterhub-idle-culler', 0);
+        await scaleDeploymentConfig(fastify, 'jupyterhub-idle-culler', 1);
       }
     }
     return { success: true, error: null };
@@ -69,10 +74,11 @@ export const getClusterSettings = async (
   const namespace = fastify.kube.namespace;
   try {
     const segmentEnabledRes = await coreV1Api.readNamespacedConfigMap(segmentKeyCfg, namespace);
-    const pvcResponse = await coreV1Api.readNamespacedConfigMap(juypterhubCfg, namespace);
+    const clusterSettingsRes = await coreV1Api.readNamespacedConfigMap(name, namespace);
 
     return {
-      pvcSize: Number(pvcResponse.body.data.singleuser_pvc_size.replace('Gi', '')),
+      pvcSize: Number(clusterSettingsRes.body.data.singleuser_pvc_size.replace('Gi', '')),
+      cullerTimeout: Number(clusterSettingsRes.body.data.culler_timeout),
       userTrackingEnabled: segmentEnabledRes.body.data.segmentKeyEnabled === 'true',
     };
   } catch (e) {
