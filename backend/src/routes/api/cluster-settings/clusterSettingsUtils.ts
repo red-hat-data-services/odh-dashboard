@@ -1,5 +1,5 @@
 import { FastifyRequest } from 'fastify';
-import { scaleDeploymentConfig } from '../../../utils/deployment';
+import { rolloutDeployment } from '../../../utils/deployment';
 import { KubeFastifyInstance, ClusterSettings } from '../../../types';
 
 const juypterhubCfg = 'jupyterhub-cfg';
@@ -32,12 +32,18 @@ export const updateClusterSettings = async (
       );
     }
     const jupyterhubCM = await coreV1Api.readNamespacedConfigMap(juypterhubCfg, namespace);
-    if (query.pvcSize) {
+    if (query.pvcSize && query.cullerTimeout) {
+      if (jupyterhubCM.body.data.singleuser_pvc_size.replace('Gi', '') !== query.pvcSize) {
+        await rolloutDeployment(fastify, namespace, 'jupyterhub');
+      }
+      if (jupyterhubCM.body.data['culler_timeout'] !== query.cullerTimeout) {
+        await rolloutDeployment(fastify, namespace, 'jupyterhub-idle-culler');
+      }
       await coreV1Api.patchNamespacedConfigMap(
         juypterhubCfg,
         namespace,
         {
-          data: { singleuser_pvc_size: `${query.pvcSize}Gi` },
+          data: { singleuser_pvc_size: `${query.pvcSize}Gi`, culler_timeout: query.cullerTimeout },
         },
         undefined,
         undefined,
@@ -49,9 +55,6 @@ export const updateClusterSettings = async (
           },
         },
       );
-      if (jupyterhubCM.body.data.singleuser_pvc_size.replace('Gi', '') !== query.pvcSize) {
-        await scaleDeploymentConfig(fastify, 'jupyterhub', 0);
-      }
     }
     return { success: true, error: null };
   } catch (e) {
@@ -69,10 +72,11 @@ export const getClusterSettings = async (
   const namespace = fastify.kube.namespace;
   try {
     const segmentEnabledRes = await coreV1Api.readNamespacedConfigMap(segmentKeyCfg, namespace);
-    const pvcResponse = await coreV1Api.readNamespacedConfigMap(juypterhubCfg, namespace);
+    const jupyterhubCfgResponse = await coreV1Api.readNamespacedConfigMap(juypterhubCfg, namespace);
 
     return {
-      pvcSize: Number(pvcResponse.body.data.singleuser_pvc_size.replace('Gi', '')),
+      pvcSize: Number(jupyterhubCfgResponse.body.data.singleuser_pvc_size.replace('Gi', '')),
+      cullerTimeout: Number(jupyterhubCfgResponse.body.data.culler_timeout),
       userTrackingEnabled: segmentEnabledRes.body.data.segmentKeyEnabled === 'true',
     };
   } catch (e) {
