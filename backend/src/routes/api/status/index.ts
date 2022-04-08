@@ -4,10 +4,6 @@ import { KubeFastifyInstance, KubeStatus } from '../../../types';
 import { DEV_MODE } from '../../../utils/constants';
 import { addCORSHeader } from '../../../utils/responseUtils';
 
-type groupObjResponse = {
-  users: string[];
-};
-
 const status = async (
   fastify: KubeFastifyInstance,
   request: FastifyRequest,

@@ -110,44 +110,13 @@ export type BuildStatus = {
   timestamp: string;
 };
 
-export type K8sResourceCommon = {
-  apiVersion?: string;
-  kind?: string;
-  metadata: {
-    name: string;
-    namespace?: string;
-    uid: string;
-    labels?: { [key: string]: string };
-    annotations?: { [key: string]: string };
-  };
+export type NotebookError = {
+  severity: string;
+  message: string;
 };
 
-// Minimal type for ConsoleLinks
-export type ConsoleLinkKind = {
-  spec: {
-    text: string;
-    location: string;
-    href: string;
-    applicationMenu: {
-      section: string;
-      imageURL: string;
-    };
-  };
-} & K8sResourceCommon;
+export type NotebookStatus = 'Importing' | 'Validating' | 'Succeeded' | 'Failed';
 
-//
-// Used for Telemetry
-//
-declare global {
-  interface Window {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    analytics?: any;
-    clusterID?: string;
-  }
-}
-
-export type ODHSegmentKey = {
-  segmentKey: string;
 export type Notebook = {
   id: string;
   phase?: NotebookStatus;
@@ -174,11 +143,6 @@ export type NotebookUpdateRequest = {
   packages?: NotebookPackage[];
 };
 
-export type TrackingEventProperties = {
-  name?: string;
-  anonymousID?: string;
-  type?: string;
-  term?: string;
 export type NotebookPackage = {
   name: string;
   version: string;

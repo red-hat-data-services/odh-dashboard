@@ -33,17 +33,23 @@ export declare type QuickStart = {
 };
 
 // Properties common to (almost) all Kubernetes resources.
-export type K8sResourceCommon = {
+export type K8sResourceBase = {
   apiVersion?: string;
   kind?: string;
+}
+
+export type K8sResourceCommon = {
   metadata?: {
     name?: string;
     namespace?: string;
+    generateName?: string;
     uid?: string;
     labels?: { [key: string]: string };
     annotations?: { [key: string]: string };
+    creationTimestamp?: Date;
   };
-};
+} & K8sResourceBase;
+
 
 export enum BUILD_PHASE {
   none = 'Not started',
@@ -222,8 +228,4 @@ export type BuildStatus = {
   name: string;
   status: BUILD_PHASE;
   timestamp?: string;
-};
-
-export type ODHSegmentKey = {
-  segmentKey: string;
 };

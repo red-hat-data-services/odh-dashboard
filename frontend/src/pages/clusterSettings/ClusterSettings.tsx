@@ -9,11 +9,14 @@ import {
   FlexItem,
   Form,
   FormGroup,
+  HelperText,
+  HelperTextItem,
   InputGroup,
   InputGroupText,
   InputGroupTextVariant,
   PageSection,
   PageSectionVariants,
+  Radio,
   Text,
   TextInput,
 } from '@patternfly/react-core';
@@ -22,6 +25,22 @@ import { fetchClusterSettings, updateClusterSettings } from '../../services/clus
 import { ClusterSettings } from '../../types';
 import { useDispatch } from 'react-redux';
 import { addNotification } from '../../redux/actions/actions';
+import {
+  DEFAULT_CONFIG,
+  DEFAULT_PVC_SIZE,
+  DEFAULT_CULLER_TIMEOUT,
+  MIN_PVC_SIZE,
+  MAX_PVC_SIZE,
+  CULLER_TIMEOUT_LIMITED,
+  CULLER_TIMEOUT_UNLIMITED,
+  MAX_MINUTE,
+  MIN_MINUTE,
+  MIN_HOUR,
+  MAX_HOUR,
+  DEFAULT_HOUR,
+} from './const';
+import { getTimeoutByHourAndMinute, getHourAndMinuteByTimeout } from '../../utilities/utils';
+
 import './ClusterSettings.scss';
 import { ExclamationCircleIcon } from '@patternfly/react-icons';
 
@@ -60,6 +79,30 @@ const ClusterSettings: React.FC = () => {
         setLoadError(e);
       });
   }, []);
+
+  React.useEffect(() => {
+    setCullerTimeout(getTimeoutByHourAndMinute(hour, minute));
+  }, [hour, minute]);
+
+  const radioCheckedChange = (_, event) => {
+    const { value } = event.currentTarget;
+    setCullerTimeoutChecked(value);
+    if (value === CULLER_TIMEOUT_UNLIMITED) {
+      setCullerTimeout(DEFAULT_CULLER_TIMEOUT);
+      submitClusterSettings({ pvcSize, cullerTimeout: DEFAULT_CULLER_TIMEOUT });
+    } else if (value === CULLER_TIMEOUT_LIMITED) {
+      setCullerTimeout(getTimeoutByHourAndMinute(hour, minute));
+      submitClusterSettings({ pvcSize, cullerTimeout: getTimeoutByHourAndMinute(hour, minute) });
+    }
+  };
+
+  const onEnterPress = (event) => {
+    if (event.key === 'Enter') {
+      if (pvcDefaultBtnRef.current) {
+        pvcDefaultBtnRef.current.focus();
+      }
+    }
+  };
 
   const submitClusterSettings = (newClusterSettings: ClusterSettings) => {
     if (!_.isEqual(clusterSettings, newClusterSettings)) {
@@ -104,15 +147,73 @@ const ClusterSettings: React.FC = () => {
       emptyMessage="No cluster settings found."
     >
       {!isEmpty ? (
-        <div className="odh-cluster-settings">
-          <PageSection variant={PageSectionVariants.light} padding={{ default: 'noPadding' }}>
-            <Flex direction={{ default: 'column' }}>
-              <FlexItem>
-                <Form
-                  className="odh-cluster-settings__form"
-                  onSubmit={(e) => {
-                    e.preventDefault();
+        <PageSection
+          className="odh-cluster-settings"
+          variant={PageSectionVariants.light}
+          padding={{ default: 'noPadding' }}
+        >
+          <Form
+            className="odh-cluster-settings__form"
+            onSubmit={(e) => {
+              e.preventDefault();
+            }}
+          >
+            <FormGroup fieldId="pvc-size" label="PVC size">
+              <Text>
+                Changing the PVC size changes the storage size attached to the new notebook servers
+                for all users.
+              </Text>
+              <InputGroup>
+                <TextInput
+                  className="odh-number-input"
+                  name="pvc"
+                  id="pvc-size-input"
+                  type="text"
+                  aria-label="PVC Size Input"
+                  value={pvcSize}
+                  pattern="/^(\s*|\d+)$/"
+                  onBlur={() => {
+                    submitClusterSettings({ pvcSize: Number(pvcSize), cullerTimeout });
                   }}
+                  onKeyPress={(event) => {
+                    if (event.key === 'Enter') {
+                      if (pvcDefaultBtnRef.current) pvcDefaultBtnRef.current.focus();
+                    }
+                  }}
+                  onChange={async (value: string) => {
+                    const modifiedValue = value.replace(/ /g, '');
+                    if (modifiedValue !== '') {
+                      let newValue = Number.isInteger(Number(modifiedValue))
+                        ? Number(modifiedValue)
+                        : pvcSize;
+                      newValue =
+                        newValue > MAX_PVC_SIZE
+                          ? MAX_PVC_SIZE
+                          : newValue < MIN_PVC_SIZE
+                          ? MIN_PVC_SIZE
+                          : newValue;
+                      setPvcSize(newValue);
+                    } else {
+                      setPvcSize(modifiedValue);
+                    }
+                  }}
+                />
+                <InputGroupText variant={InputGroupTextVariant.plain}>GiB</InputGroupText>
+              </InputGroup>
+              <Button
+                innerRef={pvcDefaultBtnRef}
+                variant={ButtonVariant.secondary}
+                onClick={() => {
+                  setPvcSize(DEFAULT_PVC_SIZE);
+                  submitClusterSettings({ pvcSize: DEFAULT_PVC_SIZE, cullerTimeout });
+                }}
+              >
+                Restore Default
+              </Button>
+              <HelperText>
+                <HelperTextItem
+                  variant={pvcSize === '' ? 'error' : 'indeterminate'}
+                  hasIcon={pvcSize === ''}
                 >
                   <FormGroup
                     fieldId="pvc-size"

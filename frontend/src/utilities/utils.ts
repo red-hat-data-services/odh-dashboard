@@ -128,3 +128,13 @@ export const isRedHatSupported = (app: OdhApplication): boolean => {
   const support = (app.spec.support || '').toLowerCase();
   return support === 'red hat' || support === 'redhat';
 };
+
+export const getHourAndMinuteByTimeout = (timeout: number): { hour: number; minute: number } => {
+  const total_minutes = timeout / 60;
+  const hour = total_minutes / 60;
+  const minute = total_minutes % 60;
+  return { hour, minute };
+};
+
+export const getTimeoutByHourAndMinute = (hour: number, minute: number): number =>
+  (hour * 60 + minute) * 60;

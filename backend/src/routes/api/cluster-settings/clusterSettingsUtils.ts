@@ -37,7 +37,7 @@ export const updateClusterSettings = async (
         juypterhubCfg,
         namespace,
         {
-          data: { singleuser_pvc_size: `${query.pvcSize}Gi` },
+          data: { singleuser_pvc_size: `${query.pvcSize}Gi`, culler_timeout: query.cullerTimeout },
         },
         undefined,
         undefined,
@@ -51,6 +51,11 @@ export const updateClusterSettings = async (
       );
       if (jupyterhubCM.body.data.singleuser_pvc_size.replace('Gi', '') !== query.pvcSize) {
         await scaleDeploymentConfig(fastify, 'jupyterhub', 0);
+      }
+      if (jupyterhubCM.body.data['culler_timeout'] !== query.cullerTimeout) {
+        // scale down to 0 and scale it up to 1
+        await scaleDeploymentConfig(fastify, 'jupyterhub-idle-culler', 0);
+        await scaleDeploymentConfig(fastify, 'jupyterhub-idle-culler', 1);
       }
     }
     return { success: true, error: null };
