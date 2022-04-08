@@ -21,6 +21,7 @@ export const updateClusterSettings = (
   const updateParams = new URLSearchParams();
 
   updateParams.set('userTrackingEnabled', JSON.stringify(settings.userTrackingEnabled));
+  updateParams.set('cullerTimeout', `${settings.cullerTimeout}`);
   updateParams.set('pvcSize', `${settings.pvcSize}`);
 
   const options = { params: updateParams };
