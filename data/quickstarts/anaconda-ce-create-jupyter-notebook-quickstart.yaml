@@ -65,10 +65,10 @@ spec:
       summary:
         success: You have a running Jupyter notebook.
         failed: Try the steps again.
-    - title: Ensure you are subscribed to use Anaconda Commercial Edition packages.
+    - title: Ensure you are subscribed to use Anaconda Professional packages.
       description: |-
-        ### To verify that you are subscribed to Anaconda Commercial Edition in the notebook, follow these steps:
-        1. In a notebook cell, type and run `!conda token set $ANACONDA_TOKEN` (replacing $ANACONDA_TOKEN with your own Anaconda Commercial Edition token.)
+        ### To verify that you are subscribed to Anaconda Professional in the notebook, follow these steps:
+        1. In a notebook cell, type and run `!conda token set $ANACONDA_TOKEN` (replacing $ANACONDA_TOKEN with your own Anaconda Professional token.)
         1. Run `!conda info` in a notebook cell.
       review:
         instructions: |-
@@ -77,7 +77,7 @@ spec:
         failedTaskHelp:
           This task is not verified yet. Try the task again.
       summary:
-        success: You have successfully subscribed to Anaconda Commercial Edition.
+        success: You have successfully subscribed to Anaconda Professional.
         failed: Try the steps again.
-  conclusion: You are now able to install Anaconda Commercial Edition packages within your Jupyter notebook using the command `conda install $PACKAGE`.  If you want to learn how to deploy a model, take the next quick start.
+  conclusion: You are now able to install Anaconda Professional packages within your Jupyter notebook using the command `conda install $PACKAGE`.  If you want to learn how to deploy a model, take the next quick start.
   nextQuickStart: [deploy-python-model]
