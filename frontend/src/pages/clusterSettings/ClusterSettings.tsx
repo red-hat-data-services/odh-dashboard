@@ -43,6 +43,7 @@ import {
 import { getTimeoutByHourAndMinute, getHourAndMinuteByTimeout } from '../../utilities/utils';
 
 import './ClusterSettings.scss';
+import { ExclamationCircleIcon } from '@patternfly/react-icons';
 
 const description = `Update global settings for all users.`;
 
