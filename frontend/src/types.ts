@@ -156,3 +156,49 @@ export type TrackingEventProperties = {
   type?: string;
   term?: string;
 };
+
+export type NotebookError = {
+  severity: string;
+  message: string;
+};
+
+export type NotebookStatus = 'Importing' | 'Validating' | 'Succeeded' | 'Failed';
+
+export type Notebook = {
+  id: string;
+  phase?: NotebookStatus;
+  user?: string;
+  uploaded?: Date;
+  error?: NotebookError;
+} & NotebookCreateRequest &
+  NotebookUpdateRequest;
+
+export type NotebookCreateRequest = {
+  name: string;
+  url: string;
+  description?: string;
+  // FIXME: This shouldn't be a user defined value consumed from the request payload but should be a controlled value from an authentication middleware.
+  user: string;
+  software?: NotebookPackage[];
+  packages?: NotebookPackage[];
+};
+
+export type NotebookUpdateRequest = {
+  id: string;
+  name?: string;
+  description?: string;
+  visible?: boolean;
+  software?: NotebookPackage[];
+  packages?: NotebookPackage[];
+};
+
+export type NotebookPackage = {
+  name: string;
+  version: string;
+  visible: boolean;
+};
+
+export type ResponseStatus = {
+  success: boolean;
+  error: string;
+};

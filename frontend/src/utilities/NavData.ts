@@ -35,6 +35,7 @@ export const adminNavData: NavDataItem[] = [
     id: 'settings',
     group: { id: 'settings', title: 'Settings' },
     children: [
+      { id: 'settings-notebook-images', label: 'Notebook Images', href: '/notebookImages' },
       { id: 'settings-cluster-settings', label: 'Cluster settings', href: '/clusterSettings' },
     ],
   },
