@@ -21,6 +21,9 @@ type ApplicationsPageProps = {
   loaded: boolean;
   empty: boolean;
   loadError?: Error;
+  errorMessage?: string;
+  emptyMessage?: string;
+  emptyStatePage?: React.ReactNode;
 };
 
 const ApplicationsPage: React.FC<ApplicationsPageProps> = ({
@@ -30,6 +33,9 @@ const ApplicationsPage: React.FC<ApplicationsPageProps> = ({
   empty,
   loadError,
   children,
+  errorMessage,
+  emptyMessage,
+  emptyStatePage,
 }) => {
   const renderHeader = () => (
     <PageSection className="odh-apps__heading" variant={PageSectionVariants.light}>
@@ -47,7 +53,7 @@ const ApplicationsPage: React.FC<ApplicationsPageProps> = ({
           <EmptyState variant={EmptyStateVariant.full} data-test-id="error-empty-state">
             <EmptyStateIcon icon={WarningTriangleIcon} />
             <Title headingLevel="h5" size="lg">
-              Error loading components
+              {errorMessage !== undefined ? errorMessage : 'Error loading components'}
             </Title>
             <EmptyStateBody className="odh-dashboard__error-body">
               <div>
@@ -73,15 +79,17 @@ const ApplicationsPage: React.FC<ApplicationsPageProps> = ({
     }
 
     if (empty) {
-      return (
+      return !emptyStatePage ? (
         <PageSection isFilled>
           <EmptyState variant={EmptyStateVariant.full} data-test-id="empty-empty-state">
             <EmptyStateIcon icon={QuestionCircleIcon} />
             <Title headingLevel="h5" size="lg">
-              No Components Found
+              {emptyMessage !== undefined ? emptyMessage : 'No Components Found'}
             </Title>
           </EmptyState>
         </PageSection>
+      ) : (
+        emptyStatePage
       );
     }
 

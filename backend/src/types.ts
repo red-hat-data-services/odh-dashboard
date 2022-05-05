@@ -9,6 +9,12 @@ export type DashboardConfig = {
   disableClusterManager: boolean;
 };
 
+export type ClusterSettings = {
+  pvcSize: number;
+  cullerTimeout: number;
+  userTrackingEnabled: boolean;
+}
+
 // Add a minimal QuickStart type here as there is no way to get types without pulling in frontend (React) modules
 export declare type QuickStart = {
   apiVersion?: string;
@@ -28,17 +34,23 @@ export declare type QuickStart = {
 };
 
 // Properties common to (almost) all Kubernetes resources.
-export type K8sResourceCommon = {
+export type K8sResourceBase = {
   apiVersion?: string;
   kind?: string;
+}
+
+export type K8sResourceCommon = {
   metadata?: {
     name?: string;
     namespace?: string;
+    generateName?: string;
     uid?: string;
     labels?: { [key: string]: string };
     annotations?: { [key: string]: string };
+    creationTimestamp?: Date;
   };
-};
+} & K8sResourceBase;
+
 
 export enum BUILD_PHASE {
   none = 'Not started',
@@ -106,6 +118,7 @@ export type KubeStatus = {
   userName: string | string[];
   clusterID: string;
   clusterBranding: string;
+  isAdmin: boolean;
 };
 
 export type KubeDecorator = KubeStatus & {
@@ -114,6 +127,7 @@ export type KubeDecorator = KubeStatus & {
   batchV1beta1Api: k8s.BatchV1beta1Api;
   batchV1Api: k8s.BatchV1Api;
   customObjectsApi: k8s.CustomObjectsApi;
+  rbac: k8s.RbacAuthorizationV1Api;
 };
 
 export type KubeFastifyInstance = FastifyInstance & {
@@ -220,3 +234,97 @@ export type BuildStatus = {
 export type ODHSegmentKey = {
   segmentKey: string;
 };
+
+export type NotebookError = {
+  severity: string;
+  message: string;
+}
+
+export type NotebookStatus = "Importing" | "Validating" | "Succeeded" | "Failed";
+
+export type Notebook = {
+  id: string;
+  phase?: NotebookStatus;
+  user?: string;
+  uploaded?: Date;
+  error?: NotebookError;
+} & NotebookCreateRequest & NotebookUpdateRequest;
+
+export type NotebookCreateRequest = {
+  name: string;
+  url: string;
+  description?: string;
+  // FIXME: This shouldn't be a user defined value consumed from the request payload but should be a controlled value from an authentication middleware.
+  user: string;
+  software?: NotebookPackage[];
+  packages?: NotebookPackage[];
+}
+
+export type NotebookUpdateRequest = {
+  id: string;
+  name?: string;
+  description?: string;
+  visible?: boolean;
+  software?: NotebookPackage[];
+  packages?: NotebookPackage[];
+}
+
+export type NotebookPackage = {
+  name: string;
+  version: string;
+  visible: boolean;
+}
+
+
+export type ImageStreamTagSpec = {
+  name: string;
+  annotations?: { [key: string]: string };
+  from?: {
+    kind: string;
+    name: string;
+  }
+}
+export type ImageStreamKind = {
+  spec?: {
+    lookupPolicy?: {
+      local: boolean
+    }
+    tags: ImageStreamTagSpec[];
+  }
+  status?: any
+} & K8sResourceCommon;
+
+export type ImageStreamListKind = {
+  items: ImageStreamKind[];
+} & K8sResourceBase;
+
+export type PipelineRunKind = {
+  spec: {
+    params: {
+      name: string;
+      value: string;
+    }[]
+    pipelineRef: {
+      name: string;
+    }
+    workspaces?: [
+      {
+        name: string
+        volumeClaimTemplate: {
+          spec: {
+            accessModes: string[]
+            resources: {
+              requests: {
+                storage: string
+              }
+            }
+          }
+        }
+      }
+    ]
+  }
+} & K8sResourceCommon;
+
+export type PipelineRunListKind = {
+  items: PipelineRunKind[];
+} & K8sResourceBase;

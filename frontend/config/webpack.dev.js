@@ -12,6 +12,7 @@ const COMMON_DIR = process.env._ODH_COMMON_DIR;
 const DIST_DIR = process.env._ODH_DIST_DIR;
 const HOST = process.env._ODH_HOST;
 const PORT = process.env._ODH_PORT;
+const BACKEND_PORT = process.env._BACKEND_PORT;
 
 module.exports = merge(
   {
@@ -33,7 +34,10 @@ module.exports = merge(
       hot: true,
       overlay: true,
       open: true,
-      stats: 'errors-only'
+      stats: 'errors-only',
+      proxy: {
+        '/api': `http://localhost:${BACKEND_PORT}`,
+      },
     },
     module: {
       rules: [
@@ -47,7 +51,7 @@ module.exports = merge(
             path.resolve(RELATIVE_DIRNAME, 'node_modules/@patternfly/react-catalog-view-extension'),
             path.resolve(RELATIVE_DIRNAME, 'node_modules/@patternfly/react-core/dist/styles/base.css'),
             path.resolve(RELATIVE_DIRNAME, 'node_modules/@patternfly/react-core/dist/esm/@patternfly/patternfly'),
-            path.resolve(RELATIVE_DIRNAME, 'node_modules/@cloudmosaic/quickstarts')
+            path.resolve(RELATIVE_DIRNAME, 'node_modules/@patternfly/quickstarts')
           ],
           use: ['style-loader', 'css-loader']
         },
