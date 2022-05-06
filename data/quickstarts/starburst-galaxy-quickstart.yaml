@@ -81,10 +81,11 @@ spec:
     - title: Run the **explore-data.ipynb** Jupyter notebook
       description: |-
         ### To run the **explore-data.ipynb** notebook:
-        1. Open the **explore-data.ipynb** notebook within your JupyterLab interface.
-        2. Follow the instructions provided in the notebook to install the required packages and initialize the environment.
-        3. Run the cells under the **What is Starburst Galaxy and how does it work?** section to confirm you are connected to your Starburst Galaxy cluster.
-        4. Run the cells under the **Accessing Data** section to confirm you are able to execute queries against your Starburst Galaxy cluster.
+        1. If you haven't already done so, clone the [Starburst Galaxy 101 GitHub repo](https://github.com/starburstdata/rhods-starburst-galaxy-101) to your local machine.
+        2. Open the **explore-data.ipynb** notebook within your JupyterLab interface.
+        3. Follow the instructions provided in the notebook to install the required packages and initialize the environment.
+        4. Run the cells under the **What is Starburst Galaxy and how does it work?** section to confirm you are connected to your Starburst Galaxy cluster.
+        5. Run the cells under the **Accessing Data** section to confirm you are able to execute queries against your Starburst Galaxy cluster.
 
         You have now successfully connected a Jupyter notebook to your Starburst Galaxy cluster and executed queries against that cluster.
       review:
