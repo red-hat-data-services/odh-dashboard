@@ -1,10 +1,10 @@
 metadata:
   name: anaconda-ce
 spec:
-  displayName: Anaconda Commercial Edition
+  displayName: Anaconda Professional
   provider: Anaconda
   description: |-
-    Anaconda Commercial Edition is a popular open source package distribution and management experience that is optimized for commercial use.
+    Anaconda Professional is a popular open source package distribution and management experience that is optimized for commercial use.
   kfdefApplications: []
   route: ''
   img: images/anaconda-ce.svg
