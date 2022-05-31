@@ -82,9 +82,9 @@ export type RouteKind = {
 
 // Minimal type for Subscriptions
 export type SubscriptionKind = {
-  status: {
-    installedCSV: string;
-    installPlanRef: {
+  status?: {
+    installedCSV?: string;
+    installPlanRef?: {
       namespace: string;
     };
   };
