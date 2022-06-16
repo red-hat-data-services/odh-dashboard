@@ -1,0 +1,26 @@
+metadata:
+  name: nvidia
+  annotations:
+    opendatahub.io/categories: 'GPU'
+spec:
+  displayName: NVIDIA GPU Add-on
+  provider: NVIDIA
+  description: |-
+    NVIDIA GPU Add-on prepares OpenShift to run GPU-accelerated workloads on a single node or on multiple nodes.
+  kfdefApplications: []
+  route: ''
+  img: images/nvidia.svg
+  category: Self-managed
+  support: third party support
+  csvName: gpu-operator-certified
+  docsLink: https://docs.nvidia.com/datacenter/cloud-native/gpu-operator/openshift/contents.html
+  quickStart: gpu-quickstart
+  getStartedLink: https://access.redhat.com/documentation/en-us/red_hat_openshift_data_science/1/html/managing_users_and_user_resources/enabling-gpu-support-in-openshift-data-science_user-mgmt
+  enable:
+    title: Enable NVIDIA GPU Add-on
+    actionLabel: Enable
+    description: Clicking enable will add the NVIDIA GPU Add-on card to the Enabled page
+    linkPreface: |-
+      Before enabling, be sure you have installed the NVIDIA GPU Add-on:
+    link: https://access.redhat.com/documentation/en-us/red_hat_openshift_data_science/1/html/managing_users_and_user_resources/enabling-gpu-support-in-openshift-data-science_user-mgmt
+    validationConfigMap: nvidia-validation-result

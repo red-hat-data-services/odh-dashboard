@@ -1,0 +1,44 @@
+kind: ConsoleQuickStart
+metadata:
+  name: gpu-quickstart
+  annotations:
+    opendatahub.io/categories: 'Getting started,GPUs,Python'
+spec:
+  displayName: Installing and verifying NVIDIA GPU add-on
+  appName: nvidia
+  durationMinutes: 5
+  icon: 'images/nvidia.svg'
+  description: Install GPU add-on
+  introduction: |-
+    ### This quick start shows you how to install the GPU add-on and verify that the JupyterHub spawner detects the available GPUs.
+  tasks:
+    - title: Launch Red Hat Hybrid Cloud Console
+      description: |-
+        1. Navigate to the Red Hat Hybrid Cloud Console in a new tab on your web browser.
+        2. On the left navigation menu select **OpenShift** -> **Clusters** and select the cluster you are working on.
+        3. From the Cluster Overview page, navigate to the **Add-ons** menu.
+        3. Install the **NVIDIA GPU Add-on**. (To install the add on the cluster must have GPU node(s) provisioned.)
+
+      review:
+        instructions: |-
+          #### To verify you have installed the GPU add-on:
+          Can you see the add-on with the label **Installed** in the add-ons menu?
+        failedTaskHelp: This task is not verified yet. Try the task again.
+      summary:
+        success: You have installed the NVIDIA GPU Add-on.
+        failed: Ensure you have met the prerequisites for the GPU add on and try the steps again.
+    - title: Verify that the JupyterHub spawner sees the available GPUs
+      description: |-
+        1. Open the JupyterHub spawner from the Red Hat OpenShift Data Science dashboard.
+        2. In the **Deployment size** menu, click on the **Number of GPUs** dropdown and select the number of GPUs you want to use.
+        3. Launch a notebook server using the Pytorch notebook image.
+
+      review:
+        instructions: |-
+          #### To verify that you have the available GPUs for use:
+          Can you select the number of GPUS in the JupyterHub spawner?
+        failedTaskHelp: This task is not verified yet. Try the task again.
+      summary:
+        success: Your server has started and the JupyterHub will automatically use the selected GPUs
+        failed: Try the steps again.
+  nextQuickStart: [gpu-enabled-notebook-quickstart]
