@@ -60,10 +60,10 @@ spec:
       description: |-
         ### To launch a JupyterHub notebook server from within the RHODS console:
         1. Click **Applications** &#x2192; **Enabled**.
-        2. Find the JupyterHub card.
+        2. Find the **JupyterHub** card.
         3. Click **Launch** on the JupyterHub card to access the JupyterHub **Start a notebook server** page.  A new browser tab will open displaying the **Start a notebook server** page.
         4. Select the **Standard Data Science** notebook image and the **Default** container size.
-        5. Add the environment variables for **TRINO_USERNAME**, *TRINO_PASSWORD**, **TRINO_HOSTNAME**, and **TRINO_PORT** using the connection details you obtained in the previous task.
+        5. Add the environment variables for **TRINO\_USERNAME**, **TRINO\_PASSWORD**, **TRINO\_HOSTNAME**, and **TRINO\_PORT** using the connection details you obtained in the previous task.
         6. Click on **Start server** to launch JupyterHub.
 
         If you have not previously authorized the jupyterhub-hub service account to access your account, the **Authorize Access** page appears prompting you to provide authorization. Inspect the permissions selected by default, and click the **Allow selected permissions** button.
@@ -81,10 +81,11 @@ spec:
     - title: Run the **explore-data.ipynb** Jupyter notebook
       description: |-
         ### To run the **explore-data.ipynb** notebook:
-        1. Open the **explore-data.ipynb** notebook within your your JupyterLab interface.
-        2. Follow the instructions provided in the notebook to install the required packages and initialize the environment.
-        3. Run the cells under the **What is Starburst Galaxy and how does it work?** section to confirm you are connected to your Starburst Galaxy cluster.
-        4. Run the cells under the **Accessing Data** section to confirm you are able to execute queries against your Starburst Galaxy cluster.
+        1. If you haven't already done so, clone the [Starburst Galaxy 101 GitHub repo](https://github.com/starburstdata/rhods-starburst-galaxy-101) to your local machine.
+        2. Open the **explore-data.ipynb** notebook within your JupyterLab interface.
+        3. Follow the instructions provided in the notebook to install the required packages and initialize the environment.
+        4. Run the cells under the **What is Starburst Galaxy and how does it work?** section to confirm you are connected to your Starburst Galaxy cluster.
+        5. Run the cells under the **Accessing Data** section to confirm you are able to execute queries against your Starburst Galaxy cluster.
 
         You have now successfully connected a Jupyter notebook to your Starburst Galaxy cluster and executed queries against that cluster.
       review:
@@ -96,4 +97,4 @@ spec:
       summary:
         success: You have connected to Starburst Galaxy using a Jupyter notebook.
         failed: Try the steps again.
-  conclusion: You are now able to create a Starburst Galaxy cluster and connect a Jupyter notebook to that cluster to execute queries against it.  launch Jupyter notebooks and write Python code.  If you want to learn how to deploy a model written in Python, take the next quick start.  For more information on how to use Starburst Galaxy, please refer to the [online documentation](https://docs.starburst.io/starburst-galaxy/).
+  conclusion: You are now able to create a Starburst Galaxy cluster and connect a Jupyter notebook to that cluster to execute queries against it.  For more information on how to use Starburst Galaxy, please refer to the [online documentation](https://docs.starburst.io/starburst-galaxy/).
