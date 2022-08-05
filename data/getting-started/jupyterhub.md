@@ -1,4 +1,4 @@
-# JupyterHub
+# Quickstart
 
 ## Prerequisites
 
