@@ -10,7 +10,7 @@ spec:
   kfdefApplications: ['odh-notebook-controller', 'notebook-images']
   img: images/jupyter.svg
   category: Red Hat managed
-  support: red hat
+  support: redhat
   docsLink: https://jupyter.org
   internalRoute: notebookController
   quickStart: create-jupyter-notebook

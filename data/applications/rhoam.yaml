@@ -18,7 +18,7 @@ spec:
   consoleLink: 'rhmi-3scale-console-link'
   img: images/red-hat.svg
   category: Red Hat managed
-  support: red hat
+  support: redhat
   docsLink: https://access.redhat.com/documentation/en-us/red_hat_openshift_api_management
   quickStart: deploy-model-rhoam
   getStartedLink: https://console.redhat.com/openshift/details/<CLUSTER_ID/>#addOns
