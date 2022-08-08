@@ -1,7 +1,7 @@
 metadata:
   name: nvidia
   annotations:
-    opendatahub.io/categories: 'GPU'
+    opendatahub.io/categories: 'Getting started'
 spec:
   displayName: NVIDIA GPU Add-on
   provider: NVIDIA

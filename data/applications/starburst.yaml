@@ -1,7 +1,7 @@
 metadata:
   name: starburst
   annotations:
-    opendatahub.io/categories: 'Data management,Python'
+    opendatahub.io/categories: 'Data management'
 spec:
   displayName: Starburst Galaxy
   provider: Starburst

@@ -2,7 +2,7 @@ metadata:
   name: python-visualization-tutorial
   type: tutorial
   annotations:
-    opendatahub.io/categories: 'AI/Machine learning,Data visualization,Jupyter notebook,Python'
+    opendatahub.io/categories: 'Data visualization,Getting started'
 spec:
   appName: anaconda-ce
   displayName: Choosing Python tools for data visualization

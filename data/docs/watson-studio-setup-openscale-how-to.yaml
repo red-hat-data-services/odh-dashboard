@@ -2,7 +2,7 @@ metadata:
   name: watson-studio-setup-openscale-how-to
   type: how-to
   annotations:
-    opendatahub.io/categories: 'Data management,Deployment,Model serving,Monitoring'
+    opendatahub.io/categories: 'Model monitoring,Getting started'
 spec:
   appName: watson-studio
   displayName: How to set up Watson OpenScale

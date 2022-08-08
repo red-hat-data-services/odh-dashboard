@@ -2,7 +2,7 @@ kind: ConsoleQuickStart
 metadata:
   name: seldon-deploy-model-explainer
   annotations:
-    opendatahub.io/categories: 'AI/Machine learning,Deployment,Model serving,Monitoring,SciKit-Learn'
+    opendatahub.io/categories: 'Model development,Model serving,Model monitoring,Getting started'
 spec:
   displayName: Identifying explanations for a deployed SKLearn model
   appName: seldon-deploy

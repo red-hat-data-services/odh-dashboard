@@ -1,7 +1,7 @@
 metadata:
   name: openvino
   annotations:
-    opendatahub.io/categories: 'AI/Machine learning,Jupyter notebook,TensorFlow,Python,PyTorch'
+    opendatahub.io/categories: 'Model optimization,Model development,Model serving,Notebook environments'
 spec:
   displayName: OpenVINO
   provider: Intel®
