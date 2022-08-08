@@ -2,7 +2,7 @@ metadata:
   name: python-notebook-generate-results-open-scale-tutorial
   type: tutorial
   annotations:
-    opendatahub.io/categories: 'AI/Machine learning,Deployment,Jupyter notebook,Model serving,Python'
+    opendatahub.io/categories: 'Model training,Model serving,Model development'
 spec:
   appName: watson-studio
   displayName: Run a Python notebook to generate results in Watson OpenScale

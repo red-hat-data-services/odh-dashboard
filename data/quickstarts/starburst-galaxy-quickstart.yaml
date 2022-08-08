@@ -2,7 +2,7 @@ kind: ConsoleQuickStart
 metadata:
   name: using-starburst-galaxy
   annotations:
-    opendatahub.io/categories: 'Getting started,Starburst Galaxy'
+    opendatahub.io/categories: 'Getting started,Data management,Data analysis'
 spec:
   displayName: Querying data with Starburst Galaxy
   appName: starburst

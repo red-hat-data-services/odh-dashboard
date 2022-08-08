@@ -1,7 +1,7 @@
 metadata:
   name: rhoam
   annotations:
-    opendatahub.io/categories: 'Deployment,Model serving'
+    opendatahub.io/categories: 'Model serving'
 spec:
   displayName: OpenShift API Management
   provider: Red Hat

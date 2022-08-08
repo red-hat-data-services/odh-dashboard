@@ -2,7 +2,7 @@ metadata:
   name: watson-studio-runtime-env-how-to
   type: how-to
   annotations:
-    opendatahub.io/categories: 'AI/Machine learning,Getting started,Jupyter notebook,Python'
+    opendatahub.io/categories: 'Notebook environments,Getting started'
 spec:
   appName: watson-studio
   displayName: How to choose between notebook runtime environment options

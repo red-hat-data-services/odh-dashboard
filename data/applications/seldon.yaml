@@ -1,5 +1,7 @@
 metadata:
   name: seldon-deploy
+  annotations:
+    opendatahub.io/categories: 'Model serving,Model monitoring'
 spec:
   displayName: Seldon Deploy
   provider: Seldon

@@ -2,7 +2,7 @@ metadata:
   name: watson-studio-integrate-with-git-how-to
   type: how-to
   annotations:
-    opendatahub.io/categories: 'Getting started'
+    opendatahub.io/categories: 'Data management,Getting started,Notebook environments'
 spec:
   appName: watson-studio
   displayName: How to create a project that integrates with Git

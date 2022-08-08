@@ -2,7 +2,7 @@ metadata:
   name: python-interactive-visualization-tutorial
   type: tutorial
   annotations:
-    opendatahub.io/categories: 'AI/Machine learning,Data visualization,Deployment,Jupyter notebook,Model serving,Python'
+    opendatahub.io/categories: 'Data visualization,Model development'
 spec:
   appName: anaconda-ce
   displayName: Building interactive visualizations and dashboards in Python
