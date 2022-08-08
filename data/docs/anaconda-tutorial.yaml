@@ -2,7 +2,7 @@ metadata:
   name: anaconda-background
   type: tutorial
   annotations:
-    opendatahub.io/categories: 'AI/Machine learning,Getting started,Python,SciKit-Learn'
+    opendatahub.io/categories: 'Package management,Notebook environments'
 spec:
   appName: anaconda-ce
   displayName: Exploring Anaconda for data science 

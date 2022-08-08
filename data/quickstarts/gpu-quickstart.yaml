@@ -2,7 +2,7 @@ kind: ConsoleQuickStart
 metadata:
   name: gpu-quickstart
   annotations:
-    opendatahub.io/categories: 'Getting started,GPUs,Python'
+    opendatahub.io/categories: 'Getting started'
 spec:
   displayName: Installing and verifying NVIDIA GPU add-on
   appName: nvidia

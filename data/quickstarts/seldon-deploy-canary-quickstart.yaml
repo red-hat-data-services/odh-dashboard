@@ -2,7 +2,7 @@ kind: ConsoleQuickStart
 metadata:
   name: seldon-deploy-model-canary
   annotations:
-    opendatahub.io/categories: 'AI/Machine learning,Deployment,Model serving,SciKit-Learn'
+    opendatahub.io/categories: 'Model serving,Getting started'
 spec:
   displayName: Launching and updating a SKLearn model with canary deployment
   appName: seldon-deploy

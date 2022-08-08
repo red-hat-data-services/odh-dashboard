@@ -1,5 +1,7 @@
 metadata:
   name: anaconda-ce
+  annotations:
+    opendatahub.io/categories: 'Package management,Notebook environments'
 spec:
   displayName: Anaconda Professional
   provider: Anaconda

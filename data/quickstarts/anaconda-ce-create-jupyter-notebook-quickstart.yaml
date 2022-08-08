@@ -2,7 +2,7 @@ kind: ConsoleQuickStart
 metadata:
   name: create-jupyter-notebook-anaconda
   annotations:
-    opendatahub.io/categories: 'Getting started,Jupyter notebook,Python'
+    opendatahub.io/categories: 'Package management,Notebook environments'
 spec:
   displayName: Creating an Anaconda-enabled Jupyter notebook
   appName: anaconda-ce

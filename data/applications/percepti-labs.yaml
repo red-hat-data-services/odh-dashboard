@@ -1,10 +1,10 @@
 metadata:
   name: perceptiLabs
   annotations:
-    opendatahub.io/categories: 'AI/Machine learning,Deployment,Python'
+    opendatahub.io/categories: 'Model serving,Model monitoring,Model development,Data preprocessing,Model optimizing'
 spec:
   displayName: PerceptiLabs
-  provider: PercetiLabs
+  provider: PerceptiLabs
   description: |-
     PerceptiLabs is a visual modeling tool for editing, managing, and monitoring your machine learning models.
   kfdefApplications: []

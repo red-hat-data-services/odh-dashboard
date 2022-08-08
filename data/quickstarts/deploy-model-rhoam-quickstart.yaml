@@ -3,7 +3,7 @@ kind: ConsoleQuickStart
 metadata:
   name: deploy-model-rhoam
   annotations:
-    opendatahub.io/categories: 'AI/Machine learning,API,Management,Model serving,Python'
+    opendatahub.io/categories: 'Getting started,Model serving'
 spec:
   displayName: Securing a deployed model using Red Hat OpenShift API Management
   appName: rhoam

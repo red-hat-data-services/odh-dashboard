@@ -2,7 +2,7 @@ metadata:
   name: watson-studio-clean-shape-visualize-how-to
   type: how-to
   annotations:
-    opendatahub.io/categories: 'AI/Machine learning,Data management,Data visualization'
+    opendatahub.io/categories: 'Data management,Data preprocessing,Data cleaning,Data visualization'
 spec:
   appName: watson-studio
   displayName: How to clean, shape, and visualize data

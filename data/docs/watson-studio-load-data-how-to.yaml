@@ -2,7 +2,7 @@ metadata:
   name: watson-studio-load-data-how-to
   type: how-to
   annotations:
-    opendatahub.io/categories: 'AI/Machine learning,Data management,Getting started,Jupyter notebook,Python'
+    opendatahub.io/categories: 'Data management,Getting started,Notebook environments'
 spec:
   appName: watson-studio
   displayName: How to load data into a Jupyter notebook 
