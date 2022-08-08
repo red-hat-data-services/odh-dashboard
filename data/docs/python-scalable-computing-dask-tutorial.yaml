@@ -1,0 +1,12 @@
+metadata:
+  name: python-scalable-computing-dask-tutorial
+  type: tutorial
+  annotations:
+    opendatahub.io/categories: 'Data analysis,Model optimization'
+spec:
+  appName: anaconda-ce
+  displayName: Using Dask for parallel data analysis 
+  description: |-
+    Analyze medium-sized datasets in parallel locally using Dask, a parallel computing library that scales the existing Python ecosystem.
+  url: https://tutorial.dask.org/
+  durationMinutes: 230

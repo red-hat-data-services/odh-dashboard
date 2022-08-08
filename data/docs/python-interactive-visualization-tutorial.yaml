@@ -1,0 +1,12 @@
+metadata:
+  name: python-interactive-visualization-tutorial
+  type: tutorial
+  annotations:
+    opendatahub.io/categories: 'Data visualization,Model development'
+spec:
+  appName: anaconda-ce
+  displayName: Building interactive visualizations and dashboards in Python
+  description: |-
+    Explore a variety of data across multiple notebooks and learn how to deploy full dashboards and applications.
+  url: https://holoviz.org/tutorial/index.html
+  durationMinutes: 210

@@ -1,0 +1,12 @@
+metadata:
+  name: pachyderm-house-pricing-tutorial
+  type: tutorial
+  annotations:
+    opendatahub.io/categories: 'Data management,Data preprocessing,Model training'
+spec:
+  appName: pachyderm
+  displayName: Training a regression model in Pachyderm
+  description: |-
+    Learn how to create a sample housing data repo using a Pachyderm cluster to run experiments, analyze data, and set up regression.
+  url: https://github.com/pachyderm/examples/blob/master/housing-prices-intermediate/housing-prices.ipynb
+  durationMinutes: 30

@@ -1,0 +1,12 @@
+metadata:
+  name: watson-studio-create-project-how-to
+  type: how-to
+  annotations:
+    opendatahub.io/categories: 'Getting started,Notebook environments'
+spec:
+  appName: watson-studio
+  displayName: How to create a project in Watson Studio
+  description: |-
+    Learn how to create an analytics project in Watson Studio. 
+  url: https://www.ibm.com/support/knowledgecenter/SSQNUZ_3.5.0/wsj/getting-started/projects.html
+  durationMinutes: 5

@@ -1,7 +1,7 @@
 metadata:
   name: jupyterhub
   annotations:
-    opendatahub.io/categories: 'Jupyter notebook'
+    opendatahub.io/categories: 'Model development,Model training,Notebook environments'
 spec:
   displayName: JupyterHub
   provider: Jupyter
