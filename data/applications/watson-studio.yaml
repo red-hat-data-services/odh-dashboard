@@ -1,7 +1,7 @@
 metadata:
   name: watson-studio
   annotations:
-    opendatahub.io/categories: 'Model development,Model training,Data visualization,Data preprocessing,Notebook environment'
+    opendatahub.io/categories: 'Model development,Model training,Data visualization,Data preprocessing,Notebook environments'
 spec:
   displayName: IBM Watson Studio
   provider: IBM
