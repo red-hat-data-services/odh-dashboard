@@ -1,0 +1,26 @@
+metadata:
+  name: habana
+  annotations:
+    opendatahub.io/categories: 'HPU'
+spec:
+  displayName: Habana Gaudi Add-on
+  provider: Habana Labs
+  description: |-
+    Habana Gaudi Add-on prepares OpenShift to run Gaudi-accelerated deep-learning workloads on Gaudi clusters.
+  kfdefApplications: []
+  route: ''
+  img: images/habana-intel.svg
+  category: Self-managed
+  support: third party support
+  csvName: ~
+  docsLink: ~
+  quickStart: hpu-quickstart
+  getStartedLink: ~
+  enable:~
+    title: Enable Habana Gaudi Add-on
+    actionLabel: Enable
+    description: Clicking enable will add the Habana Gaudi Add-on card to the Enabled page
+    linkPreface: |-
+      Before enabling, be sure you have installed the Habana Gaudi Add-on:
+    link: ~
+    validationConfigMap: ~

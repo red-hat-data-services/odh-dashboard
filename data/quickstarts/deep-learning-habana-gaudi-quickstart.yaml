@@ -1,0 +1,86 @@
+kind: ConsoleQuickStart
+metadata:
+  name: habana-tensorflow-image-classification-notebook
+  annotations:
+    opendatahub.io/categories: 'AI/Machine learning,Getting started,Jupyter notebook,TensorFlow,Python,PyTorch'
+
+spec:
+  displayName: Deep Learning Training with Habana Gaudi 
+  appName: habana
+  durationMinutes: 5
+  icon: 'images/habana-intel.svg'
+  description: This QuickStart will walk you through training a TensorFlow image classification model on an Amazon EC2 DL1 instance.  
+  introduction: |-
+    ### This tutorial shows how to classify images of flowers. It creates an image classifier using a `keras.Sequential` model, and loads data using `preprocessing.image_dataset_from_directory`. You will gain practical experience with the following concepts:
+
+    -	Efficiently loading a dataset off disk.
+
+    -	Identifying overfitting and applying techniques to mitigate it, including data augmentation and Dropout.
+
+
+    This tutorial follows a basic machine learning workflow:
+
+    1.	Examine and understand data
+
+    2.	Build an input pipeline
+
+    3.	Build the model
+
+    4.	Train the model
+
+    5.	Test the model
+
+    6.	Improve the model and repeat the process
+
+    [View Image Classification Tutorial](https://developer.habana.ai/tutorials/tensorflow/image-classification/)
+
+    For more examples like this please see our [TensorFlow] (https://developer.habana.ai/category/tutorials/tensorflow/) or [PyTorch]( https://developer.habana.ai/category/tutorials/pytorch/) , or [PyTorch Lightning]( https://developer.habana.ai/category/tutorials/pytorch-lightning/) tutorial pages. 
+
+  tasks:
+    - title: Ensure Habana Notebook is built
+      description: |-
+        ### Administrator steps
+        #### This is only required the first time
+        1. Install the Habana operator if it's not installed
+        2. Change namespace to redhat-ods-applications
+        3. Enter the Habana operator. This can be found in the UI under Operators > Installed Operators > Habana Toolkit
+        4. Go to the "Notebook" tab
+        5. Click create
+        6. The notebook will now build, this may take several minutes
+      review:
+        instructions: |-
+          #### The Habana Notebook is now created
+          Has the build completed?
+          Inspect under Builds > builds (the submenu item) > habana-tutorial-1
+    - title: Launch JupyterHub notebook server
+      description: |-
+        ### Important considerations
+        Use the **Habana Tutorials** notebook with a **Large** container size.
+        The **Habana Tutorials** custom resource must be enabled from the operator and have built successfully (see previous step)
+
+      review:
+        instructions: |-
+          #### Launched JupyterHub notebook server
+          Do you have a notebook browser tab?
+        failedTaskHelp: This task is not verified yet. Try the task again.
+      summary:
+        success: You have a notebook server
+        failed: Review the "Creating a Jupyter notebook" quick start for additional help.
+    - title: Load Habana notebook
+      description: |-
+        ### Loading the Habana notebook
+        1. Download the "image classification.ipynb" notebook from the [Habana Gaudi Tutorials](https://github.com/HabanaAI/Gaudi-tutorials).
+        2. Upload the **image classification.ipynb** notebook file using the JupyterLab file manager.
+        3. Click on the uploaded notebook to launch it in a new JupyterLab tab.
+
+      review:
+        instructions: |-
+          #### Verify that the notebook launched successfully
+          Do you have a notebook tab for the Habana notebook in your browser?
+        failedTaskHelp:
+          This task is not verified yet. Try the task again.
+      summary:
+        success: You have loaded the example notebook
+        failed: Try the steps again.
+  conclusion: You can complete the rest of the quick start inside the notebook itself. Proceed cell by cell, taking care not to skip any. Once you have completed the entire notebook, you will have learned about several Habana toolkit fundamentals.
+  nextQuickStart: []
