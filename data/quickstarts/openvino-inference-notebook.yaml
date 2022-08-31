@@ -2,7 +2,7 @@ kind: ConsoleQuickStart
 metadata:
   name: openvino-inference-notebook
   annotations:
-    opendatahub.io/categories: 'Getting started,Model optimization,Data preprocessing'
+    opendatahub.io/categories: 'Getting started,Model optimization,Data preprocessing,Notebook environments'
 
 spec:
   displayName: Using the OpenVINO toolkit 
