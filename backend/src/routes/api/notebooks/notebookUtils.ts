@@ -10,6 +10,7 @@ import { FastifyRequest } from 'fastify';
 import { createCustomError } from '../../../utils/requestUtils';
 import { getUserName } from '../../../utils/userUtils';
 import { RecursivePartial } from '../../../typeHelpers';
+import { sanitizeNotebookForSecurity } from '../../../utils/route-security';
 
 export const getNotebooks = async (
   fastify: KubeFastifyInstance,
@@ -85,13 +86,13 @@ export const createNotebook = async (
   fastify: KubeFastifyInstance,
   request: FastifyRequest<{
     Params: {
-      projectName: string;
+      namespace: string;
     };
     Body: Notebook;
   }>,
 ): Promise<Notebook> => {
-  const namespace = request.params.projectName;
-  const notebookData = request.body;
+  const namespace = request.params.namespace;
+  const notebookData = await sanitizeNotebookForSecurity<Notebook>(fastify, request, request.body);
   const notebookName = notebookData.metadata.name;
   notebookData.metadata.namespace = namespace;
 
@@ -186,18 +187,14 @@ export const createRBAC = async (
   fastify: KubeFastifyInstance,
   request: FastifyRequest<{
     Params: {
-      projectName: string;
+      namespace: string;
     };
     Body: Notebook;
   }>,
   namespace: string,
   notebookData: Notebook,
 ): Promise<void> => {
-  const userName = await getUserName(
-    request,
-    fastify.kube.customObjectsApi,
-    fastify.kube.currentUser,
-  );
+  const userName = await getUserName(fastify, request);
 
   const notebookRole: V1Role = {
     apiVersion: 'rbac.authorization.k8s.io/v1',
