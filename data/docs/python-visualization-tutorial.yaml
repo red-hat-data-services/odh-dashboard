@@ -1,0 +1,12 @@
+metadata:
+  name: python-visualization-tutorial
+  type: tutorial
+  annotations:
+    opendatahub.io/categories: 'Data visualization,Getting started'
+spec:
+  appName: anaconda-ce
+  displayName: Choosing Python tools for data visualization
+  description: |-
+    Use the PyViz.org website to help you decide on the best open source Python data visualization tools for you.
+  url: https://pyviz.org
+  durationMinutes: 30

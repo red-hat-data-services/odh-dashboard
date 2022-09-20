@@ -1,7 +1,7 @@
 metadata:
   name: jupyterhub
   annotations:
-    opendatahub.io/categories: 'Jupyter notebook'
+    opendatahub.io/categories: 'Model development,Model training,Notebook environments'
 spec:
   displayName: JupyterHub
   provider: Jupyter
@@ -11,7 +11,7 @@ spec:
   route: jupyterhub
   img: images/jupyterhub.svg
   category: Red Hat managed
-  support: red hat
+  support: redhat
   docsLink: https://jupyter.org/hub
   quickStart: create-jupyter-notebook
   getStartedLink: https://jupyterhub.readthedocs.io/en/stable/getting-started/index.html

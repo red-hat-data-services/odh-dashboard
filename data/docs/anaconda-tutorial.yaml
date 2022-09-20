@@ -1,0 +1,12 @@
+metadata:
+  name: anaconda-background
+  type: tutorial
+  annotations:
+    opendatahub.io/categories: 'Package management,Notebook environments'
+spec:
+  appName: anaconda-ce
+  displayName: Exploring Anaconda for data science 
+  description: |-
+    Learn about Anaconda, a freemium open source distribution of the Python and R programming languages.
+  url: https://anaconda.org/training/anaconda_introduction/notebook
+  durationMinutes: 5

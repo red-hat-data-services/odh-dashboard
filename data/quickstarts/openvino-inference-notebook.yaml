@@ -1,0 +1,69 @@
+kind: ConsoleQuickStart
+metadata:
+  name: openvino-inference-notebook
+  annotations:
+    opendatahub.io/categories: 'Getting started,Model optimization,Data preprocessing,Notebook environments'
+
+spec:
+  displayName: Using the OpenVINO toolkit 
+  appName: openvino
+  durationMinutes: 5
+  icon: 'images/openvino.svg'
+  description: Quantize an ONNX computer vision model using the OpenVINO model optimizer and use the result for inference from a notebook. 
+  introduction: |-
+    ### This quick start details how to quantize a model and use the result for inference from a notebook using the OpenVINO toolkit.
+
+    The OpenVINO toolkit model optimizer can create lower precision intermediate representations of machine learning models.
+
+    Using the resulting intermediate representations can reduce the time required to perform an inference operation while maintaining acceptable accuracy.
+
+    This quick start will walk through how to optimize a ONNX computer vision model using the OpenVINO model optimizer, and use the resulting intermediate representation to perform hardware accelerated inference in-notebook.
+
+  tasks:
+    - title: Ensure OpenVINO Notebook is built
+      description: |-
+        ### Administrator steps
+        #### This is only required the first time
+        1. Install the OpenVINO operator if it's not installed
+        2. Change namespace to redhat-ods-applications
+        3. Enter the OpenVINO operator. This can be found in the UI under Operators > Installed Operators > OpenVINO Toolkit
+        4. Go to the "Notebook" tab
+        5. Click create
+        6. The notebook will now build, this may take several minutes
+      review:
+        instructions: |-
+          #### The OpenVINO Notebook is now created
+          Has the build completed?
+          Inspect under Builds > builds (the submenu item) > openvino-notebook-1
+    - title: Launch JupyterHub notebook server
+      description: |-
+        ### Important considerations
+        Use the **OpenVINO Python** notebook with a **Large** container size.
+        The **OpenVINO Notebook** custom resource must be enabled from the operator and have built successfully (see previous step)
+
+      review:
+        instructions: |-
+          #### Launched JupyterHub notebook server
+          Do you have a notebook browser tab?
+        failedTaskHelp: This task is not verified yet. Try the task again.
+      summary:
+        success: You have a notebook server
+        failed: Review the "Creating a Jupyter notebook" quick start for additional help.
+    - title: Load OpenVINO notebook
+      description: |-
+        ### Loading the OpenVINO notebook
+        1. Download the "pytorch_onnx_openvino.ipynb" notebook from the [OpenVINO Notebooks repository](https://github.com/openvinotoolkit/openvino_notebooks).
+        2. Upload the **pytorch_onnx_openvino.ipynb** notebook file using the JupyterLab file manager.
+        3. Click on the uploaded notebook to launch it in a new JupyterLab tab.
+
+      review:
+        instructions: |-
+          #### Verify that the notebook launched successfully
+          Do you have a notebook tab for the OpenVINO notebook in your browser?
+        failedTaskHelp:
+          This task is not verified yet. Try the task again.
+      summary:
+        success: You have loaded the example notebook
+        failed: Try the steps again.
+  conclusion: You can complete the rest of the quick start inside the notebook itself. Proceed cell by cell, taking care not to skip any. Once you have completed the entire notebook, you will have learned about several OpenVINO toolkit fundamentals.
+  nextQuickStart: []
