@@ -640,6 +640,7 @@ export type NotebookData = {
   gpus: number;
   envVars: EnvVarReducedTypeKeyValues;
   state: NotebookState;
+  // only used for admin calls, regular users cannot use this field
   username?: string;
 };
 
