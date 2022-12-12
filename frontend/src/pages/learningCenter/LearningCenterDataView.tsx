@@ -39,7 +39,7 @@ type LearningCenterDataViewProps = {
 const LearningCenterDataView: React.FC<LearningCenterDataViewProps> = React.memo(
   ({ filteredDocApps, favorites, updateFavorite, viewType }) => {
     const navigate = useNavigate();
-    const [sizeClass, setSizeClass] = React.useState<string>('m-ods-size-lg');
+    const [sizeClass, setSizeClass] = React.useState('m-ods-size-lg');
     const { observe } = useDimensions({
       breakpoints: { sm: 0, md: 600, lg: 750 },
       onResize: ({ currentBreakpoint }) => {
@@ -77,7 +77,7 @@ const LearningCenterDataView: React.FC<LearningCenterDataViewProps> = React.memo
 
       if (viewType !== LIST_VIEW) {
         return (
-          <Gallery role="list" className="odh-learning-paths__gallery" hasGutter>
+          <Gallery maxWidths={{ default: '330px' }} role="list" hasGutter>
             {filteredDocApps.map((doc) => (
               <OdhDocCard
                 key={`${doc.metadata.name}`}

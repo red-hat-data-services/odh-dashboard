@@ -9,7 +9,7 @@ import { ProjectDetailsContext } from '../../../ProjectDetailsContext';
 import StorageTable from './StorageTable';
 
 const StorageList: React.FC = () => {
-  const [isOpen, setOpen] = React.useState<boolean>(false);
+  const [isOpen, setOpen] = React.useState(false);
   const {
     pvcs: { data: pvcs, loaded, error: loadError },
     refreshAllProjectData: refresh,
@@ -40,7 +40,7 @@ const StorageList: React.FC = () => {
           />
         }
       >
-        <StorageTable pvcs={pvcs} refresh={refresh} />
+        <StorageTable pvcs={pvcs} refresh={refresh} onAddPVC={() => setOpen(true)} />
       </DetailsSection>
       <ManageStorageModal
         isOpen={isOpen}

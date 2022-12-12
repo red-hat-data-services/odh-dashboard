@@ -1,23 +1,24 @@
 import * as React from 'react';
-import { DropdownDirection, Icon } from '@patternfly/react-core';
-import { InferenceServiceKind } from '../../../../k8sTypes';
+import { DropdownDirection } from '@patternfly/react-core';
+import { InferenceServiceKind, ServingRuntimeKind } from '../../../../k8sTypes';
 import { ActionsColumn, Tbody, Td, Tr } from '@patternfly/react-table';
 import ResourceNameTooltip from '../../../projects/components/ResourceNameTooltip';
-import { checkInferenceServiceReady, getInferenceServiceDisplayName } from './utils';
+import { getInferenceServiceDisplayName } from './utils';
 import InferenceServiceEndpoint from './InferenceServiceEndpoint';
-import { CheckCircleIcon, ExclamationCircleIcon } from '@patternfly/react-icons';
-import { Link } from 'react-router-dom';
 import InferenceServiceProject from './InferenceServiceProject';
+import InferenceServiceStatus from './InferenceServiceStatus';
 
 type InferenceServiceTableRowProps = {
   obj: InferenceServiceKind;
   isGlobal: boolean;
+  servingRuntime?: ServingRuntimeKind;
   onDeleteInferenceService: (obj: InferenceServiceKind) => void;
   onEditInferenceService: (obj: InferenceServiceKind) => void;
 };
 
 const InferenceServiceTableRow: React.FC<InferenceServiceTableRowProps> = ({
   obj: inferenceService,
+  servingRuntime,
   onDeleteInferenceService,
   onEditInferenceService,
   isGlobal,
@@ -27,7 +28,8 @@ const InferenceServiceTableRow: React.FC<InferenceServiceTableRowProps> = ({
       <Tr>
         <Td dataLabel="Name">
           <ResourceNameTooltip resource={inferenceService}>
-            <Link to="/modelServing">{getInferenceServiceDisplayName(inferenceService)}</Link>
+            {/* Disabling link until implementing metrics <Link to="/modelServing">{}</Link> */}
+            {getInferenceServiceDisplayName(inferenceService)}
           </ResourceNameTooltip>
         </Td>
         {isGlobal && (
@@ -36,18 +38,13 @@ const InferenceServiceTableRow: React.FC<InferenceServiceTableRowProps> = ({
           </Td>
         )}
         <Td dataLabel="Inference endpoint">
-          <InferenceServiceEndpoint inferenceService={inferenceService} />
+          <InferenceServiceEndpoint
+            inferenceService={inferenceService}
+            servingRuntime={servingRuntime}
+          />
         </Td>
         <Td dataLabel="Status">
-          {checkInferenceServiceReady(inferenceService) ? (
-            <Icon status="success">
-              <CheckCircleIcon />
-            </Icon>
-          ) : (
-            <Icon status="danger">
-              <ExclamationCircleIcon />
-            </Icon>
-          )}
+          <InferenceServiceStatus inferenceService={inferenceService} />
         </Td>
         <Td isActionCell>
           <ActionsColumn

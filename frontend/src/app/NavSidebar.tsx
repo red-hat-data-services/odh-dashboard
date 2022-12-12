@@ -22,7 +22,7 @@ const NavHref: React.FC<{ item: NavDataHref; pathname: string }> = ({ item, path
 const NavGroup: React.FC<{ item: NavDataGroup; pathname: string }> = ({ item, pathname }) => {
   const { group, children } = item;
   const isActive = !!children.find((c) => pathname === c.href);
-  const [expanded, setExpanded] = React.useState<boolean>(isActive);
+  const [expanded, setExpanded] = React.useState(isActive);
 
   return (
     <NavExpandable
@@ -44,12 +44,12 @@ const NavGroup: React.FC<{ item: NavDataGroup; pathname: string }> = ({ item, pa
 };
 
 const NavSidebar: React.FC = () => {
-  const { isNavOpen, dashboardConfig } = useAppContext();
+  const { dashboardConfig } = useAppContext();
   const routerLocation = useLocation();
   const { isAdmin } = useUser();
   const userNavData = getNavBarData(isAdmin, dashboardConfig);
   const nav = (
-    <Nav className="nav" theme="dark" aria-label="Nav">
+    <Nav theme="dark" aria-label="Nav">
       <NavList>
         {userNavData.map((item) =>
           isNavDataGroup(item) ? (
@@ -61,7 +61,7 @@ const NavSidebar: React.FC = () => {
       </NavList>
     </Nav>
   );
-  return <PageSidebar isNavOpen={isNavOpen} nav={nav} theme="dark" />;
+  return <PageSidebar nav={nav} theme="dark" />;
 };
 
 export default NavSidebar;

@@ -6,7 +6,7 @@ import { ExternalLinkAltIcon } from '@patternfly/react-icons';
 import { OdhDocument, OdhDocumentType } from '../../types';
 import { useWatchComponents } from '../../utilities/useWatchComponents';
 import { useWatchDocs } from '../../utilities/useWatchDocs';
-import { useLocalStorage } from '../../components/localStorage';
+import { useBrowserStorage } from '../../components/browserStorage';
 import { useQueryParams } from '../../utilities/useQueryParams';
 import ApplicationsPage from '../ApplicationsPage';
 import QuickStarts from '../../app/QuickStarts';
@@ -45,12 +45,12 @@ export const LearningCenter: React.FC = () => {
   const queryParams = useQueryParams();
   const sortType = queryParams.get(DOC_SORT_KEY) || SORT_TYPE_NAME;
   const sortOrder = queryParams.get(DOC_SORT_ORDER_KEY) || SORT_ASC;
-  const [favourites, setFavorites] = useLocalStorage<string[]>(FAVORITE_RESOURCES, []);
-  const favoriteResources = useDeepCompareMemoize(favourites);
+  const [favorites, setFavorites] = useBrowserStorage<string[]>(FAVORITE_RESOURCES, []);
+  const favoriteResources = useDeepCompareMemoize(favorites);
   const docFilterer = useDocFilterer(favoriteResources);
-  const [viewType, setViewType] = useLocalStorage<string>(VIEW_TYPE, '', false);
-  const [filtersCollapsed, setFiltersCollapsed] = React.useState<boolean>(false);
-  const [filtersCollapsible, setFiltersCollapsible] = React.useState<boolean>(false);
+  const [viewType, setViewType] = useBrowserStorage<string>(VIEW_TYPE, '', false);
+  const [filtersCollapsed, setFiltersCollapsed] = React.useState(false);
+  const [filtersCollapsible, setFiltersCollapsible] = React.useState(false);
   const { observe } = useDimensions({
     breakpoints: { sm: 0, md: 600 },
     onResize: ({ currentBreakpoint }) => {
@@ -182,14 +182,8 @@ export const LearningCenter: React.FC = () => {
   const docLink = DOC_LINK ? (
     <>
       {docText}
-      <a
-        className="odh-dashboard__external-link"
-        href={DOC_LINK}
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        view the documentation.
-        <ExternalLinkAltIcon />
+      <a href={DOC_LINK} target="_blank" rel="noopener noreferrer">
+        view the documentation. <ExternalLinkAltIcon />
       </a>
     </>
   ) : null;

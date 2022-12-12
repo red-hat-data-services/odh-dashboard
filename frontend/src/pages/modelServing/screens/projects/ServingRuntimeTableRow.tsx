@@ -7,8 +7,7 @@ import { ProjectDetailsContext } from '../../../projects/ProjectDetailsContext';
 import { ServingRuntimeTableTabs } from '../types';
 import ServingRuntimeTableExpandedSection from './ServingRuntimeTableExpandedSection';
 import { ExclamationCircleIcon } from '@patternfly/react-icons';
-import { Link } from 'react-router-dom';
-import { isTokenEnabledServingRuntime } from './utils';
+import { isServingRuntimeTokenEnabled } from './utils';
 
 type ServingRuntimeTableRowProps = {
   obj: ServingRuntimeKind;
@@ -85,12 +84,12 @@ const ServingRuntimeTableRow: React.FC<ServingRuntimeTableRowProps> = ({
           dataLabel="Tokens"
           compoundExpand={compoundExpandParams(
             ServingRuntimeTableTabs.TOKENS,
-            secrets.length === 0 || isTokenEnabledServingRuntime(obj),
+            secrets.length === 0 || !isServingRuntimeTokenEnabled(obj),
           )}
         >
           {secretsLoaded ? (
             <>
-              {isTokenEnabledServingRuntime(obj) ? 'Tokens disabled' : secrets.length}{' '}
+              {!isServingRuntimeTokenEnabled(obj) ? 'Tokens disabled' : secrets.length}{' '}
               {secretsLoadError && (
                 <Tooltip
                   removeFindDomNode
@@ -108,7 +107,7 @@ const ServingRuntimeTableRow: React.FC<ServingRuntimeTableRowProps> = ({
           )}
         </Td>
         <Td style={{ textAlign: 'end' }}>
-          <Link to={'#'}>View metrics</Link>
+          {/* //Hiding this for next release <Link to={'#'}>View metrics</Link> */}
         </Td>
         <Td isActionCell>
           <ActionsColumn

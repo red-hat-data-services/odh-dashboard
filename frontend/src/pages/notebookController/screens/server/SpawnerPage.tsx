@@ -60,7 +60,7 @@ const SpawnerPage: React.FC = () => {
   const { notebookNamespace: projectName } = useNamespaces();
   const currentUserState = useNotebookUserState();
   const username = currentUserState.user;
-  const [createInProgress, setCreateInProgress] = React.useState<boolean>(false);
+  const [createInProgress, setCreateInProgress] = React.useState(false);
   const { startShown, hideStartShown, refreshNotebookForStart } =
     useSpawnerNotebookModalState(createInProgress);
   const [selectedImageTag, setSelectedImageTag] = React.useState<ImageTag>({
@@ -68,7 +68,7 @@ const SpawnerPage: React.FC = () => {
     tag: undefined,
   });
   const { selectedSize, setSelectedSize, sizes } = usePreferredNotebookSize();
-  const [selectedGpu, setSelectedGpu] = React.useState<string>('0');
+  const [selectedGpu, setSelectedGpu] = React.useState('0');
   const [variableRows, setVariableRows] = React.useState<VariableRow[]>([]);
   const [submitError, setSubmitError] = React.useState<Error | null>(null);
 
@@ -248,7 +248,7 @@ const SpawnerPage: React.FC = () => {
       gpus: parseInt(selectedGpu),
       envVars: envVars,
       state: NotebookState.Started,
-      username: impersonatedUsername || username,
+      username: impersonatedUsername || undefined,
     })
       .then(() => {
         fireStartServerEvent();
@@ -258,7 +258,7 @@ const SpawnerPage: React.FC = () => {
         setSubmitError(e);
         setCreateInProgress(false);
         // We had issues spawning the notebook -- try to stop it
-        stopNotebook(impersonatedUsername ? impersonatedUsername : undefined).catch(() =>
+        stopNotebook(impersonatedUsername || undefined).catch(() =>
           notification.error(
             'Error creating notebook',
             'Error spawning notebook and unable to properly stop it',
@@ -273,11 +273,12 @@ const SpawnerPage: React.FC = () => {
       <ApplicationsPage
         title="Start a notebook server"
         description="Select options for your notebook server."
+        provideChildrenPadding
         loaded={loaded}
         loadError={loadError}
         empty={!images || images.length === 0}
       >
-        <Form maxWidth="1000px" className="odh-notebook-controller__page">
+        <Form maxWidth="1000px">
           <FormSection title="Notebook image">
             <FormGroup fieldId="modal-notebook-image">
               <Grid sm={12} md={12} lg={12} xl={6} xl2={6} hasGutter>
@@ -365,7 +366,7 @@ const SpawnerPage: React.FC = () => {
           onClose={() => {
             if (currentUserNotebook) {
               const notebookName = currentUserNotebook.metadata.name;
-              stopNotebook(impersonatedUsername ? impersonatedUsername : undefined)
+              stopNotebook(impersonatedUsername || undefined)
                 .then(() => requestNotebookRefresh())
                 .catch((e) => notification.error(`Error stop notebook ${notebookName}`, e.message));
             } else {

@@ -26,8 +26,8 @@ type EnableModalProps = {
 };
 
 const EnableModal: React.FC<EnableModalProps> = ({ selectedApp, shown, onClose }) => {
-  const [postError, setPostError] = React.useState<string>('');
-  const [validationInProgress, setValidationInProgress] = React.useState<boolean>(false);
+  const [postError, setPostError] = React.useState('');
+  const [validationInProgress, setValidationInProgress] = React.useState(false);
   const [enableValues, setEnableValues] = React.useState<{ [key: string]: string }>({});
   const [validationStatus, validationErrorMessage] = useEnableApplication(
     validationInProgress,
@@ -116,14 +116,8 @@ const EnableModal: React.FC<EnableModalProps> = ({ selectedApp, shown, onClose }
       {enable.link ? (
         <div className="odh-enable-modal__enable-link">
           {enable.linkPreface ? <div>{enable.linkPreface}</div> : null}
-          <a
-            className="odh-dashboard__external-link"
-            href={enable.link}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {enable.link}
-            <ExternalLinkAltIcon />
+          <a href={enable.link} target="_blank" rel="noopener noreferrer">
+            {enable.link} <ExternalLinkAltIcon />
           </a>
         </div>
       ) : null}

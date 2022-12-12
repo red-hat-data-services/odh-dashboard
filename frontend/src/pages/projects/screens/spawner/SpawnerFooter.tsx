@@ -19,6 +19,8 @@ import {
 } from './service';
 import { useUser } from '../../../../redux/selectors';
 import { ProjectDetailsContext } from '../../ProjectDetailsContext';
+import { AppContext } from '../../../../app/AppContext';
+import { fireTrackingEvent } from '../../../../utilities/segmentIOUtils';
 
 type SpawnerFooterProps = {
   startNotebookData: StartNotebookData;
@@ -33,6 +35,12 @@ const SpawnerFooter: React.FC<SpawnerFooterProps> = ({
 }) => {
   const [errorMessage, setErrorMessage] = React.useState('');
   const {
+    dashboardConfig: {
+      spec: { notebookController },
+    },
+  } = React.useContext(AppContext);
+  const tolerationSettings = notebookController?.notebookTolerationSettings;
+  const {
     notebooks: { data },
     refreshAllProjectData,
   } = React.useContext(ProjectDetailsContext);
@@ -43,13 +51,20 @@ const SpawnerFooter: React.FC<SpawnerFooterProps> = ({
   const editNotebook = notebookState?.notebook;
   const { projectName } = startNotebookData;
   const navigate = useNavigate();
-  const [createInProgress, setCreateInProgress] = React.useState<boolean>(false);
+  const [createInProgress, setCreateInProgress] = React.useState(false);
   const isButtonDisabled =
     createInProgress ||
     !checkRequiredFieldsForNotebookStart(startNotebookData, storageData, envVariables);
   const { username } = useUser();
 
-  const redirect = () => {
+  const afterStart = (type: 'created' | 'updated') => {
+    const { gpus, notebookSize, image } = startNotebookData;
+    fireTrackingEvent(`Workbench ${type}`, {
+      GPU: gpus,
+      lastSelectedSize: notebookSize.name,
+      lastSelectedImage: `${image.imageVersion?.from.name}`,
+      projectName,
+    });
     refreshAllProjectData();
     navigate(`/projects/${projectName}`);
   };
@@ -80,9 +95,15 @@ const SpawnerFooter: React.FC<SpawnerFooterProps> = ({
         return;
       }
       const { volumes, volumeMounts } = pvcDetails;
-      const newStartNotebookData = { ...startNotebookData, volumes, volumeMounts, envFrom };
+      const newStartNotebookData = {
+        ...startNotebookData,
+        volumes,
+        volumeMounts,
+        envFrom,
+        tolerationSettings,
+      };
       updateNotebook(editNotebook, newStartNotebookData, username)
-        .then(redirect)
+        .then(() => afterStart('updated'))
         .catch(handleError);
     }
   };
@@ -101,9 +122,17 @@ const SpawnerFooter: React.FC<SpawnerFooterProps> = ({
     }
 
     const { volumes, volumeMounts } = pvcDetails;
-    const newStartData = { ...startNotebookData, volumes, volumeMounts, envFrom };
+    const newStartData = {
+      ...startNotebookData,
+      volumes,
+      volumeMounts,
+      envFrom,
+      tolerationSettings,
+    };
 
-    createNotebook(newStartData, username).then(redirect).catch(handleError);
+    createNotebook(newStartData, username)
+      .then(() => afterStart('created'))
+      .catch(handleError);
   };
 
   return (
