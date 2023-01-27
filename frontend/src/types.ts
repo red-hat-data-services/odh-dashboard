@@ -64,14 +64,22 @@ export type NotebookControllerUserState = {
   lastActivity?: number;
 };
 
+/**
+ * OdhDashboardConfig contains gpuSetting as a string value override -- proper gpus return as numbers
+ * TODO: Look to make it just number by properly parsing the value
+ */
+export type GPUCount = string | number;
+
 export type NotebookResources = {
   requests?: {
     cpu?: string;
     memory?: string;
+    'nvidia.com/gpu'?: GPUCount;
   };
   limits?: {
     cpu?: string;
     memory?: string;
+    'nvidia.com/gpu'?: GPUCount;
   };
 };
 
@@ -274,10 +282,12 @@ export type TrackingEventProperties = {
   anonymousID?: string;
   type?: string;
   term?: string;
-  GPU?: number;
+  GPU?: GPUCount;
   lastSelectedSize?: string;
   lastSelectedImage?: string;
   projectName?: string;
+  notebookName?: string;
+  lastActivity?: string;
 };
 
 export type NotebookPort = {
