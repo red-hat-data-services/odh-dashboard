@@ -1,0 +1,31 @@
+name: Auto Update Release Branches
+on:
+  push:
+    branches: main
+  workflow_dispatch:
+
+env:
+  source: main
+  dest: rhods-1.23
+  
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GH_ACCESS_TOKEN }}
+          ref: ${{ env.source }}
+      - name: Updating branch ${{ env.dest }}
+        run: |
+          git config user.name "GH Bot"
+          git config user.email ghbot@github.com
+          git checkout ${{ env.dest }}
+          git merge ${{ env.source }} --no-edit -m "Merged ${{ env.source }} branch on $(date +%F)"
+      - name: Push the updated branch ${{ env.dest }}
+        run: |
+          git push origin ${{ env.dest }}
