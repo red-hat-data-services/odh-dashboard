@@ -57,7 +57,7 @@ Run storybook a11y tests and interaction tests.
   $ npm run test:storybook
   ```
 
-For in-depth testing guidance review the [contribution guidelines](./CONTRIBUTING.md#Testing)
+For in-depth testing guidance review the [contribution guidelines](./CONTRIBUTING.md#Testing).
 
 ## Deploying the ODH Dashbard
 
