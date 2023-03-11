@@ -1,4 +1,4 @@
-# Anaconda Commercial Edition
+# Anaconda Professional
 
 The world's most popular open-source package distribution and management experience, optimized for commercial use and compliance with our Terms of Service.
 
@@ -10,14 +10,14 @@ The world's most popular open-source package distribution and management experie
 * Guaranteed up-time to support commercial usage
 * Compliant for commercial use according to the Anaconda Terms of Service
 
-For more information visit [https://www.anaconda.com/products/commercial-edition](https://www.anaconda.com/products/commercial-edition)
+For more information visit [https://www.anaconda.com/products/professional](https://www.anaconda.com/products/professional)
 
 ## Subscribe
 
 1. Go to [https://anaconda.cloud/register](https://anaconda.cloud/register?utm_source=redhat-rhods-summit)
 1. Create an account
 1. Create a profile
-1. Purchase a Commercial Edition subscription
-1. Receive an Anaconda Commercial Edition token and instructions for install and configuration via email.
+1. Purchase a Professional subscription
+1. Receive an Anaconda Professional token and instructions for install and configuration via email.
 
 You will need the token provided in the email when launching the Anaconda Jupyter image.

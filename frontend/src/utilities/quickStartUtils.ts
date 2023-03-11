@@ -1,7 +1,7 @@
 import {
-  getQuickStartStatus,
   QuickStartContextValues,
   QuickStartStatus,
+  QuickStartTaskStatus,
 } from '@patternfly/quickstarts';
 
 export enum LaunchStatusEnum {
@@ -9,6 +9,12 @@ export enum LaunchStatusEnum {
   Continue = 'Continue',
   Restart = 'Restart',
   Close = 'Close',
+}
+
+export enum CompletionStatusEnum {
+  InProgress = 'In Progress',
+  Success = 'Success',
+  Failed = 'Failed',
 }
 
 export const getLaunchStatus = (
@@ -36,6 +42,10 @@ export const getLaunchStatus = (
     qsContext.activeQuickStartID === quickStartId ||
     quickStartState.status === QuickStartStatus.COMPLETE
   ) {
+    const taskStatus = getQuickStartCompletionStatus(quickStartId, qsContext);
+    if (taskStatus === CompletionStatusEnum.InProgress) {
+      return LaunchStatusEnum.Continue;
+    }
     return LaunchStatusEnum.Restart;
   }
 
@@ -58,28 +68,47 @@ export const getQuickStartLabel = (
   return `${launchStatus}`;
 };
 
-export const isQuickStartInProgress = (
+export const getQuickStartCompletionStatus = (
   quickStartId?: string | null,
   qsContext?: QuickStartContextValues,
-): boolean => {
+): CompletionStatusEnum | undefined => {
   if (!quickStartId || !qsContext || !qsContext.allQuickStartStates) {
-    return false;
+    return undefined;
   }
-  const launchStatus = getLaunchStatus(quickStartId, qsContext);
 
-  return launchStatus === LaunchStatusEnum.Continue;
-};
-
-export const isQuickStartComplete = (
-  quickStartId?: string | null,
-  qsContext?: QuickStartContextValues,
-): boolean => {
-  if (!quickStartId || !qsContext || !qsContext.allQuickStartStates) {
-    return false;
+  const quickStartState = qsContext.allQuickStartStates[quickStartId];
+  if (!quickStartState || quickStartState.taskNumber === -1) {
+    return undefined;
   }
-  return (
-    getQuickStartStatus(qsContext.allQuickStartStates, quickStartId) === QuickStartStatus.COMPLETE
-  );
+
+  if (quickStartState.status === QuickStartStatus.COMPLETE) {
+    const quickStart = qsContext.allQuickStarts?.find((qs) => qs.metadata.name === quickStartId);
+    let qsStatus = CompletionStatusEnum.Success,
+      currentStep = 0;
+    const tasks = quickStart?.spec.tasks;
+    if (tasks) {
+      while (currentStep < tasks.length) {
+        const status = quickStartState[`taskStatus${currentStep}`];
+        if (!status) {
+          return CompletionStatusEnum.InProgress;
+        }
+        if (status === QuickStartTaskStatus.FAILED) {
+          qsStatus = CompletionStatusEnum.Failed;
+        }
+        if (
+          status === QuickStartTaskStatus.REVIEW ||
+          status === QuickStartTaskStatus.VISITED ||
+          status === QuickStartTaskStatus.INIT
+        ) {
+          return CompletionStatusEnum.InProgress;
+        }
+        currentStep++;
+      }
+    }
+    return qsStatus;
+  } else {
+    return CompletionStatusEnum.InProgress;
+  }
 };
 
 export const launchQuickStart = (
