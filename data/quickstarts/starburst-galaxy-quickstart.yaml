@@ -15,7 +15,7 @@ spec:
 
     In a matter of minutes, you will be able to access data from multiple sources with a single query using a Jupyter notebook.
 
-    Before you begin, please be sure to clone the [Starburst Galaxy 101 GitHub repo](https://github.com/starburstdata/rhods-starburst-galaxy-101.git) to your local machine.
+    Before you begin, please be sure to clone the [Starburst Galaxy 101 GitHub repo](https://github.com/starburstdata/rhods-starburst-101.git) to your local machine.
 
     A recording of this quickstart is available [here](https://developers.redhat.com/articles/2021/11/22/access-more-data-your-jupyter-notebook) in case you are unsure of how to complete any of the tasks.
   tasks:
@@ -81,7 +81,7 @@ spec:
     - title: Run the **explore-data.ipynb** Jupyter notebook
       description: |-
         ### To run the **explore-data.ipynb** notebook:
-        1. If you haven't already done so, clone the [Starburst Galaxy 101 GitHub repo](https://github.com/starburstdata/rhods-starburst-galaxy-101) to your local machine.
+        1. If you haven't already done so, clone the [Starburst Galaxy 101 GitHub repo](https://github.com/starburstdata/rhods-starburst-101) to your local machine.
         2. Open the **explore-data.ipynb** notebook within your JupyterLab interface.
         3. Follow the instructions provided in the notebook to install the required packages and initialize the environment.
         4. Run the cells under the **What is Starburst Galaxy and how does it work?** section to confirm you are connected to your Starburst Galaxy cluster.
