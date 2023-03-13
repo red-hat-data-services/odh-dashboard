@@ -1,8 +1,6 @@
 import path from 'path';
 import dotenv from 'dotenv';
 import { configure } from '@testing-library/react';
-import '@testing-library/jest-dom';
-import { TextEncoder } from 'util';
 
 dotenv.config({ path: './.env.test.local' });
 dotenv.config({ path: './.env.test' });
@@ -19,7 +17,3 @@ configure({
 });
 
 jest.mock('@openshift/dynamic-plugin-sdk-utils', () => ({}));
-
-
-
-global.TextEncoder = TextEncoder;
