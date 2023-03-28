@@ -8,10 +8,12 @@ A dashboard for Open Data Hub components.
 - Links to component documentation
 
 ## Requirements
+
 Before developing for ODH, the basic requirements:
 * Your system needs to be running [NodeJS version 14 and NPM](https://nodejs.org/)
 
 ### Additional tooling requirements
+
 * [OpenShift CLI, the "oc" command](https://docs.openshift.com/enterprise/3.2/cli_reference/get_started_cli.html#installing-the-cli)
 * [podman](https://github.com/containers/podman)
 * [Quay.io](https://quay.io/)
