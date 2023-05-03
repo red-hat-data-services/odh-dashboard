@@ -1,14 +1,23 @@
 import { RoleBindingKind } from '~/k8sTypes';
 import { SortableData } from '~/components/table/useTableColumnSort';
 import { firstSubject } from './utils';
+import { ProjectSharingRBType } from './types';
+
+const COL_NAME: SortableData<RoleBindingKind> = {
+  field: 'name',
+  label: 'Username',
+  width: 30,
+  sortable: (a, b) => firstSubject(a).localeCompare(firstSubject(b)),
+};
+
+const COL_GROUPS: SortableData<RoleBindingKind> = {
+  field: 'name',
+  label: 'Groups',
+  width: 30,
+  sortable: (a, b) => firstSubject(a).localeCompare(firstSubject(b)),
+};
 
 export const columnsProjectSharing: SortableData<RoleBindingKind>[] = [
-  {
-    field: 'username',
-    label: 'Name',
-    width: 30,
-    sortable: (a, b) => firstSubject(a).localeCompare(firstSubject(b)),
-  },
   {
     field: 'permission',
     label: 'Permission',
@@ -23,4 +32,11 @@ export const columnsProjectSharing: SortableData<RoleBindingKind>[] = [
       new Date(b.metadata.creationTimestamp || 0).getTime() -
       new Date(a.metadata.creationTimestamp || 0).getTime(),
   },
+];
+
+export const getColumnsProjectSharing = (
+  projectType: ProjectSharingRBType,
+): SortableData<RoleBindingKind>[] => [
+  ...(projectType === ProjectSharingRBType.USER ? [COL_NAME] : [COL_GROUPS]),
+  ...columnsProjectSharing,
 ];

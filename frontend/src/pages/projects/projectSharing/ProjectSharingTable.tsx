@@ -4,7 +4,7 @@ import { RoleBindingKind } from '~/k8sTypes';
 import { ProjectDetailsContext } from '~/pages/projects/ProjectDetailsContext';
 import { deleteRoleBinding, generateRoleBindingProjectSharing, createRoleBinding } from '~/api';
 import ProjectSharingTableRow from './ProjectSharingTableRow';
-import { columnsProjectSharing } from './data';
+import { getColumnsProjectSharing } from './data';
 import { ProjectSharingRBType } from './types';
 import { firstSubject } from './utils';
 import ProjectSharingTableRowAdd from './ProjectSharingTableRowAdd';
@@ -36,7 +36,7 @@ const ProjectSharingTable: React.FC<ProjectSharingTableProps> = ({
     <Table
       variant="compact"
       data={permissions}
-      columns={columnsProjectSharing}
+      columns={getColumnsProjectSharing(type)}
       disableRowRenderSupport
       footerRow={() =>
         isAdding ? (
