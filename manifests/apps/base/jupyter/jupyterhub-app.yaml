@@ -84,7 +84,7 @@ spec:
       </g>
     </svg>
   category: Red Hat managed
-  support: red hat
+  support: redhat
   docsLink: https://jupyter.org/hub
   quickStart: create-jupyter-notebook
   getStartedLink: https://jupyterhub.readthedocs.io/en/stable/getting-started/index.html

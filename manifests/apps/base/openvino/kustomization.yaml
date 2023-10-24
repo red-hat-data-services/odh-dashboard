@@ -4,4 +4,6 @@ commonLabels:
   app: odh-dashboard
   app.kubernetes.io/part-of: odh-dashboard
 resources:
-  - ./jupyter
+- openvino-app.yaml
+- openvino-docs.yaml
+- openvino-inference-notebook.yaml
