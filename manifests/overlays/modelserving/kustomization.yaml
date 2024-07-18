@@ -14,7 +14,7 @@ images:
     digest: sha256:00a4e77789cd9e312e98f798cdf67b646040801973c8bb1f44c53cb364467a64
   - name: quay.io/opendatahub/text-generation-inference
     newName: quay.io/modh/text-generation-inference
-    digest: sha256:61458fa55b1f4f9b2b1a45c829e2a4312f42c9dcc5de167e60e3cda94568c302
+    digest: sha256:01f88c5e028b25feff6bc32b275eb18d28884bc92e41cffd95e4c249dc4fee05
   - name: quay.io/opendatahub/openvino_model_server
     newName: quay.io/modh/openvino_model_server
     digest: sha256:5d04d405526ea4ce5b807d0cd199ccf7f71bab1228907c091e975efa770a4908
