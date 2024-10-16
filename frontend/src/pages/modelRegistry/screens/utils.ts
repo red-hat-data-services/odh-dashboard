@@ -79,8 +79,10 @@ export const filterModelVersions = (
   unfilteredModelVersions: ModelVersion[],
   search: string,
   searchType: SearchType,
-): ModelVersion[] =>
-  unfilteredModelVersions.filter((mv: ModelVersion) => {
+): ModelVersion[] => {
+  const searchLower = search.toLowerCase();
+
+  return unfilteredModelVersions.filter((mv: ModelVersion) => {
     if (!search) {
       return true;
     }
@@ -88,21 +90,20 @@ export const filterModelVersions = (
     switch (searchType) {
       case SearchType.KEYWORD:
         return (
-          mv.name.toLowerCase().includes(search.toLowerCase()) ||
-          (mv.description && mv.description.toLowerCase().includes(search.toLowerCase()))
+          mv.name.toLowerCase().includes(searchLower) ||
+          (mv.description && mv.description.toLowerCase().includes(searchLower)) ||
+          getLabels(mv.customProperties).some((label) => label.toLowerCase().includes(searchLower))
         );
 
-      case SearchType.AUTHOR:
-        return (
-          mv.author &&
-          (mv.author.toLowerCase().includes(search.toLowerCase()) ||
-            (mv.author && mv.author.toLowerCase().includes(search.toLowerCase())))
-        );
+      case SearchType.AUTHOR: {
+        return mv.author && mv.author.toLowerCase().includes(searchLower);
+      }
 
       default:
         return true;
     }
   });
+};
 
 export const sortModelVersionsByCreateTime = (registeredModels: ModelVersion[]): ModelVersion[] =>
   registeredModels.toSorted((a, b) => {
@@ -113,25 +114,42 @@ export const sortModelVersionsByCreateTime = (registeredModels: ModelVersion[]):
 
 export const filterRegisteredModels = (
   unfilteredRegisteredModels: RegisteredModel[],
+  unfilteredModelVersions: ModelVersion[],
   search: string,
   searchType: SearchType,
-): RegisteredModel[] =>
-  unfilteredRegisteredModels.filter((rm: RegisteredModel) => {
+): RegisteredModel[] => {
+  const searchLower = search.toLowerCase();
+
+  return unfilteredRegisteredModels.filter((rm: RegisteredModel) => {
     if (!search) {
       return true;
     }
+    const modelVersions = unfilteredModelVersions.filter((mv) => mv.registeredModelId === rm.id);
 
     switch (searchType) {
-      case SearchType.KEYWORD:
-        return (
-          rm.name.toLowerCase().includes(search.toLowerCase()) ||
-          (rm.description && rm.description.toLowerCase().includes(search.toLowerCase()))
+      case SearchType.KEYWORD: {
+        const matchesModel =
+          rm.name.toLowerCase().includes(searchLower) ||
+          (rm.description && rm.description.toLowerCase().includes(searchLower)) ||
+          getLabels(rm.customProperties).some((label) => label.toLowerCase().includes(searchLower));
+
+        const matchesVersion = modelVersions.some(
+          (mv: ModelVersion) =>
+            mv.name.toLowerCase().includes(searchLower) ||
+            (mv.description && mv.description.toLowerCase().includes(searchLower)) ||
+            getLabels(mv.customProperties).some((label) =>
+              label.toLowerCase().includes(searchLower),
+            ),
         );
 
-      case SearchType.OWNER:
-        return rm.owner && rm.owner.toLowerCase().includes(search.toLowerCase());
+        return matchesModel || matchesVersion;
+      }
+      case SearchType.OWNER: {
+        return rm.owner && rm.owner.toLowerCase().includes(searchLower);
+      }
 
       default:
         return true;
     }
   });
+};

@@ -82,7 +82,7 @@ const ModelRegistrySelector: React.FC<ModelRegistrySelectorProps> = ({
   };
 
   const options = [
-    <SelectGroup label="Select a model registry" key="all">
+    <SelectGroup label="All model registries" key="all">
       <SelectList>
         {modelRegistryServices.map((mr) => (
           <SelectOption
@@ -121,6 +121,7 @@ const ModelRegistrySelector: React.FC<ModelRegistrySelectorProps> = ({
 
   const selector = (
     <Select
+      isScrollable
       toggle={(toggleRef) => (
         <MenuToggle
           ref={toggleRef}

@@ -161,7 +161,7 @@ describe('assembleNotebook', () => {
     startNotebookDataMock.volumeMounts = undefined;
     startNotebookDataMock.volumes = undefined;
 
-    const Notebook = assembleNotebook(startNotebookDataMock, username, true);
+    const notebook = assembleNotebook(startNotebookDataMock, username, true);
     k8sCreateResourceMock.mockResolvedValue(mockNotebookK8sResource({ uid: 'test' }));
 
     createElyraServiceAccountRoleBindingMock.mockResolvedValue(
@@ -171,11 +171,16 @@ describe('assembleNotebook', () => {
     const renderResult = await createNotebook(startNotebookDataMock, username, true);
 
     expect(k8sCreateResourceMock).toHaveBeenCalledWith({
+      fetchOptions: { requestInit: {} },
       model: NotebookModel,
-      resource: Notebook,
+      resource: notebook,
+      queryOptions: {
+        queryParams: {},
+      },
     });
     expect(createElyraServiceAccountRoleBindingMock).toHaveBeenCalledWith(
       mockNotebookK8sResource({ uid: 'test' }),
+      undefined,
     );
     expect(createElyraServiceAccountRoleBindingMock).toHaveBeenCalledTimes(1);
     expect(k8sCreateResourceMock).toHaveBeenCalledTimes(1);
@@ -185,7 +190,7 @@ describe('assembleNotebook', () => {
     const startNotebookMock = mockStartNotebookData({});
     startNotebookMock.volumes = undefined;
     startNotebookMock.volumeMounts = undefined;
-    const Notebook = assembleNotebook(startNotebookMock, username, false);
+    const notebook = assembleNotebook(startNotebookMock, username, false);
     k8sCreateResourceMock.mockResolvedValue(mockNotebookK8sResource({ uid: 'test' }));
 
     createElyraServiceAccountRoleBindingMock.mockResolvedValue(
@@ -195,8 +200,12 @@ describe('assembleNotebook', () => {
     const renderResult = await createNotebook(startNotebookMock, username, false);
 
     expect(k8sCreateResourceMock).toHaveBeenCalledWith({
+      fetchOptions: { requestInit: {} },
       model: NotebookModel,
-      resource: Notebook,
+      resource: notebook,
+      queryOptions: {
+        queryParams: {},
+      },
     });
     expect(createElyraServiceAccountRoleBindingMock).toHaveBeenCalledTimes(0);
     expect(k8sCreateResourceMock).toHaveBeenCalledTimes(1);
@@ -218,14 +227,18 @@ describe('createNotebook', () => {
 
     expect(createElyraServiceAccountRoleBinding).not.toHaveBeenCalled();
     expect(k8sCreateResourceMock).toHaveBeenCalledWith({
+      fetchOptions: { requestInit: {} },
       model: NotebookModel,
       resource: notebook,
+      queryOptions: {
+        queryParams: {},
+      },
     });
     expect(k8sCreateResourceMock).toHaveBeenCalledTimes(1);
     expect(renderResult).toStrictEqual(mockNotebookK8sResource({ uid }));
   });
   it('should create a notebook with pipelines', async () => {
-    const Notebook = assembleNotebook(mockStartNotebookData({}), username, true);
+    const notebook = assembleNotebook(mockStartNotebookData({}), username, true);
     k8sCreateResourceMock.mockResolvedValue(mockNotebookK8sResource({ uid }));
 
     createElyraServiceAccountRoleBindingMock.mockResolvedValue(mockRoleBindingK8sResource({ uid }));
@@ -233,23 +246,31 @@ describe('createNotebook', () => {
     const renderResult = await createNotebook(mockStartNotebookData({}), username, true);
 
     expect(k8sCreateResourceMock).toHaveBeenCalledWith({
+      fetchOptions: { requestInit: {} },
       model: NotebookModel,
-      resource: Notebook,
+      resource: notebook,
+      queryOptions: {
+        queryParams: {},
+      },
     });
     expect(createElyraServiceAccountRoleBindingMock).toHaveBeenCalledTimes(1);
     expect(k8sCreateResourceMock).toHaveBeenCalledTimes(1);
     expect(renderResult).toStrictEqual(mockNotebookK8sResource({ uid }));
   });
   it('should handle errors and rethrow', async () => {
-    const Notebook = assembleNotebook(mockStartNotebookData({}), username, true);
+    const notebook = assembleNotebook(mockStartNotebookData({}), username, true);
     k8sCreateResourceMock.mockRejectedValue(new Error('error1'));
     await expect(createNotebook(mockStartNotebookData({}), username, true)).rejects.toThrow(
       'error1',
     );
     expect(k8sCreateResourceMock).toHaveBeenCalledTimes(1);
     expect(k8sCreateResourceMock).toHaveBeenCalledWith({
+      fetchOptions: { requestInit: {} },
       model: NotebookModel,
-      resource: Notebook,
+      resource: notebook,
+      queryOptions: {
+        queryParams: {},
+      },
     });
   });
 });
@@ -759,6 +780,12 @@ describe('removeNotebookPVC', () => {
           path: '/spec/template/spec/volumes',
           value: [
             { name: notebookName, persistentVolumeClaim: { claimName: notebookName } },
+            {
+              name: 'test-storage-1',
+              persistentVolumeClaim: {
+                claimName: 'test-storage-1',
+              },
+            },
             { name: 'oauth-config', secret: { secretName: 'workbench-oauth-config' } },
             { name: 'tls-certificates', secret: { secretName: 'workbench-tls' } },
           ],
@@ -766,7 +793,13 @@ describe('removeNotebookPVC', () => {
         {
           op: 'replace',
           path: '/spec/template/spec/containers/0/volumeMounts',
-          value: [{ mountPath: '/opt/app-root/src', name: notebookName }],
+          value: [
+            { mountPath: '/opt/app-root/src', name: notebookName },
+            {
+              mountPath: '/opt/app-root/src/root',
+              name: 'test-storage-1',
+            },
+          ],
         },
       ],
       queryOptions: { name: notebookName, ns: namespace, queryParams: {} },
@@ -832,6 +865,12 @@ describe('removeNotebookPVC', () => {
           path: '/spec/template/spec/volumes',
           value: [
             { name: notebookName, persistentVolumeClaim: { claimName: notebookName } },
+            {
+              name: 'test-storage-1',
+              persistentVolumeClaim: {
+                claimName: 'test-storage-1',
+              },
+            },
             { name: 'oauth-config', secret: { secretName: 'workbench-oauth-config' } },
             { name: 'tls-certificates', secret: { secretName: 'workbench-tls' } },
           ],
@@ -839,7 +878,13 @@ describe('removeNotebookPVC', () => {
         {
           op: 'replace',
           path: '/spec/template/spec/containers/0/volumeMounts',
-          value: [{ mountPath: '/opt/app-root/src', name: notebookName }],
+          value: [
+            { mountPath: '/opt/app-root/src', name: notebookName },
+            {
+              mountPath: '/opt/app-root/src/root',
+              name: 'test-storage-1',
+            },
+          ],
         },
       ],
       queryOptions: { name: notebookName, ns: namespace, queryParams: {} },

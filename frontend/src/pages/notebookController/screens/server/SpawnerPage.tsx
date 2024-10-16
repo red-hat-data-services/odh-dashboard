@@ -84,7 +84,7 @@ const SpawnerPage: React.FC = () => {
   const [variableRows, setVariableRows] = React.useState<VariableRow[]>([]);
   const [submitError, setSubmitError] = React.useState<Error | null>(null);
 
-  const defaultStorageClass = useDefaultStorageClass();
+  const [defaultStorageClass, defaultStorageClassLoaded] = useDefaultStorageClass();
 
   const [selectedAcceleratorProfile, setSelectedAcceleratorProfile] =
     useGenericObjectState<AcceleratorProfileSelectFieldState>({
@@ -99,7 +99,8 @@ const SpawnerPage: React.FC = () => {
       ({ errors, variables }) =>
         Object.keys(errors).length > 0 ||
         variables.find((variable) => !variable.name || variable.name === EMPTY_KEY),
-    );
+    ) ||
+    !defaultStorageClassLoaded;
 
   React.useEffect(() => {
     const setFirstValidImage = () => {
@@ -414,22 +415,25 @@ const SpawnerPage: React.FC = () => {
           </div>
           <BrowserTabPreferenceCheckbox />
         </Form>
-        <StartServerModal
-          spawnInProgress={startShown}
-          open={createInProgress}
-          onClose={() => {
-            if (currentUserNotebook) {
-              const notebookName = currentUserNotebook.metadata.name;
-              stopNotebook(impersonatedUsername || undefined)
-                .then(() => requestNotebookRefresh())
-                .catch((e) => notification.error(`Error stop notebook ${notebookName}`, e.message));
-            } else {
-              // Shouldn't happen, but if we don't have a notebook, there is nothing to stop
-              hideStartShown();
-            }
-            setCreateInProgress(false);
-          }}
-        />
+        {createInProgress ? (
+          <StartServerModal
+            spawnInProgress={startShown}
+            onClose={() => {
+              if (currentUserNotebook) {
+                const notebookName = currentUserNotebook.metadata.name;
+                stopNotebook(impersonatedUsername || undefined)
+                  .then(() => requestNotebookRefresh())
+                  .catch((e) =>
+                    notification.error(`Error stop notebook ${notebookName}`, e.message),
+                  );
+              } else {
+                // Shouldn't happen, but if we don't have a notebook, there is nothing to stop
+                hideStartShown();
+              }
+              setCreateInProgress(false);
+            }}
+          />
+        ) : null}
       </ApplicationsPage>
     </>
   );

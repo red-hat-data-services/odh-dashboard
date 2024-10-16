@@ -62,6 +62,16 @@ const initIntercepts = ({
       disableModelRegistry: disableModelRegistryFeature,
     }),
   );
+  cy.interceptOdh(
+    `GET /api/service/modelregistry/:serviceName/api/model_registry/:apiVersion/model_versions`,
+    {
+      path: {
+        serviceName: 'modelregistry-sample',
+        apiVersion: MODEL_REGISTRY_API_VERSION,
+      },
+    },
+    mockModelVersionList({ items: modelVersions }),
+  );
 
   cy.interceptK8sList(ServiceModel, mockK8sResourceList(modelRegistries));
 
@@ -196,6 +206,12 @@ describe('Model Versions', () => {
 
     // filtering by keyword
     modelRegistry.findModelVersionsTableSearch().type('new model version');
+    modelRegistry.findModelVersionsTableRows().should('have.length', 1);
+    modelRegistry.findModelVersionsTableRows().contains('new model version');
+    modelRegistry.findModelVersionsTableSearch().focused().clear();
+
+    // filtering by label
+    modelRegistry.findModelVersionsTableSearch().type('Financial');
     modelRegistry.findModelVersionsTableRows().should('have.length', 1);
     modelRegistry.findModelVersionsTableRows().contains('new model version');
     modelRegistry.findModelVersionsTableSearch().focused().clear();
