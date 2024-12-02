@@ -1,7 +1,7 @@
 # Build arguments
 ARG SOURCE_CODE=.
 
-FROM registry.access.redhat.com/ubi8/nodejs-18@sha256:2fcda2fccd4c4c969ad81d707aab18d5ff2894cc0e47ccb2361e1510f3e8a269 as builder
+FROM registry.access.redhat.com/ubi8/nodejs-18@sha256:1fba4777c8137e79c7c6897fc60980a307d3a72006f9a4f1d2a0e42bafe3d086 as builder
 
 ## Build args to be used at this step
 ARG SOURCE_CODE
