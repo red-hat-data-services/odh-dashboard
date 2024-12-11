@@ -278,7 +278,7 @@ spec:
         value: $(params.build-args-file)
       - name: LABELS
         value:
-        - version=v2.16.0
+        - version=v2.16.1
         - url=$(params.git-url)
         - release=$(tasks.clone-repository.results.commit-timestamp)
         - git.url=$(params.git-url)
