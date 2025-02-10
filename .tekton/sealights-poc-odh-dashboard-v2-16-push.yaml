@@ -25,7 +25,7 @@ spec:
     value: quay.io/redhat-user-workloads/rhoai-tenant/sealights-poc-odh-dashboard-v2-16:{{revision}}
   - name: dockerfile
     value: Dockerfile.konflux
-  - name: path-context
+  - name: path-context 
     value: .
   - name: prefetch-input
     value: [{"type": "npm", "path": "."}, {"type": "npm", "path": "frontend"}, {"type": "npm", "path": "backend"}]
@@ -166,6 +166,43 @@ spec:
       workspaces:
       - name: basic-auth
         workspace: git-auth
+    - name: sealights-nodejs-instrumentation
+      runAfter:
+        - clone-repository
+      taskRef:
+        params:
+        - name: name
+          value: sealights-nodejs-oci-ta
+        - name: bundle
+          value: quay.io/konflux-ci/tekton-catalog/task-sealights-nodejs-oci-ta:0.1@sha256:736cf77e5b64e726257776eb1a9ed6a2b459940224873d20b7b177afbefab675
+        - name: kind
+          value: task
+        resolver: bundles
+      params:
+        - name: SOURCE_ARTIFACT
+          value: $(tasks.clone-repository.results.SOURCE_ARTIFACT)
+        - name: nodejs-version
+          value: "18"
+        - name: component
+          value: '{{ repo_name }}'
+        - name: branch
+          value: '{{ source_branch }}'
+        - name: revision
+          value: '{{ revision }}'
+        - name: repository-url
+          value: '{{ repo_url }}'
+        - name: test-event
+          value: '{{ event_type }}'
+        - name: pull-request-number
+          value: '{{ pull_request_number }}'
+        - name: target-branch
+          value: '{{ target_branch }}'
+        - name: exclude
+          value: ['examples/**/*.js,test/**/*.js']
+        - name: workspace-path
+          value: "frontend/public"
+        - name: is-frontend
+          value: "true"
     - name: prefetch-dependencies
       params:
       - name: input
@@ -177,7 +214,7 @@ spec:
       - name: ociArtifactExpiresAfter
         value: $(params.image-expires-after)
       runAfter:
-      - clone-repository
+      - sealights-nodejs-instrumentation
       taskRef:
         params:
         - name: name
