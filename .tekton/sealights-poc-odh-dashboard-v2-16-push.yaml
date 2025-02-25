@@ -22,9 +22,9 @@ spec:
   - name: revision
     value: '{{revision}}'
   - name: output-image
-    value: quay.io/redhat-user-workloads/rhoai-tenant/sealights-poc-odh-dashboard-v2-16:{{revision}}
+    value: quay.io/ckhordiasma/sealights-poc-odh-dashboard:{{revision}}
   - name: dockerfile
-    value: Dockerfile.konflux
+    value: Dockerfile.konflux.sealights
   - name: path-context 
     value: .
   - name: prefetch-input
@@ -231,6 +231,8 @@ spec:
         workspace: netrc
     - name: build-container
       params:
+      - name: ADDITIONAL_SECRET
+        value: sealights-credentials 
       - name: IMAGE
         value: $(params.output-image)
       - name: DOCKERFILE
