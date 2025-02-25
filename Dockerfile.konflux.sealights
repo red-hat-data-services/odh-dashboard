@@ -40,12 +40,12 @@ ENV SCM_PROVIDER="Github"
 RUN npm install slnodejs
 
 USER root
-RUN --mount=type=secret,id=sealights-credentials/token \
-    export SEALIGHTS_TOKEN="$(cat /run/secrets/sealights-credentials/token)"  
-USER default
 ENV NODE_DEBUG=sl
-RUN ./node_modules/.bin/slnodejs scan --buildsessionidfile buildSessionId --scm git --scmProvider "${SCM_PROVIDER}" --excludedpaths "${EXCLUDE}" --build "${BUILD_NAME}" --workspacepath "${BUILD_DIR_PATH}" --token "${SEALIGHTS_TOKEN}" --instrumentForBrowsers --babylonPlugins "${BABYLON_PLUGINS}" --outputpath sl_build
+RUN --mount=type=secret,id=sealights-credentials/token \
+    SEALIGHTS_TOKEN="$(cat /run/secrets/sealights-credentials/token)"  && \
+ ./node_modules/.bin/slnodejs scan --buildsessionidfile buildSessionId --scm git --scmProvider "${SCM_PROVIDER}" --excludedpaths "${EXCLUDE}" --build "${BUILD_NAME}" --workspacepath "${BUILD_DIR_PATH}" --token "${SEALIGHTS_TOKEN}" --instrumentForBrowsers --babylonPlugins "${BABYLON_PLUGINS}" --outputpath sl_build
 
+USER default
 ## END SEALIGHTS
 
 FROM registry.access.redhat.com/ubi8/nodejs-18@sha256:b12ade0bf20f0544870fa8b7b59f3c3627f0a775061a74c4b5cabffde8546fdd as runtime
