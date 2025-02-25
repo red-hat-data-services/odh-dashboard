@@ -37,12 +37,14 @@ ENV TARGET_BRANCH="sealights-poc-2.16"
 ENV EXCLUDE="public/**/*.js,files/**/*.js"
 ENV SCM_PROVIDER="Github"
 
+RUN npm install slnodejs
+
 USER root
 RUN --mount=type=secret,id=sealights-credentials/token \
     export SEALIGHTS_TOKEN="$(cat /run/secrets/sealights-credentials/token)"  
 USER default
-
-RUN npx slnodejs scan --buildsessionidfile buildSessionId --scm git --scmProvider "${SCM_PROVIDER}" --excludedpaths "${EXCLUDE}" --build "${BUILD_NAME}" --workspacepath "${BUILD_DIR_PATH}" --token "${SEALIGHTS_TOKEN}" --instrumentForBrowsers --babylonPlugins "${BABYLON_PLUGINS}" --outputpath sl_build
+ENV NODE_DEBUG=sl
+RUN ./node_modules/.bin/slnodejs scan --buildsessionidfile buildSessionId --scm git --scmProvider "${SCM_PROVIDER}" --excludedpaths "${EXCLUDE}" --build "${BUILD_NAME}" --workspacepath "${BUILD_DIR_PATH}" --token "${SEALIGHTS_TOKEN}" --instrumentForBrowsers --babylonPlugins "${BABYLON_PLUGINS}" --outputpath sl_build
 
 ## END SEALIGHTS
 
