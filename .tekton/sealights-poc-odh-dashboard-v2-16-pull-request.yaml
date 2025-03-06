@@ -253,6 +253,8 @@ spec:
       - name: BUILD_ARGS
         value:
         - $(params.build-args[*])
+        - "SEALIGHTS_BUILD_NAME=$(tasks.sealights-nodejs-instrumentation.results.sealights-build-name)"
+        - "SEALIGHTS_BSID=$(tasks.sealights-nodejs-instrumentation.results.sealights-bsid)"
       - name: BUILD_ARGS_FILE
         value: $(params.build-args-file)
       - name: SOURCE_ARTIFACT
