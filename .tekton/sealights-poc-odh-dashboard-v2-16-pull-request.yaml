@@ -196,7 +196,7 @@ spec:
         - name: nodejs-version
           value: "18"
         - name: component
-          value: 'sealights-poc-odh-dashboard-v2-16' # '{{ repo_name }}'
+          value: sealights-poc-odh-dashboard-v2-16 
         - name: branch
           value: '{{ source_branch }}'
         - name: revision
