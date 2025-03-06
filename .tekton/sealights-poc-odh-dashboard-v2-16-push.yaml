@@ -25,10 +25,19 @@ spec:
     value: quay.io/ckhordiasma/sealights-poc-odh-dashboard:{{revision}}
   - name: dockerfile
     value: Dockerfile.konflux.sealights
-  - name: path-context 
+  - name: path-context
     value: .
   - name: prefetch-input
     value: [{"type": "npm", "path": "."}, {"type": "npm", "path": "frontend"}, {"type": "npm", "path": "backend"}]
+  taskRunSpecs:
+  - pipelineTaskName: build-container
+    stepSpecs:
+    - name: build
+      computeResources:
+        requests:
+          memory: 10Gi
+        limits:
+          memory: 10Gi
   pipelineSpec:
     description: |
       This pipeline is ideal for building container images from a Containerfile while maintaining trust after pipeline customization.
@@ -184,7 +193,7 @@ spec:
         - name: nodejs-version
           value: "18"
         - name: component
-          value: '{{ repo_name }}'
+          value: sealights-poc-odh-dashboard-v2-16 
         - name: branch
           value: '{{ source_branch }}'
         - name: revision
@@ -250,6 +259,9 @@ spec:
       - name: BUILD_ARGS
         value:
         - $(params.build-args[*])
+        - "SEALIGHTS_BUILD_NAME=$(tasks.sealights-nodejs-instrumentation.results.sealights-build-name)"
+        - "SEALIGHTS_BSID=$(tasks.sealights-nodejs-instrumentation.results.sealights-bsid)"
+        - "COMMIT={{revision}}"
       - name: BUILD_ARGS_FILE
         value: $(params.build-args-file)
       - name: LABELS
