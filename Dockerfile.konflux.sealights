@@ -34,6 +34,7 @@ ENV BUILD_DIR_PATH="./frontend/public"
 ENV BABYLON_PLUGINS="jsx,typescript"
 ARG SEALIGHTS_BUILD_NAME=test
 ARG SEALIGHTS_BSID=test
+ARG COMMIT=abc
 ENV TARGET_BRANCH="sealights-poc-2.16"
 
 RUN npm install slnodejs
@@ -42,7 +43,7 @@ USER root
 ENV NODE_DEBUG=sl
 RUN --mount=type=secret,id=sealights-credentials/token \
     SEALIGHTS_TOKEN="$(cat /run/secrets/sealights-credentials/token)"  && \
- ./node_modules/.bin/slnodejs scan --buildsessionid "${SEALIGHTS_BSID}" --scm none --excludedpaths "${EXCLUDE}" --build "${BUILD_NAME}" --workspacepath "${BUILD_DIR_PATH}" --token "${SEALIGHTS_TOKEN}" --instrumentForBrowsers --babylonPlugins "${BABYLON_PLUGINS}" --outputpath sl_build
+ ./node_modules/.bin/slnodejs scan --buildsessionid "${SEALIGHTS_BSID}" --commit "${COMMIT}" --scm none --excludedpaths "${EXCLUDE}" --build "${BUILD_NAME}" --workspacepath "${BUILD_DIR_PATH}" --token "${SEALIGHTS_TOKEN}" --instrumentForBrowsers --babylonPlugins "${BABYLON_PLUGINS}" --outputpath sl_build
 
 USER default
 ## END SEALIGHTS
