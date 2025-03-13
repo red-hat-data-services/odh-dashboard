@@ -1,7 +1,7 @@
 # Build arguments
 ARG SOURCE_CODE=.
 
-FROM registry.access.redhat.com/ubi8/nodejs-18@sha256:72a3c0e5ec8f2e1b58c5017a119a758c3a5f1588a9cc0b59e597505dc73c4806 as builder
+FROM registry.access.redhat.com/ubi8/nodejs-18@sha256:42bb2b88aca3eb231031fad1f193daf8333d6e5ab65af855f173bb0cc0930e86 as builder
 
 
 ## Build args to be used at this step
@@ -29,7 +29,7 @@ ENV COMMUNITY_LINK=""
 
 RUN npm run build
 
-FROM registry.access.redhat.com/ubi8/nodejs-18@sha256:72a3c0e5ec8f2e1b58c5017a119a758c3a5f1588a9cc0b59e597505dc73c4806 as runtime
+FROM registry.access.redhat.com/ubi8/nodejs-18@sha256:42bb2b88aca3eb231031fad1f193daf8333d6e5ab65af855f173bb0cc0930e86 as runtime
 
 WORKDIR /usr/src/app
 
