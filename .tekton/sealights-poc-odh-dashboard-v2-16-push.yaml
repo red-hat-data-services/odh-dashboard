@@ -6,8 +6,10 @@ metadata:
     build.appstudio.redhat.com/commit_sha: '{{revision}}'
     build.appstudio.redhat.com/target_branch: '{{target_branch}}'
     pipelinesascode.tekton.dev/max-keep-runs: "3"
-    pipelinesascode.tekton.dev/on-cel-expression: event == "push" && target_branch
-      == "sealights-poc-2.16"
+    build.appstudio.openshift.io/build-nudge-files: "build/operator-nudging.yaml"
+    pipelinesascode.tekton.dev/on-cel-expression: |
+      event == "push" 
+      && target_branch == "sealights-poc-2.16"
   creationTimestamp: null
   labels:
     appstudio.openshift.io/application: sealights-poc-v2-16
@@ -22,7 +24,7 @@ spec:
   - name: revision
     value: '{{revision}}'
   - name: output-image
-    value: quay.io/ckhordiasma/sealights-poc-odh-dashboard:{{revision}}
+    value: quay.io/rhoai-sealights/odh-dashboard-rhel8:{{revision}}
   - name: dockerfile
     value: Dockerfile.konflux.sealights
   - name: path-context
