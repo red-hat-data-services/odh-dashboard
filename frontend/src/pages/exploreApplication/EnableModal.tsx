@@ -22,6 +22,19 @@ type EnableModalProps = {
   onClose: () => void;
 };
 
+// Helper function to poll /api/integrations/nim
+const fetchNimIntegrationStatus = async (): Promise<boolean> => {
+  try {
+    const res = await fetch('/api/integrations/nim');
+    const data = await res.json();
+    console.log('[NIM] Polled backend status from /api/integrations/nim:', data);
+    return data?.isEnabled === true;
+  } catch (err) {
+    console.error('[NIM] Error fetching backend integration status:', err);
+    return false;
+  }
+};
+
 const EnableModal: React.FC<EnableModalProps> = ({ selectedApp, shown, onClose }) => {
   const [postError, setPostError] = React.useState('');
   const [validationInProgress, setValidationInProgress] = React.useState(false);
@@ -33,6 +46,7 @@ const EnableModal: React.FC<EnableModalProps> = ({ selectedApp, shown, onClose }
     enableValues,
     selectedApp.spec.internalRoute,
   );
+
   const focusRef = (element: HTMLElement | null) => {
     if (element) {
       element.focus();
@@ -40,44 +54,72 @@ const EnableModal: React.FC<EnableModalProps> = ({ selectedApp, shown, onClose }
   };
 
   const updateEnableValue = (key: string, value: string): void => {
-    const updatedValues = {
-      ...enableValues,
+    setEnableValues((prev) => ({
+      ...prev,
       [key]: value,
-    };
-    setEnableValues(updatedValues);
+    }));
   };
 
   const onDoEnableApp = () => {
+    console.log(`[NIM] [EnableModal] Submitting enable request for: ${selectedApp.metadata.name}`);
+    console.log('[NIM] [EnableModal] Submitted values:', enableValues);
     setPostError('');
     setValidationInProgress(true);
   };
 
   React.useEffect(() => {
-    if (validationInProgress && validationStatus === EnableApplicationStatus.SUCCESS) {
-      setValidationInProgress(false);
-      // TODO: Disable rule below temporarily. Refactor to notify the owner and avoid modifying the object directly.
-      /* eslint-disable no-param-reassign */
-      selectedApp.spec.isEnabled = true;
-      selectedApp.spec.shownOnEnabledPage = true;
-      /* eslint-enable no-param-reassign */
+    console.log('[NIM] [EnableModal] Component re-rendered. Shown:', shown);
+  });
 
-      onClose();
+  React.useEffect(() => {
+    if (validationInProgress && validationStatus === EnableApplicationStatus.SUCCESS) {
+      console.log(`[NIM] [EnableModal] Enable request succeeded. Polling backend for confirmation...`);
+
+      const interval = setInterval(async () => {
+        const isEnabled = await fetchNimIntegrationStatus();
+        if (isEnabled) {
+          console.log(`[NIM] ✅ NIM backend confirms isEnabled = true. Closing modal.`);
+          clearInterval(interval);
+          clearTimeout(timeout);
+          setValidationInProgress(false);
+          onClose();
+        }
+      }, 1000);
+
+      const timeout = setTimeout(() => {
+        console.error(`[NIM] ❌ Timeout: backend did not confirm enablement in time.`);
+        clearInterval(interval);
+        setPostError('Timeout while waiting for application to be enabled.');
+        setValidationInProgress(false);
+      }, 50000);
+
+      return () => {
+        console.log('[NIM] Cleaning up polling interval and timeout.');
+        clearInterval(interval);
+        clearTimeout(timeout);
+      };
     }
+
     if (validationInProgress && validationStatus === EnableApplicationStatus.FAILED) {
+      console.error(`[NIM] ❌ Validation failed: ${validationErrorMessage}`);
       setValidationInProgress(false);
       setPostError(validationErrorMessage);
     }
-  }, [onClose, selectedApp.spec, validationErrorMessage, validationInProgress, validationStatus]);
+
+    return undefined;
+  }, [
+    validationInProgress,
+    validationStatus,
+    validationErrorMessage,
+    onClose,
+    selectedApp.metadata.name,
+  ]);
 
   React.useEffect(() => {
-    if (shown) {
-      if (!validationInProgress) {
-        setPostError('');
-      }
+    if (shown && !validationInProgress) {
+      setPostError('');
     }
-    // Only update when shown is updated to true
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [shown]);
+  }, [shown, validationInProgress]);
 
   const handleClose = () => {
     if (!validationInProgress) {
@@ -87,8 +129,10 @@ const EnableModal: React.FC<EnableModalProps> = ({ selectedApp, shown, onClose }
   };
 
   if (!selectedApp.spec.enable || !shown) {
+    console.log('[NIM] [EnableModal] Not shown or missing enable spec.');
     return null;
   }
+
   const { enable } = selectedApp.spec;
 
   return (
