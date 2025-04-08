@@ -22,15 +22,13 @@ type EnableModalProps = {
   onClose: () => void;
 };
 
-// Helper function to poll /api/integrations/nim
+// Poll /api/integrations/nim to confirm backend enablement
 const fetchNimIntegrationStatus = async (): Promise<boolean> => {
   try {
     const res = await fetch('/api/integrations/nim');
     const data = await res.json();
-    console.log('[NIM] Polled backend status from /api/integrations/nim:', data);
     return data?.isEnabled === true;
-  } catch (err) {
-    console.error('[NIM] Error fetching backend integration status:', err);
+  } catch {
     return false;
   }
 };
@@ -61,24 +59,15 @@ const EnableModal: React.FC<EnableModalProps> = ({ selectedApp, shown, onClose }
   };
 
   const onDoEnableApp = () => {
-    console.log(`[NIM] [EnableModal] Submitting enable request for: ${selectedApp.metadata.name}`);
-    console.log('[NIM] [EnableModal] Submitted values:', enableValues);
     setPostError('');
     setValidationInProgress(true);
   };
 
   React.useEffect(() => {
-    console.log('[NIM] [EnableModal] Component re-rendered. Shown:', shown);
-  });
-
-  React.useEffect(() => {
     if (validationInProgress && validationStatus === EnableApplicationStatus.SUCCESS) {
-      console.log(`[NIM] [EnableModal] Enable request succeeded. Polling backend for confirmation...`);
-
       const interval = setInterval(async () => {
         const isEnabled = await fetchNimIntegrationStatus();
         if (isEnabled) {
-          console.log(`[NIM] ✅ NIM backend confirms isEnabled = true. Closing modal.`);
           clearInterval(interval);
           clearTimeout(timeout);
           setValidationInProgress(false);
@@ -87,21 +76,18 @@ const EnableModal: React.FC<EnableModalProps> = ({ selectedApp, shown, onClose }
       }, 1000);
 
       const timeout = setTimeout(() => {
-        console.error(`[NIM] ❌ Timeout: backend did not confirm enablement in time.`);
         clearInterval(interval);
         setPostError('Timeout while waiting for application to be enabled.');
         setValidationInProgress(false);
       }, 50000);
 
       return () => {
-        console.log('[NIM] Cleaning up polling interval and timeout.');
         clearInterval(interval);
         clearTimeout(timeout);
       };
     }
 
     if (validationInProgress && validationStatus === EnableApplicationStatus.FAILED) {
-      console.error(`[NIM] ❌ Validation failed: ${validationErrorMessage}`);
       setValidationInProgress(false);
       setPostError(validationErrorMessage);
     }
@@ -129,7 +115,6 @@ const EnableModal: React.FC<EnableModalProps> = ({ selectedApp, shown, onClose }
   };
 
   if (!selectedApp.spec.enable || !shown) {
-    console.log('[NIM] [EnableModal] Not shown or missing enable spec.');
     return null;
   }
 
