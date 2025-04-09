@@ -14,9 +14,9 @@ import {
   Text,
   TextContent,
   Tooltip,
+  AlertVariant,
 } from '@patternfly/react-core';
 import { ExternalLinkAltIcon } from '@patternfly/react-icons';
-import { AlertVariant } from '@patternfly/react-core';
 import { OdhApplication } from '~/types';
 import MarkdownView from '~/components/MarkdownView';
 import { markdownConverter } from '~/utilities/markdown';
@@ -43,7 +43,6 @@ const fetchNimIntegrationStatus = async (): Promise<boolean> => {
     const data = await res.json();
     return data?.isEnabled === true;
   } catch (err) {
-    console.error('[NIM] Failed to fetch /api/integrations/nim:', err);
     return false;
   }
 };
@@ -58,9 +57,9 @@ const GetStartedPanel: React.FC<GetStartedPanelProps> = ({ selectedApp, onClose,
   const hasNotifiedRef = React.useRef(false);
 
   React.useEffect(() => {
-    if (selectedApp?.metadata.name !== 'nvidia-nim' || isActuallyEnabled) return;
-
-    let interval: NodeJS.Timer;
+    if (selectedApp?.metadata.name !== 'nvidia-nim' || isActuallyEnabled) {
+      return;
+    }
 
     const checkEnabled = async () => {
       const enabled = await fetchNimIntegrationStatus();
@@ -82,7 +81,8 @@ const GetStartedPanel: React.FC<GetStartedPanelProps> = ({ selectedApp, onClose,
     };
 
     checkEnabled();
-    interval = setInterval(checkEnabled, 2000);
+
+    const interval = setInterval(checkEnabled, 2000);
 
     return () => clearInterval(interval);
   }, [selectedApp?.metadata.name, isActuallyEnabled, dispatch, selectedApp?.spec.displayName]);
@@ -110,7 +110,9 @@ const GetStartedPanel: React.FC<GetStartedPanelProps> = ({ selectedApp, onClose,
       </Button>
     );
 
-    return enablement ? button : (
+    return enablement ? (
+      button
+    ) : (
       <Tooltip content="This feature has been disabled by an administrator.">
         <span>{button}</span>
       </Tooltip>

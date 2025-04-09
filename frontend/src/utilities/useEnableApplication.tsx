@@ -45,7 +45,7 @@ export const useEnableApplication = (
         dispatch(forceComponentsUpdate());
         return;
       }
-  
+
       dispatch(
         addNotification({
           status: AlertVariant.danger,
@@ -57,7 +57,6 @@ export const useEnableApplication = (
     },
     [appId, appName, dispatch],
   );
-  
 
   React.useEffect(() => {
     if (!doEnable) {
