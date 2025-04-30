@@ -8,15 +8,15 @@ metadata:
     pipelinesascode.tekton.dev/max-keep-runs: "3"
     build.appstudio.openshift.io/build-nudge-files: "build/operator-nudging.yaml"
     pipelinesascode.tekton.dev/on-cel-expression: |
-      event == "push" 
+      event == "pull_request" 
       && target_branch == "rhoai-2.21"
-      && ( !".tekton/**".pathChanged() || ".tekton/odh-dashboard-v2-21-push.yaml".pathChanged() )
+      && ( !".tekton/**".pathChanged() || ".tekton/odh-dashboard-v2-21-on-pull-request.yaml".pathChanged() )
   creationTimestamp: null
   labels:
     appstudio.openshift.io/application: rhoai-v2-21
     appstudio.openshift.io/component: odh-dashboard-v2-21
     pipelines.appstudio.openshift.io/type: build
-  name: odh-dashboard-v2-21-on-push
+  name: odh-dashboard-v2-21-on-pull-request
   namespace: rhoai-tenant
 spec:
   timeouts:
@@ -28,13 +28,13 @@ spec:
     value: '{{revision}}'
   - name: additional-tags
     value:
-    - '{{target_branch}}-{{revision}}'
+    - 'on-pr-{{target_branch}}-{{revision}}'
   - name: additional-labels
     value:
     - version=v2.21.0
     - io.openshift.tags=odh-dashboard
   - name: output-image
-    value: quay.io/rhoai/odh-dashboard-rhel9:{{target_branch}}
+    value: quay.io/rhoai/odh-dashboard-rhel9:on-pr-{{revision}}
   - name: build-platforms
     value:
     - linux/x86_64
