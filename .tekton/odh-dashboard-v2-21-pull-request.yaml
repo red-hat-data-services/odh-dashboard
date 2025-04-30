@@ -55,7 +55,8 @@ spec:
       [
         {"type": "npm", "path": "."}, 
         {"type": "npm", "path": "frontend"}, 
-        {"type": "npm", "path": "backend"}
+        {"type": "npm", "path": "backend"},
+        {"type": "npm", "path": "install"}
       ]
   - name: build-image-index
     value: true
