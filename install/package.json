@@ -15,40 +15,9 @@
     "node": ">=20.0.0"
   },
   "scripts": {
-    "build": "run-p -l build:*",
-    "build:backend": "cd ./backend && npm run build",
-    "build:frontend": "cd ./frontend && npm run build",
-    "dev": "run-p -l dev:*",
-    "dev:backend": "cd ./backend && npm run start:dev",
-    "dev:frontend": "cd ./frontend && npm run start:dev",
-    "format": "prettier --write \"backend/**/*.ts\" \"frontend/**/*.ts\" \"frontend/**/*.tsx\"",
-    "make": "make",
-    "make:build": "make build",
-    "make:deploy": "make deploy",
-    "make:login": "make login",
-    "make:undeploy": "make undeploy",
-    "make:push": "make push",
-    "postinstall": "run-p postinstall:*",
-    "postinstall:backend": "cd ./backend && npm install",
-    "postinstall:frontend": "cd ./frontend && npm install",
-    "start": "run-p start:*",
-    "start:backend": "cd ./backend && npm start",
-    "start:frontend": "echo \"...available at ./frontend/public\"",
-    "test": "run-s test:backend test:frontend",
-    "test:backend": "cd ./backend && npm run test",
-    "test:frontend": "cd ./frontend && npm run test",
-    "test:frontend:coverage": "cd ./frontend && npm run test:coverage",
-    "test:frontend:unit-coverage": "cd ./frontend && npm run test:unit-coverage",
-    "test:backend:unit-coverage": "cd ./backend && npm run test:unit-coverage",
-
-    "test:cypress-ci": "cd ./frontend && npm run test:cypress-ci -- ",
-    "test:unit": "cd ./frontend && npm run test:unit",
-    "lint:frontend:backend": "cd ./backend && npm run test:lint && cd ../frontend && npm run test:lint",
-    "test:fix": "run-s test:fix-backend test:fix-frontend",
-    "test:fix-backend": "cd ./backend && npm run test:fix",
-    "test:fix-frontend": "cd ./frontend && npm run test:fix"
+    "build": "np run build"
   },
-  "dependencies": {
+  "optionalDependencies": {
     "@esbuild/linux-arm": "0.25.3",
     "@esbuild/linux-arm64": "0.25.3",
     "@esbuild/linux-ia32": "0.25.3",
