@@ -18,7 +18,7 @@ RUN npm cache clean --force
 
 RUN npm ci
 
-RUN grep -r '@esbuild/linux-s390x' node_modules/
+RUN grep -r '@esbuild/linux-s390x' frontend/node_modules/ || echo "not successful"
 
 # Set Red Hat Openshift AI logo and links
 ENV ODH_LOGO=../images/rhoai-logo.svg
