@@ -23,6 +23,8 @@ spec:
   timeouts:
     pipeline: 8h
   params:
+  - name: image-expires-after
+    value: 5d
   - name: git-url
     value: '{{source_url}}'
   - name: revision
