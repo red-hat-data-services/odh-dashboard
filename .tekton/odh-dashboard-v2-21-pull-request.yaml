@@ -18,7 +18,7 @@ metadata:
     appstudio.openshift.io/application: rhoai-v2-21
     appstudio.openshift.io/component: odh-dashboard-v2-21
     pipelines.appstudio.openshift.io/type: build
-  name: odh-dashboard-v2-21-on-pull-request
+  name: odh-dashboard-v2-20-on-pull-request
   namespace: rhoai-tenant
 spec:
   timeouts:
@@ -39,7 +39,7 @@ spec:
     value: quay.io/rhoai/odh-dashboard-rhel9:on-pr-{{revision}}
   - name: build-platforms
     value:
-    # - linux/x86_64
+    - linux/x86_64
     # - linux/ppc64le
     - linux-large/s390x
   - name: dockerfile
