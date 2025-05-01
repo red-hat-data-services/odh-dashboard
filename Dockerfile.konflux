@@ -33,7 +33,7 @@ RUN \
     *) echo "Unsupported architecture: ${TARGETARCH}" && exit 1 ;; \
   esac \
   && echo "Installing ${ESBUILD_PKG} for ${TARGETARCH}" \
-  && npm install --no-save ${ESBUILD_PKG}
+  && npm ci --no-save ${ESBUILD_PKG}
 
 RUN npm ci --omit=optional
 
