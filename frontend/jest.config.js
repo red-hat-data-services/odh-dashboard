@@ -45,4 +45,11 @@ module.exports = {
     '!<rootDir>/src/__mocks__/**',
     '!**/*.spec.{ts,tsx}',
   ],
+  reporters: [
+    "default",
+    [ "jest-junit", {
+      outputDirectory: "./reports/junit",
+      outputName: "js-test-results.xml"
+    }]
+  ]
 };
