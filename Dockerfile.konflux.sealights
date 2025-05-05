@@ -43,7 +43,11 @@ USER root
 ENV NODE_DEBUG=sl
 RUN --mount=type=secret,id=sealights-credentials/token \
     SEALIGHTS_TOKEN="$(cat /run/secrets/sealights-credentials/token)"  && \
- ./node_modules/.bin/slnodejs scan --buildsessionid "${SEALIGHTS_BSID}" --commit "${COMMIT}" --scm none --excludedpaths "${EXCLUDE}" --build "${BUILD_NAME}" --workspacepath "${BUILD_DIR_PATH}" --token "${SEALIGHTS_TOKEN}" --instrumentForBrowsers --es6Modules --outputpath sl_build && \
+    ./node_modules/.bin/slnodejs scan --token "${SEALIGHTS_TOKEN}" --buildsessionid "${SEALIGHTS_BSID}" --scm none --workspacepath "${BUILD_DIR_PATH}" --es6Modules --scmProvider github --scmBaseUrl https://github.com/red-hat-data-services/odh-dashboard/  
+
+RUN --mount=type=secret,id=sealights-credentials/token \
+    SEALIGHTS_TOKEN="$(cat /run/secrets/sealights-credentials/token)"  && \
+    ./node_modules/.bin/slnodejs instrument --token "${SEALIGHTS_TOKEN}" --buildsessionid "${SEALIGHTS_BSID}" --workspacepath "${BUILD_DIR_PATH}" --outputpath sl_build && \
   rm -rf ./frontend/public && mv sl_build ./frontend/public
 
 
