@@ -20,6 +20,7 @@ import './commands';
 import { asProjectAdminUser } from '~/__tests__/cypress/cypress/utils/mockUsers';
 import { addCommands as webSocketsAddCommands } from './websockets';
 import 'cypress-plugin-steps';
+import "sealights-cypress-plugin/support";
 
 chai.use(chaiSubset);
 

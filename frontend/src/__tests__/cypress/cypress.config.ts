@@ -14,6 +14,8 @@ import { setup as setupWebsockets } from '~/__tests__/cypress/cypress/support/we
 import { env, cypressEnv, BASE_URL } from '~/__tests__/cypress/cypress/utils/testConfig';
 
 const resultsDir = `${env.CY_RESULTS_DIR || 'results'}/${env.CY_MOCK ? 'mocked' : 'e2e'}`;
+const { defineConfig } = require("cypress");
+const { registerSealightsTasks } = require("sealights-cypress-plugin");
 
 export default defineConfig({
   experimentalMemoryManagement: true,
@@ -54,6 +56,10 @@ export default defineConfig({
   },
   defaultCommandTimeout: 10000,
   e2e: {
+    experimentalInteractiveRunEvents: true, // If you want to run with 'npm cypress open' and still report coverage
+        setupNodeEvents(on, config) {
+            registerSealightsTasks(on, config);
+        },
     baseUrl: BASE_URL,
     specPattern: env.CY_MOCK
       ? `cypress/tests/mocked/**/*.cy.ts`

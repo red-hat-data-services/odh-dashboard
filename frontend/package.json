@@ -32,7 +32,7 @@
     "test:fix": "eslint --ext .js,.ts,.jsx,.tsx ./src --fix",
     "test:lint": "eslint --max-warnings 0 --ext .js,.ts,.jsx,.tsx ./src",
     "test:type-check": "tsc --noEmit && cd ./src/__tests__/cypress && tsc --noEmit",
-    "test:jest": "jest",
+    "test:jest": "jest --config jest.config.js --sl-testStage='Jest Tests'",
     "test:jest:coverage": "rimraf jest-coverage && jest --silent --coverage --coverageReporters=json --coverageReporters=lcov",
     "test:unit": "npm run test:jest -- --silent",
     "test:cypress-ci": "npx concurrently -P -k -s first \"npm run cypress:server:build && npm run cypress:server\" \"npx wait-on tcp:127.0.0.1:9001 && npm run cypress:run:mock -- {@}\" -- ",
@@ -93,6 +93,8 @@
     "redux": "^4.2.0",
     "redux-thunk": "^2.4.1",
     "sass": "^1.56.2",
+    "sealights-cypress-plugin": "^2.0.116",
+    "sealights-jest-plugin": "^2.0.112",
     "showdown": "^2.1.0",
     "yaml": "^2.2.2",
     "zod": "^3.23.8"

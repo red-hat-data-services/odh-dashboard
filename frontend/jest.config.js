@@ -1,6 +1,18 @@
 // For a detailed explanation regarding each configuration property, visit:
 // https://jestjs.io/docs/en/configuration.html
 
+/** @type {import('jest').Config} */
+const { configCreator } = require('sealights-jest-plugin');
+
+const config = {
+  testEnvironment: "node",
+  testMatch: ["<rootDir>/dist/test/**/*.test.js"],
+  verbose: true,
+  rootDir: ".",
+};
+
+module.exports = configCreator(config); 
+
 module.exports = {
   roots: ['<rootDir>/src/'],
   testMatch: [
