@@ -40,7 +40,6 @@ ENV TARGET_BRANCH="sealights-poc-2.16"
 RUN npm install slnodejs
 
 USER root
-ENV NODE_DEBUG=sl
 
 RUN --mount=type=secret,id=sealights-credentials/token \
     SEALIGHTS_TOKEN="$(cat /run/secrets/sealights-credentials/token)"  && \
