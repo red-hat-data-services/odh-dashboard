@@ -6,6 +6,10 @@ FROM registry.access.redhat.com/ubi9/nodejs-20@sha256:8cbfbca4dbbbd98b0d87dd7f29
 ## Build args to be used at this step
 ARG SOURCE_CODE
 
+# Explicitly declare the ARG for TARGETARCH
+# This is necessary to ensure that the correct architecture is used in the build stage
+ARG TARGETARCH
+
 WORKDIR /usr/src/app
 
 ## Copying in source code
