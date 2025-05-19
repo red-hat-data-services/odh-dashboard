@@ -6,10 +6,6 @@ FROM registry.access.redhat.com/ubi9/nodejs-20@sha256:a30f4d8b632eb048c294b1e1fc
 ## Build args to be used at this step
 ARG SOURCE_CODE
 
-# Explicitly declare the ARG for TARGETARCH
-# This is necessary to ensure that the correct architecture is used in the build stage
-ARG TARGETARCH
-
 WORKDIR /usr/src/app
 
 ## Copying in source code
@@ -20,22 +16,9 @@ USER default
 
 RUN npm cache clean --force
 
-# Explicitly install the required esbuild binary for the target platform
-# This is necessary because the esbuild binary is not included in the node_modules
-# Check https://github.com/evanw/esbuild/blob/main/npm/esbuild/package.json for updates
-ARG ESBUILD_VERSION=0.25.3
-RUN \
-  case ${TARGETARCH} in \
-    "amd64")   ESBUILD_PKG="@esbuild/linux-x64@${ESBUILD_VERSION}" ;; \
-    "arm64")   ESBUILD_PKG="@esbuild/linux-arm64@${ESBUILD_VERSION}" ;; \
-    "ppc64le") ESBUILD_PKG="@esbuild/linux-ppc64le@${ESBUILD_VERSION}" ;; \
-    "s390x")   ESBUILD_PKG="@esbuild/linux-s390x@${ESBUILD_VERSION}" ;; \
-    *) echo "Unsupported architecture: ${TARGETARCH}" && exit 1 ;; \
-  esac \
-  && echo "Installing ${ESBUILD_PKG} for ${TARGETARCH}" \
-  && npm ci --no-save ${ESBUILD_PKG}
-
-RUN npm ci --omit=optional
+RUN npm ci --omit=optional --ignore-scripts
+RUN cd frontend && npm ci --omit=optional --ignore-scripts
+RUN cd backend && npm ci --omit=optional --ignore-scripts
 
 # Set Red Hat Openshift AI logo and links
 ENV ODH_LOGO=../images/rhoai-logo.svg
@@ -48,6 +31,10 @@ ENV COMMUNITY_LINK=""
 
 RUN npm run build
 
+# Install only production dependencies
+# This is needed to remove the dev dependencies that were installed in the previous step
+RUN cd backend && npm prune --omit=dev
+
 FROM registry.access.redhat.com/ubi9/nodejs-20@sha256:a30f4d8b632eb048c294b1e1fc71c1e574e14ee89cef73101d76d561420f6504 as runtime
 
 WORKDIR /usr/src/app
@@ -59,12 +46,11 @@ USER 1001:0
 COPY --chown=default:root --from=builder /usr/src/app/frontend/public /usr/src/app/frontend/public
 COPY --chown=default:root --from=builder /usr/src/app/backend/package.json /usr/src/app/backend/package.json
 COPY --chown=default:root --from=builder /usr/src/app/backend/package-lock.json /usr/src/app/backend/package-lock.json
+COPY --chown=default:root --from=builder /usr/src/app/backend/node_modules /usr/src/app/backend/node_modules
 COPY --chown=default:root --from=builder /usr/src/app/backend/dist /usr/src/app/backend/dist
 COPY --chown=default:root --from=builder /usr/src/app/.npmrc /usr/src/app/backend/.npmrc
 COPY --chown=default:root --from=builder /usr/src/app/.env /usr/src/app/.env
 COPY --chown=default:root --from=builder /usr/src/app/data /usr/src/app/data
-
-RUN cd backend && npm cache clean --force && npm ci --omit=dev --omit=optional && chmod -R g+w ${HOME}/.npm
 
 WORKDIR /usr/src/app/backend
 
