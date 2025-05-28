@@ -64,7 +64,7 @@ spec:
       build: "true"
       add-nodejs-instrumentation: "true"
       dockerfile: "Dockerfile.konflux.sealights"
-      output-image: "quay.io/rhoai-sealights/odh-dashboard-rhel9:{{target_branch}}"
+      output-image: "quay.io/rhoai-sealights/odh-dashboard-rhel9:on-pr-{{revision}}"
       nodejs-version: "20"
       component: "odh-dashboard-v2-22"
       branch: "{{ source_branch }}"
