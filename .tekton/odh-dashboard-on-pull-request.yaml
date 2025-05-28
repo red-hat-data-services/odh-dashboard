@@ -62,7 +62,8 @@ spec:
   - name: sealights-config
     value:
       build: "true"
-      dockerfile: "Dockerfile.sealights"
+      add-nodejs-instrumentation: "true"
+      dockerfile: "Dockerfile.konflux.sealights"
       output-image: "quay.io/rhoai-sealights/odh-dashboard-rhel9:{{target_branch}}"
       nodejs-version: "20"
       component: "odh-dashboard-v2-22"
@@ -72,7 +73,7 @@ spec:
       test-event: "{{ event_type }}"
       pull-request-number: "{{ pull_request_number }} "
       target-branch: "{{ target_branch }}"
-      workspace-path: "frontend/public"
+      workspace-path: "."
       is-frontend: "true"
   pipelineRef:
     resolver: git
