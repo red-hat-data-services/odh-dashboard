@@ -4,7 +4,7 @@ import * as fs from 'fs';
 // @ts-expect-error: Types are not available for this third-party library
 import registerCypressGrep from '@cypress/grep/src/plugin';
 //import { defineConfig } from 'cypress';
-//import coverage from '@cypress/code-coverage/task';
+import coverage from '@cypress/code-coverage/task';
 //import registerSealightsTasks from 'sealights-cypress-plugin';
 const { defineConfig } = require('cypress');
 const { registerSealightsTasks } = require('sealights-cypress-plugin');
