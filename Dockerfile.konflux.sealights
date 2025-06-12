@@ -36,7 +36,7 @@ ARG SEALIGHTS_BUILD_NAME=
 ARG SEALIGHTS_BSID=
 ARG COMMIT=
 
-RUN npm install slnodejs
+RUN npm install slnodejs@6.1.1067
 
 USER root
 
@@ -44,9 +44,9 @@ RUN --mount=type=secret,id=sealights-credentials/token \
     SEALIGHTS_TOKEN="$(cat /run/secrets/sealights-credentials/token)"  && \
     ./node_modules/.bin/slnodejs scan --token "${SEALIGHTS_TOKEN}" --buildsessionid "${SEALIGHTS_BSID}" --scm none --workspacepath "./frontend/public" --es6Modules --scmProvider github --scmBaseUrl https://github.com/red-hat-data-services/odh-dashboard/  --uniqueModuleId frontend
 
-# RUN --mount=type=secret,id=sealights-credentials/token \
-#    SEALIGHTS_TOKEN="$(cat /run/secrets/sealights-credentials/token)"  && \
-#    ./node_modules/.bin/slnodejs scan --token "${SEALIGHTS_TOKEN}" --buildsessionid "${SEALIGHTS_BSID}" --scm none --workspacepath "./backend/dist" --es6Modules --scmProvider github --scmBaseUrl https://github.com/red-hat-data-services/odh-dashboard/  --uniqueModuleId backend
+RUN --mount=type=secret,id=sealights-credentials/token \
+    SEALIGHTS_TOKEN="$(cat /run/secrets/sealights-credentials/token)"  && \
+    ./node_modules/.bin/slnodejs scan --token "${SEALIGHTS_TOKEN}" --buildsessionid "${SEALIGHTS_BSID}" --scm none --workspacepath "./backend/dist" --es6Modules --scmProvider github --scmBaseUrl https://github.com/red-hat-data-services/odh-dashboard/  --uniqueModuleId backend
 
 RUN --mount=type=secret,id=sealights-credentials/token \
     SEALIGHTS_TOKEN="$(cat /run/secrets/sealights-credentials/token)"  && \
@@ -54,8 +54,9 @@ RUN --mount=type=secret,id=sealights-credentials/token \
 
 RUN --mount=type=secret,id=sealights-credentials/token \
     SEALIGHTS_TOKEN="$(cat /run/secrets/sealights-credentials/token)"  && \
-    ./node_modules/.bin/slnodejs instrument --token "${SEALIGHTS_TOKEN}" --buildsessionid "${SEALIGHTS_BSID}" --workspacepath "./frontend/public" --outputpath sl_build && \
-  rm -rf ./frontend/public && mv sl_build ./frontend/public
+    ./node_modules/.bin/slnodejs instrument --token "${SEALIGHTS_TOKEN}" --buildsessionid "${SEALIGHTS_BSID}" --workspacepath "./frontend/public" --outputpath sl_build
+RUN rm -rf ./frontend/public
+RUN mv -v sl_build ./frontend/public
 
 USER default
 ## END SEALIGHTS
