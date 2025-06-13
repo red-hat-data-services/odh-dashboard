@@ -87,6 +87,15 @@ WORKDIR /usr/src/app/backend
 # BEGIN SEALIGHTS
 RUN npm install slnodejs
 ENV NODE_OPTIONS="--require ./node_modules/slnodejs/lib/preload.js"
+
+ARG SEALIGHTS_BSID=
+ENV SL_BUILD_SESSION_ID=$SEALIGHTS_BSID
+ENV SL_TOKENFILE=/usr/src/app/backend/sltoken.txt
+
+USER root
+RUN --mount=type=secret,id=sealights-credentials/token cp /run/secrets/sealights-credentials/token $SL_TOKENFILE
+RUN chmod +r ${SL_TOKENFILE}
+USER 1001:0
 # END SEALIGHTS
 
 CMD ["npm", "run", "start"]
