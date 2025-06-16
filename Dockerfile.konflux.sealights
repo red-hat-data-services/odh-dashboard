@@ -41,8 +41,9 @@ RUN npm install slnodejs@6.1.1067
 USER root
 
 RUN --mount=type=secret,id=sealights-credentials/token \
-    SEALIGHTS_TOKEN="$(cat /run/secrets/sealights-credentials/token)"  && \
-    ./node_modules/.bin/slnodejs scan --token "${SEALIGHTS_TOKEN}" --buildsessionid "${SEALIGHTS_BSID}" --scm none --workspacepath "./frontend/public" --es6Modules --scmProvider github --scmBaseUrl https://github.com/red-hat-data-services/odh-dashboard/  --uniqueModuleId frontend
+    SEALIGHTS_TOKEN="$(cat /run/secrets/sealights-credentials/token)"  && cd ./frontend && \
+    ./node_modules/.bin/slnodejs scan --token "${SEALIGHTS_TOKEN}" --buildsessionid "${SEALIGHTS_BSID}" --scm none --workspacepath "./public" --es6Modules --scmProvider github --scmBaseUrl https://github.com/red-hat-data-services/odh-dashboard/  --uniqueModuleId frontend && \
+    cd ..
 
 RUN --mount=type=secret,id=sealights-credentials/token \
     SEALIGHTS_TOKEN="$(cat /run/secrets/sealights-credentials/token)"  && cd ./backend && \
@@ -55,7 +56,7 @@ RUN --mount=type=secret,id=sealights-credentials/token \
 
 RUN --mount=type=secret,id=sealights-credentials/token \
     SEALIGHTS_TOKEN="$(cat /run/secrets/sealights-credentials/token)"  && \
-    ./node_modules/.bin/slnodejs instrument --token "${SEALIGHTS_TOKEN}" --buildsessionid "${SEALIGHTS_BSID}" --workspacepath "./frontend/public" --outputpath sl_build
+    ./node_modules/.bin/slnodejs instrument --token "${SEALIGHTS_TOKEN}" --buildsessionid "${SEALIGHTS_BSID}" --workspacepath "./frontend/public" --outputpath sl_build --labid sl_LabId_ReplaceMe
 RUN rm -rf ./frontend/public
 RUN mv -v sl_build ./frontend/public
 
@@ -92,10 +93,12 @@ ENV NODE_OPTIONS="--require ./node_modules/slnodejs/lib/preload.js"
 ARG SEALIGHTS_BSID=
 ENV SL_BUILD_SESSION_ID=$SEALIGHTS_BSID
 ENV SL_TOKENFILE=/usr/src/app/backend/sltoken.txt
+ENV SL_LAB_ID=ods-qe-psi-02
 
 USER root
 RUN --mount=type=secret,id=sealights-credentials/token cp /run/secrets/sealights-credentials/token $SL_TOKENFILE
 RUN chmod +r ${SL_TOKENFILE}
+RUN find /usr/src/app/frontend/public -type f -name "*.js" -exec sed -i 's/sl_LabId_ReplaceMe/ods-qe-psi-02/g' {} +
 USER 1001:0
 # END SEALIGHTS
 
