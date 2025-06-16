@@ -45,8 +45,9 @@ RUN --mount=type=secret,id=sealights-credentials/token \
     ./node_modules/.bin/slnodejs scan --token "${SEALIGHTS_TOKEN}" --buildsessionid "${SEALIGHTS_BSID}" --scm none --workspacepath "./frontend/public" --es6Modules --scmProvider github --scmBaseUrl https://github.com/red-hat-data-services/odh-dashboard/  --uniqueModuleId frontend
 
 RUN --mount=type=secret,id=sealights-credentials/token \
-    SEALIGHTS_TOKEN="$(cat /run/secrets/sealights-credentials/token)"  && \
-    ./node_modules/.bin/slnodejs scan --token "${SEALIGHTS_TOKEN}" --buildsessionid "${SEALIGHTS_BSID}" --scm none --workspacepath "./backend/dist" --es6Modules --scmProvider github --scmBaseUrl https://github.com/red-hat-data-services/odh-dashboard/  --uniqueModuleId backend
+    SEALIGHTS_TOKEN="$(cat /run/secrets/sealights-credentials/token)"  && cd ./backend && \
+    ../node_modules/.bin/slnodejs scan --token "${SEALIGHTS_TOKEN}" --buildsessionid "${SEALIGHTS_BSID}" --scm none --workspacepath "./dist" --es6Modules --scmProvider github --scmBaseUrl https://github.com/red-hat-data-services/odh-dashboard/  --uniqueModuleId backend && \
+    cd ..
 
 RUN --mount=type=secret,id=sealights-credentials/token \
     SEALIGHTS_TOKEN="$(cat /run/secrets/sealights-credentials/token)"  && \
