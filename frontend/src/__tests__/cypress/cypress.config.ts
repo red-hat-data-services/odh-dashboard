@@ -71,8 +71,8 @@ export default defineConfig({
       ? `cypress/tests/mocked/**/*.scy.ts`
       : `cypress/tests/e2e/**/*.cy.ts`,
     experimentalInteractiveRunEvents: true,
-    async setupNodeEvents(on, config) {
-      await registerCypressGrep(config);
+    setupNodeEvents(on, config) {
+      registerCypressGrep(config);
       cypressHighResolution(on, config);
       coverage(on, config);
       setupWebsockets(on, config);
