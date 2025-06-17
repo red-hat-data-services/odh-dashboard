@@ -1,6 +1,5 @@
 # Build arguments
 ARG SOURCE_CODE=.
-ARG SLNODEJS_VERSION=6.1.1069
 
 FROM registry.access.redhat.com/ubi9/nodejs-20@sha256:9d0dd7af383e77f842f5331741a640fbc865e6c2487d065cbac91270bfdb99fa as builder
 
@@ -36,10 +35,8 @@ RUN npm run build
 ARG SEALIGHTS_BUILD_NAME=
 ARG SEALIGHTS_BSID=
 ARG COMMIT=
-ARG SLNODEJS_VERSION
 
-ENV SLNODEJS_VERSION=$SLNODEJS_VERSION
-RUN npm install slnodejs@$SLNODEJS_VERSION
+RUN npm install slnodejs@$6.1.1069
 
 USER root
 
@@ -90,10 +87,7 @@ COPY --chown=default:root --from=builder /usr/src/app/data /usr/src/app/data
 WORKDIR /usr/src/app/backend
 
 # BEGIN SEALIGHTS
-ARG SLNODEJS_VERSION
-ENV SLNODEJS_VERSION=$SLNODEJS_VERSION
-
-RUN npm install slnodejs@$SLNODEJS_VERSION
+RUN npm install slnodejs@6.1.1069
 ENV NODE_OPTIONS="--require ./node_modules/slnodejs/lib/preload.js"
 
 ARG SEALIGHTS_BSID=
