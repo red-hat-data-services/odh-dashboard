@@ -1,5 +1,6 @@
 # Build arguments
 ARG SOURCE_CODE=.
+ARG SLNODEJS_VERSION=6.1.1069
 
 FROM registry.access.redhat.com/ubi9/nodejs-20@sha256:9d0dd7af383e77f842f5331741a640fbc865e6c2487d065cbac91270bfdb99fa as builder
 
@@ -35,8 +36,10 @@ RUN npm run build
 ARG SEALIGHTS_BUILD_NAME=
 ARG SEALIGHTS_BSID=
 ARG COMMIT=
+ARG SLNODEJS_VERSION
 
-RUN npm install slnodejs@6.1.1067
+ENV SLNODEJS_VERSION=$SLNODEJS_VERSION
+RUN npm install slnodejs@$SLNODEJS_VERSION
 
 USER root
 
@@ -87,7 +90,10 @@ COPY --chown=default:root --from=builder /usr/src/app/data /usr/src/app/data
 WORKDIR /usr/src/app/backend
 
 # BEGIN SEALIGHTS
-RUN npm install slnodejs
+ARG SLNODEJS_VERSION
+ENV SLNODEJS_VERSION=$SLNODEJS_VERSION
+
+RUN npm install slnodejs@$SLNODEJS_VERSION
 ENV NODE_OPTIONS="--require ./node_modules/slnodejs/lib/preload.js"
 
 ARG SEALIGHTS_BSID=
@@ -98,7 +104,6 @@ ENV SL_LAB_ID=ods-qe-psi-02
 USER root
 RUN --mount=type=secret,id=sealights-credentials/token cp /run/secrets/sealights-credentials/token $SL_TOKENFILE
 RUN chmod +r ${SL_TOKENFILE}
-# RUN find /usr/src/app/frontend/public -type f -name "*.js" -exec sed -i 's/sl_LabId_ReplaceMe/ods-qe-psi-02/g' {} +
 USER 1001:0
 # END SEALIGHTS
 
