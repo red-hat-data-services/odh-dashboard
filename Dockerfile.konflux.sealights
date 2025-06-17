@@ -98,7 +98,7 @@ ENV SL_LAB_ID=ods-qe-psi-02
 USER root
 RUN --mount=type=secret,id=sealights-credentials/token cp /run/secrets/sealights-credentials/token $SL_TOKENFILE
 RUN chmod +r ${SL_TOKENFILE}
-RUN find /usr/src/app/frontend/public -type f -name "*.js" -exec sed -i 's/sl_LabId_ReplaceMe/ods-qe-psi-02/g' {} +
+# RUN find /usr/src/app/frontend/public -type f -name "*.js" -exec sed -i 's/sl_LabId_ReplaceMe/ods-qe-psi-02/g' {} +
 USER 1001:0
 # END SEALIGHTS
 
