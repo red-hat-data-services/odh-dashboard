@@ -36,7 +36,7 @@ ARG SEALIGHTS_BUILD_NAME=
 ARG SEALIGHTS_BSID=
 ARG COMMIT=
 
-#RUN npm install slnodejs@6.1.1069
+RUN npm install slnodejs@6.1.1069
 
 USER root
 
