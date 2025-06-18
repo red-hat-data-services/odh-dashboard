@@ -36,27 +36,27 @@ ARG SEALIGHTS_BUILD_NAME=
 ARG SEALIGHTS_BSID=
 ARG COMMIT=
 
-RUN npm install slnodejs@6.1.1069
+RUN npm install slnodejs@$6.1.1069
 
 USER root
 
 RUN --mount=type=secret,id=sealights-credentials/token \
     SEALIGHTS_TOKEN="$(cat /run/secrets/sealights-credentials/token)"  && cd ./frontend && \
-    npx slnodejs@6.1.1069 scan --token "${SEALIGHTS_TOKEN}" --buildsessionid "${SEALIGHTS_BSID}" --scm none --workspacepath "./public" --es6Modules --scmProvider github --scmBaseUrl https://github.com/red-hat-data-services/odh-dashboard/  --uniqueModuleId frontend && \
+    ./node_modules/.bin/slnodejs scan --token "${SEALIGHTS_TOKEN}" --buildsessionid "${SEALIGHTS_BSID}" --scm none --workspacepath "./public" --es6Modules --scmProvider github --scmBaseUrl https://github.com/red-hat-data-services/odh-dashboard/  --uniqueModuleId frontend && \
     cd ..
 
 RUN --mount=type=secret,id=sealights-credentials/token \
     SEALIGHTS_TOKEN="$(cat /run/secrets/sealights-credentials/token)"  && cd ./backend && \
-    npx slnodejs@6.1.1069 scan --token "${SEALIGHTS_TOKEN}" --buildsessionid "${SEALIGHTS_BSID}" --scm none --workspacepath "./dist" --es6Modules --scmProvider github --scmBaseUrl https://github.com/red-hat-data-services/odh-dashboard/  --uniqueModuleId backend && \
+    ../node_modules/.bin/slnodejs scan --token "${SEALIGHTS_TOKEN}" --buildsessionid "${SEALIGHTS_BSID}" --scm none --workspacepath "./dist" --es6Modules --scmProvider github --scmBaseUrl https://github.com/red-hat-data-services/odh-dashboard/  --uniqueModuleId backend && \
     cd ..
 
 RUN --mount=type=secret,id=sealights-credentials/token \
     SEALIGHTS_TOKEN="$(cat /run/secrets/sealights-credentials/token)"  && \
-    npx slnodejs@6.1.1069 buildend --token "${SEALIGHTS_TOKEN}" --buildsessionid "${SEALIGHTS_BSID}" --ok
+    ./node_modules/.bin/slnodejs buildend --token "${SEALIGHTS_TOKEN}" --buildsessionid "${SEALIGHTS_BSID}" --ok
 
 RUN --mount=type=secret,id=sealights-credentials/token \
     SEALIGHTS_TOKEN="$(cat /run/secrets/sealights-credentials/token)"  && \
-    npx slnodejs@6.1.1069 instrument --token "${SEALIGHTS_TOKEN}" --buildsessionid "${SEALIGHTS_BSID}" --workspacepath "./frontend/public" --outputpath sl_build --labid sl_LabId_ReplaceMe
+    ./node_modules/.bin/slnodejs instrument --token "${SEALIGHTS_TOKEN}" --buildsessionid "${SEALIGHTS_BSID}" --workspacepath "./frontend/public" --outputpath sl_build --labid sl_LabId_ReplaceMe
 RUN rm -rf ./frontend/public
 RUN mv -v sl_build ./frontend/public
 
