@@ -1,0 +1,95 @@
+apiVersion: tekton.dev/v1
+kind: PipelineRun
+metadata:
+  annotations:
+    build.appstudio.openshift.io/repo: https://github.com/red-hat-data-services/odh-dashboard?rev={{revision}}
+    build.appstudio.redhat.com/commit_sha: '{{revision}}'
+    build.appstudio.redhat.com/target_branch: '{{target_branch}}'
+    pipelinesascode.tekton.dev/max-keep-runs: "3"
+    build.appstudio.openshift.io/build-nudge-files: "build/operator-nudging.yaml"
+    pipelinesascode.tekton.dev/on-cel-expression: |
+      event == "push" 
+      && target_branch == "rhoai-2.23"
+      && ( !".tekton/**".pathChanged() || ".tekton/odh-dashboard-v2-23-push.yaml".pathChanged() )
+  creationTimestamp: null
+  labels:
+    appstudio.openshift.io/application: rhoai-v2-23
+    appstudio.openshift.io/component: odh-dashboard-v2-23
+    pipelines.appstudio.openshift.io/type: build
+  name: odh-dashboard-v2-23-on-push
+  namespace: rhoai-tenant
+spec:
+  timeouts:
+    pipeline: 8h
+  params:
+  - name: additional-build-secret
+    value: sealights-credentials
+  - name: git-url
+    value: '{{source_url}}'
+  - name: revision
+    value: '{{revision}}'
+  - name: additional-tags
+    value:
+    - '{{target_branch}}-{{revision}}'
+  - name: additional-labels
+    value:
+    - version=v2.23.0
+    - io.openshift.tags=odh-dashboard
+  - name: output-image
+    value: quay.io/rhoai/odh-dashboard-rhel9:{{target_branch}}
+  - name: build-platforms
+    value:
+    - linux/x86_64
+    - linux/ppc64le
+    - linux/s390x
+    - linux-m2xlarge/arm64
+  - name: dockerfile
+    value: Dockerfile.konflux
+  - name: path-context
+    value: .
+  - name: hermetic
+    value: true
+  - name: prefetch-input
+    value: |
+      [
+        {"type": "npm", "path": "."}, 
+        {"type": "npm", "path": "frontend"}, 
+        {"type": "npm", "path": "backend"}
+      ]
+  - name: build-image-index
+    value: true
+  - name: sealights-nodejs-exclude
+    value: ['examples/**/*.js,test/**/*.js']
+  - name: sealights-config
+    value:
+      build: "true"
+      build-platform: "linux/x86_64"
+      add-nodejs-instrumentation: "true"
+      dockerfile: "Dockerfile.konflux.sealights"
+      output-image: "quay.io/rhoai-sealights/odh-dashboard-rhel9:{{target_branch}}"
+      nodejs-version: "20"
+      component: "odh-dashboard"
+      branch: "{{ source_branch }}"
+      revision: "{{ revision }}"
+      repository-url: "https://github.com/red-hat-data-services/odh-dashboard"
+      test-event: "{{ event_type }}"
+      pull-request-number: "{{ pull_request_number }} "
+      target-branch: "{{ target_branch }}"
+      workspace-path: "."
+      is-frontend: "true"
+  pipelineRef:
+    resolver: git
+    params:
+    - name: url
+      value: https://github.com/red-hat-data-services/konflux-central.git
+    - name: revision
+      value: '{{ target_branch }}'
+    - name: pathInRepo
+      value: pipelines/multi-arch-container-build.yaml
+  taskRunTemplate:
+    serviceAccountName: build-pipeline-odh-dashboard-v2-23
+  workspaces:
+  - name: git-auth
+    secret:
+      secretName: '{{ git_auth_secret }}'
+status: {}
