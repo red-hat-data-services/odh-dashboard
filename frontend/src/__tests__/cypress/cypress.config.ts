@@ -73,8 +73,8 @@ export default defineConfig({
       : `cypress/tests/e2e/**/*.cy.ts`,
     experimentalInteractiveRunEvents: true,
     testIsolation: false,
-    async setupNodeEvents(on, config) {
-      await registerSealightsTasks(on, config);
+    setupNodeEvents(on, config) {
+      registerSealightsTasks(on, config);
       registerCypressGrep(config);
       cypressHighResolution(on, config);
       coverage(on, config);
