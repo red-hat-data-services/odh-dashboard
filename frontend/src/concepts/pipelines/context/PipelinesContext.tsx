@@ -15,14 +15,17 @@ import DeletePipelineServerModal from '#~/concepts/pipelines/content/DeletePipel
 import { ConfigurePipelinesServerModal } from '#~/concepts/pipelines/content/configurePipelinesServer/ConfigurePipelinesServerModal';
 import ViewPipelineServerModal from '#~/concepts/pipelines/content/ViewPipelineServerModal';
 import useSyncPreferredProject from '#~/concepts/projects/useSyncPreferredProject';
-import useManageElyraSecret from '#~/concepts/pipelines/context/useManageElyraSecret';
 import { conditionalArea, SupportedArea } from '#~/concepts/areas';
 import { DEV_MODE } from '#~/utilities/const';
 import { MetadataStoreServicePromiseClient } from '#~/third_party/mlmd';
 import { getGenericErrorCode } from '#~/api';
 import UnauthorizedError from '#~/pages/UnauthorizedError';
 import usePipelineAPIState, { PipelineAPIState } from './usePipelineAPIState';
-import usePipelineNamespaceCR, { dspaLoaded, hasServerTimedOut } from './usePipelineNamespaceCR';
+import usePipelineNamespaceCR, {
+  dspaLoaded,
+  hasServerTimedOut,
+  isDspaAllReady,
+} from './usePipelineNamespaceCR';
 import usePipelinesAPIRoute from './usePipelinesAPIRoute';
 import useRecurringRunRelatedInformation from './useRecurringRunRelatedInformation';
 
@@ -46,6 +49,7 @@ type PipelineContext = {
   apiState: PipelineAPIState;
   metadataStoreServiceClient: MetadataStoreServicePromiseClient;
   managedPipelines: DSPipelineManagedPipelinesKind | undefined;
+  isStarting?: boolean;
 };
 
 const PipelinesContext = React.createContext<PipelineContext>({
@@ -70,6 +74,7 @@ const PipelinesContext = React.createContext<PipelineContext>({
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   metadataStoreServiceClient: null as unknown as MetadataStoreServicePromiseClient,
   managedPipelines: undefined,
+  isStarting: false,
 });
 
 type PipelineContextProviderProps = {
@@ -88,6 +93,11 @@ export const PipelineContextProvider = conditionalArea<PipelineContextProviderPr
 
   const state = usePipelineNamespaceCR(namespace);
   const [pipelineNamespaceCR, crLoaded, crLoadError, refreshCR] = state;
+
+  const isResourceLoaded = crLoaded && !!pipelineNamespaceCR;
+  const isAllLoaded = isDspaAllReady(state);
+  const isStarting = isResourceLoaded && !isAllLoaded;
+
   const isCRReady = dspaLoaded(state);
   const [disableTimeout, setDisableTimeout] = React.useState(false);
   const serverTimedOut = !disableTimeout && hasServerTimedOut(state, isCRReady);
@@ -95,16 +105,14 @@ export const PipelineContextProvider = conditionalArea<PipelineContextProviderPr
     setDisableTimeout(true);
   }, []);
   const dspaName = pipelineNamespaceCR?.metadata.name;
-  const [pipelineAPIRouteHost, routeLoaded, routeLoadError, refreshRoute] = usePipelinesAPIRoute(
+  const [, routeLoaded, routeLoadError, refreshRoute] = usePipelinesAPIRoute(
     isCRReady,
     dspaName ?? '',
     namespace,
   );
 
-  const routeHost = routeLoaded && pipelineAPIRouteHost ? pipelineAPIRouteHost : null;
   const hostPath =
     routeLoaded && namespace && dspaName ? `/api/service/pipelines/${namespace}/${dspaName}` : null;
-  useManageElyraSecret(namespace, pipelineNamespaceCR, routeHost);
 
   const refreshState = React.useCallback(
     () => Promise.all([refreshCR(), refreshRoute()]).then(() => undefined),
@@ -159,6 +167,7 @@ export const PipelineContextProvider = conditionalArea<PipelineContextProviderPr
         getRecurringRunInformation,
         metadataStoreServiceClient,
         managedPipelines: pipelineNamespaceCR?.spec.apiServer?.managedPipelines,
+        isStarting,
       }}
     >
       {children}
@@ -178,6 +187,8 @@ type UsePipelinesAPI = PipelineAPIState & {
     timedOut: boolean;
     compatible: boolean;
     name: string;
+    crStatus: DSPipelineKind['status'];
+    isStarting: boolean | undefined;
   };
   /**
    * Allows agnostic functionality to request all watched API to be reacquired.
@@ -205,6 +216,8 @@ export const usePipelinesAPI = (): UsePipelinesAPI => {
     metadataStoreServiceClient,
     managedPipelines,
     refreshState,
+    crStatus,
+    isStarting,
   } = React.useContext(PipelinesContext);
 
   const pipelinesServer: UsePipelinesAPI['pipelinesServer'] = {
@@ -213,6 +226,8 @@ export const usePipelinesAPI = (): UsePipelinesAPI => {
     compatible: hasCompatibleVersion,
     timedOut: serverTimedOut,
     name: crName,
+    crStatus,
+    isStarting,
   };
 
   return {

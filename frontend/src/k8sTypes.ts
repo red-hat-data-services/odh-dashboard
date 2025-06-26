@@ -26,6 +26,7 @@ export enum KnownLabels {
   MODEL_SERVING_PROJECT = 'modelmesh-enabled',
   DATA_CONNECTION_AWS = 'opendatahub.io/managed',
   LABEL_SELECTOR_MODEL_REGISTRY = 'component=model-registry',
+  LABEL_SELECTOR_DATA_SCIENCE_PIPELINES = 'data-science-pipelines',
   PROJECT_SUBJECT = 'opendatahub.io/rb-project-subject',
   REGISTERED_MODEL_ID = 'modelregistry.opendatahub.io/registered-model-id',
   MODEL_VERSION_ID = 'modelregistry.opendatahub.io/model-version-id',
@@ -116,6 +117,7 @@ export type NotebookAnnotations = Partial<{
   'notebooks.opendatahub.io/last-image-version-git-commit-selection': string; // the build commit of the last image they selected
   'opendatahub.io/hardware-profile-namespace': string | null; // the namespace of the hardware profile used
   'opendatahub.io/workbench-image-namespace': string | null; // namespace of the
+  'opendatahub.io/accelerator-profile-namespace': string | undefined; // the namespace of the accelerator profile used
 }>;
 
 export type DashboardLabels = {
@@ -136,6 +138,15 @@ export type K8sCondition = {
   lastHeartbeatTime?: string;
 };
 
+// from: https://github.com/opendatahub-io/data-science-pipelines-operator/blob/9b518e02ee794d0afbe2b9ad35c85be10051ce6e/controllers/config/defaults.go#L127-L138
+export enum K8sDspaConditionReason {
+  MinimumReplicasAvailable = 'MinimumReplicasAvailable',
+  FailingToDeploy = 'FailingToDeploy',
+  ComponentDeploymentNotFound = 'ComponentDeploymentNotFound',
+  UnsupportedVersion = 'UnsupportedVersion',
+  Deploying = 'Deploying',
+}
+
 export type ServingRuntimeAnnotations = Partial<{
   'opendatahub.io/template-name': string;
   'opendatahub.io/template-display-name': string;
@@ -145,6 +156,7 @@ export type ServingRuntimeAnnotations = Partial<{
   'opendatahub.io/apiProtocol': string;
   'opendatahub.io/serving-runtime-scope': string;
   'opendatahub.io/hardware-profile-namespace': string | undefined;
+  'opendatahub.io/accelerator-profile-namespace': string | undefined;
   'enable-route': string;
   'enable-auth': string;
   'modelmesh-enabled': 'true' | 'false';
@@ -230,6 +242,8 @@ export type EventKind = K8sResourceCommon & {
   };
   involvedObject: {
     name: string;
+    uid?: string;
+    kind?: string;
   };
   lastTimestamp?: string;
   eventTime: string;
@@ -245,16 +259,21 @@ export type ImageStreamKind = K8sResourceCommon & {
   };
   spec: {
     tags?: ImageStreamSpecTagType[];
+    lookupPolicy?: {
+      local: boolean;
+    };
   };
   status?: {
     dockerImageRepository?: string;
     publicDockerImageRepository?: string;
-    tags?: {
-      tag: string;
-      items: ImageStreamStatusTagItem[] | null;
-      conditions?: ImageStreamStatusTagCondition[];
-    }[];
+    tags?: ImageStreamStatusTag[];
   };
+};
+
+export type ImageStreamStatusTag = {
+  tag: string;
+  items: ImageStreamStatusTagItem[] | null;
+  conditions?: ImageStreamStatusTagCondition[];
 };
 
 export type ImageStreamSpecTagType = {
@@ -1235,12 +1254,15 @@ export type DashboardCommonConfig = {
   disableFineTuning: boolean;
   disableLlamaStackChatBot: boolean;
   disableLMEval: boolean;
+  disableKueue: boolean;
 };
 
+// [1] Intentionally disjointed fields from the CRD in this type definition
+// but still present in the CRD until we upgrade the CRD version.
 export type DashboardConfigKind = K8sResourceCommon & {
   spec: {
     dashboardConfig: DashboardCommonConfig;
-    // Intentionally disjointed from the CRD, we should move away from this code-wise now; CRD later
+    // Intentionally disjointed from the CRD [1]
     // groupsConfig?: {
     notebookSizes?: NotebookSize[];
     modelServerSizes?: ModelServingSize[];
@@ -1248,7 +1270,8 @@ export type DashboardConfigKind = K8sResourceCommon & {
       enabled: boolean;
       pvcSize?: string;
       storageClassName?: string;
-      notebookNamespace?: string;
+      // Intentionally disjointed from the CRD [1]
+      // notebookNamespace?: string;
       notebookTolerationSettings?: TolerationSettings;
     };
     templateOrder?: string[];
@@ -1273,8 +1296,11 @@ export type AcceleratorProfileKind = K8sResourceCommon & {
   };
 };
 
-export type LMEvaluationKind = K8sResourceCommon & {
+export type LMEvalKind = K8sResourceCommon & {
   metadata: {
+    annotations?: Partial<{
+      'opendatahub.io/display-name': string;
+    }>;
     name: string;
     namespace: string;
   };
@@ -1284,7 +1310,7 @@ export type LMEvaluationKind = K8sResourceCommon & {
     batchSize?: string;
     logSamples?: boolean;
     model: string;
-    modelArgs?: string[];
+    modelArgs?: { name: string; value: string }[];
     timeout?: number;
     taskList: {
       taskNames: string[];
@@ -1298,6 +1324,13 @@ export type LMEvaluationKind = K8sResourceCommon & {
     reason?: string;
     results?: string;
     state?: string;
+    progressBars?: {
+      count: string;
+      elapsedTime: string;
+      message: string;
+      percent: string;
+      remainingTimeEstimate: string;
+    }[];
   };
 };
 
@@ -1419,6 +1452,9 @@ export type DataScienceClusterKindStatus = {
     /** Status of Model Registry, including its namespace configuration. */
     [DataScienceStackComponent.MODEL_REGISTRY]?: DataScienceClusterComponentStatus & {
       registriesNamespace?: string;
+    };
+    [DataScienceStackComponent.WORKBENCHES]?: DataScienceClusterComponentStatus & {
+      workbenchNamespace?: string;
     };
   };
   conditions: K8sCondition[];

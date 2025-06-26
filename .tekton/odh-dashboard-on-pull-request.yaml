@@ -72,7 +72,7 @@ spec:
       revision: "{{ revision }}"
       repository-url: "https://github.com/red-hat-data-services/odh-dashboard"
       test-event: "{{ event_type }}"
-      pull-request-number: "{{ pull_request_number }} "
+      pull-request-number: "{{ pull_request_number }}"
       target-branch: "{{ target_branch }}"
       workspace-path: "."
       is-frontend: "true"
