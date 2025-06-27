@@ -20,7 +20,6 @@ import '@cypress/code-coverage/support';
 import 'cypress-mochawesome-reporter/register';
 import 'cypress-plugin-steps';
 import './commands';
-import 'sealights-cypress-plugin/support';
 import { asProjectAdminUser } from '#~/__tests__/cypress/cypress/utils/mockUsers';
 import { mockDscStatus } from '#~/__mocks__/mockDscStatus';
 import { addCommands as webSocketsAddCommands } from './websockets';

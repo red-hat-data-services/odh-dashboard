@@ -19,7 +19,6 @@ import { extractHttpsUrlsWithLocation } from './cypress/utils/urlExtractor';
 import { validateHttpsUrls } from './cypress/utils/urlValidator';
 import { logToConsole, LogLevel } from './cypress/utils/logger';
 
-const { registerSealightsTasks } = require('sealights-cypress-plugin');
 const resultsDir = `${env.CY_RESULTS_DIR || 'results'}/${env.CY_MOCK ? 'mocked' : 'e2e'}`;
 
 export default defineConfig({
@@ -74,7 +73,6 @@ export default defineConfig({
     experimentalInteractiveRunEvents: true,
     testIsolation: false,
     setupNodeEvents(on, config) {
-      registerSealightsTasks(on, config);
       registerCypressGrep(config);
       cypressHighResolution(on, config);
       coverage(on, config);
