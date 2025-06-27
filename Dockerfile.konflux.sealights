@@ -58,7 +58,7 @@ RUN --mount=type=secret,id=sealights-credentials/token \
 WORKDIR /usr/src/app/frontend
 RUN --mount=type=secret,id=sealights-credentials/token \
     SEALIGHTS_TOKEN="$(cat /run/secrets/sealights-credentials/token)" && \
-    ./node_modules/.bin/slnodejs scan --token "${SEALIGHTS_TOKEN}" --buildsessionid "${SEALIGHTS_BSID}" --scm none --workspacepath "./public" --enrichByMethodRange --es6Modules --scmProvider github --scmBaseUrl https://github.com/red-hat-data-services/odh-dashboard/  --uniqueModuleId frontend --useModulePrefix 
+    ./node_modules/.bin/slnodejs scan --token "${SEALIGHTS_TOKEN}" --buildsessionid "${SEALIGHTS_BSID}" --scm none --workspacepath "./public" --enrichByMethodRange --useRelativeSlMapping --es6Modules --scmProvider github --scmBaseUrl https://github.com/red-hat-data-services/odh-dashboard/  --uniqueModuleId frontend --useModulePrefix 
 
 # Change back to app root for remaining commands
 WORKDIR /usr/src/app
