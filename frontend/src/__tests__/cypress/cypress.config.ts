@@ -1,6 +1,7 @@
 import * as path from 'path';
 import * as fs from 'fs';
 
+const { registerSealightsTasks } = require('sealights-cypress-plugin');
 // @ts-expect-error: Types are not available for this third-party library
 import registerCypressGrep from '@cypress/grep/src/plugin';
 import { defineConfig } from 'cypress';
@@ -72,7 +73,8 @@ export default defineConfig({
       : `cypress/tests/e2e/**/*.cy.ts`,
     experimentalInteractiveRunEvents: true,
     testIsolation: false,
-    setupNodeEvents(on, config) {
+    async setupNodeEvents(on, config) {
+      await registerSealightsTasks(on, config);
       registerCypressGrep(config);
       cypressHighResolution(on, config);
       coverage(on, config);

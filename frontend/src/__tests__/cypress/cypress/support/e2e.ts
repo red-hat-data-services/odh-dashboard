@@ -23,6 +23,7 @@ import './commands';
 import { asProjectAdminUser } from '#~/__tests__/cypress/cypress/utils/mockUsers';
 import { mockDscStatus } from '#~/__mocks__/mockDscStatus';
 import { addCommands as webSocketsAddCommands } from './websockets';
+import 'sealights-cypress-plugin/support';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const softAssert = require('soft-assert');
