@@ -22,8 +22,6 @@ spec:
   timeouts:
     pipeline: 8h
   params:
-  - name: additional-build-secret
-    value: sealights-credentials
   - name: git-url
     value: '{{source_url}}'
   - name: revision
@@ -58,25 +56,6 @@ spec:
       ]
   - name: build-image-index
     value: true
-  - name: sealights-nodejs-exclude
-    value: ['examples/**/*.js,test/**/*.js']
-  - name: sealights-config
-    value:
-      build: "true"
-      build-platform: "linux/x86_64"
-      add-nodejs-instrumentation: "true"
-      dockerfile: "Dockerfile.konflux.sealights"
-      output-image: "quay.io/rhoai-sealights/odh-dashboard-rhel9:{{target_branch}}"
-      nodejs-version: "20"
-      component: "odh-dashboard"
-      branch: "{{ source_branch }}"
-      revision: "{{ revision }}"
-      repository-url: "https://github.com/red-hat-data-services/odh-dashboard"
-      test-event: "{{ event_type }}"
-      pull-request-number: "{{ source_branch }}"
-      target-branch: "{{ target_branch }}"
-      workspace-path: "."
-      is-frontend: "true"
   pipelineRef:
     resolver: git
     params:
