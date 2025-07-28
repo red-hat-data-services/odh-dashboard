@@ -30,7 +30,7 @@ spec:
     - 'odh-dashboard-{{target_branch}}-{{revision}}'
   - name: additional-labels
     value:
-    - version=v2.22.0
+    - version=v2.22.1
     - io.openshift.tags=odh-dashboard
   - name: output-image
     value: quay.io/redhat-user-workloads/rhoai-tenant/pull-request-pipelines:odh-dashboard-{{revision}}
