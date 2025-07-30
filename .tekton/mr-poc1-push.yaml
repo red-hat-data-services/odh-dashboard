@@ -30,6 +30,8 @@ spec:
     value: Dockerfile
   - name: path-context
     value: frontend/packages/model-registry
+  - name: prefetch-input
+    value: '[{"path":".","type":"npm"},{"path":"frontend","type":"npm"},{"path":"backend","type":"npm"}]'
   pipelineSpec:
     description: |
       This pipeline is ideal for building container images from a Containerfile while maintaining trust after pipeline customization.
