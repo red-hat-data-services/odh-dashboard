@@ -27,9 +27,9 @@ spec:
   - name: output-image
     value: quay.io/redhat-user-workloads/rhoai-tenant/mr-poc1:{{revision}}
   - name: dockerfile
-    value: frontend/packages/model-registry/Dockerfile
+    value: Dockerfile
   - name: path-context
-    value: .
+    value: ./frontend/packages/model-registry
   - name: prefetch-input
     value: '[{"path":".","type":"npm"},{"path":"frontend","type":"npm"},{"path":"backend","type":"npm"}]'
   pipelineSpec:
