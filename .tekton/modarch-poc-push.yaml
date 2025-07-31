@@ -29,7 +29,7 @@ spec:
   - name: dockerfile
     value: Dockerfile
   - name: path-context
-    value: frontend/packages/model-registry
+    value: ./frontend/packages/model-registry
   - name: prefetch-input
     value: '[{"path":"frontend/packages/model-registry/upstream/frontend","type":"npm"},{"path":"frontend/packages/model-registry/upstream/bff","type":"gomod"}]'
   pipelineSpec:
