@@ -24,7 +24,7 @@ USER default
 
 # Install the dependencies and build
 RUN npm cache clean --force
-RUN npm ci --omit=optional
+RUN npm ci --omit=optional --ignore-scripts
 RUN npm run build:prod
 
 # BFF build stage
