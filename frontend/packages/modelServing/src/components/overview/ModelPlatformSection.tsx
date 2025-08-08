@@ -13,6 +13,8 @@ import CollapsibleSection from '@odh-dashboard/internal/concepts/design/Collapsi
 import { ProjectObjectType, SectionType } from '@odh-dashboard/internal/concepts/design/utils';
 import OverviewCard from '@odh-dashboard/internal/pages/projects/screens/detail/overview/components/OverviewCard';
 import { ProjectDetailsContext } from '@odh-dashboard/internal/pages/projects/ProjectDetailsContext';
+import ModelServingPlatformSelectErrorAlert from '@odh-dashboard/internal/concepts/modelServing/Platforms/ModelServingPlatformSelectErrorAlert';
+import { NavigateBackToRegistryButton } from '@odh-dashboard/internal/concepts/modelServing/NavigateBackToRegistryButton';
 import {
   useProjectServingPlatform,
   type ModelServingPlatform,
@@ -35,6 +37,7 @@ const ModelPlatformSection: React.FC<{ platforms: ModelServingPlatform[] }> = ({
     resetProjectPlatform,
     newProjectPlatformLoading,
     projectPlatformError,
+    clearProjectPlatformError,
   } = useProjectServingPlatform(currentProject, platforms);
 
   // If no platform is selected -
@@ -63,9 +66,10 @@ const ModelPlatformSection: React.FC<{ platforms: ModelServingPlatform[] }> = ({
           </FlexItem>
           {projectPlatformError && (
             <FlexItem>
-              <Alert isInline title="Error" variant="danger">
-                {projectPlatformError}
-              </Alert>
+              <ModelServingPlatformSelectErrorAlert
+                error={projectPlatformError}
+                clearError={clearProjectPlatformError}
+              />
             </FlexItem>
           )}
           <FlexItem>
@@ -107,15 +111,19 @@ const ModelPlatformSection: React.FC<{ platforms: ModelServingPlatform[] }> = ({
         <CardBody>
           <Stack hasGutter>
             {projectPlatformError && (
-              <Alert isInline title="Loading error" variant="danger">
-                {projectPlatformError}
-              </Alert>
+              <ModelServingPlatformSelectErrorAlert
+                error={projectPlatformError}
+                clearError={clearProjectPlatformError}
+              />
             )}
             <Content component="small">{startHintDescription}</Content>
           </Stack>
         </CardBody>
         <CardFooter>
-          <DeployButton project={currentProject} variant="link" />
+          <Flex gap={{ default: 'gapMd' }}>
+            <DeployButton project={currentProject} variant="link" />
+            <NavigateBackToRegistryButton isInline />
+          </Flex>
         </CardFooter>
       </OverviewCard>
     </CollapsibleSection>
