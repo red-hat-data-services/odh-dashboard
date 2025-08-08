@@ -1,6 +1,6 @@
 # Build arguments
 ARG SOURCE_CODE=.
-
+#test
 FROM registry.access.redhat.com/ubi9/nodejs-20@sha256:79c31cabc1e76d95cef83100d1be5c55851d504bef4bd7fa610e0bacb5a565d7 as builder
 
 ## Build args to be used at this step
