@@ -11,7 +11,7 @@ metadata:
       event == "push" 
       && target_branch == "rhoai-2.24"
       && ( !".tekton/**".pathChanged() || ".tekton/odh-dashboard-v2-24-push.yaml".pathChanged() )
-  # retry konflux build due to RHOAIENG-31914
+  # retry konflux build due to RHOAIENG-31914;
   creationTimestamp: null
   labels:
     appstudio.openshift.io/application: rhoai-v2-24
