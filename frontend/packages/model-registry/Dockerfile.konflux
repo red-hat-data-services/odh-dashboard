@@ -86,3 +86,13 @@ USER 65532:65532
 EXPOSE 8080
 
 ENTRYPOINT ["/bff"]
+
+LABEL com.redhat.component="odh-dashboard-container" \
+      name="rhoai/odh-mod-arch-model-registry-rhel9" \
+      description="odh-mod-arch-model-registry-rhel9" \
+      summary="odh-mod-arch-model-registry-rhel9" \
+      maintainer="['managed-open-data-hub@redhat.com']" \
+      io.openshift.expose-services="" \
+      io.k8s.display-name="odh-mod-arch-model-registry-rhel9" \
+      io.k8s.description="odh-mod-arch-model-registry-rhel9" \
+      com.redhat.license_terms="https://www.redhat.com/licenses/Red_Hat_Standard_EULA_20191108.pdf"
