@@ -87,7 +87,7 @@ EXPOSE 8080
 
 ENTRYPOINT ["/bff"]
 
-LABEL com.redhat.component="odh-dashboard-container" \
+LABEL com.redhat.component="odh-mod-arch-model-registry-rhel9" \
       name="rhoai/odh-mod-arch-model-registry-rhel9" \
       description="odh-mod-arch-model-registry-rhel9" \
       summary="odh-mod-arch-model-registry-rhel9" \
