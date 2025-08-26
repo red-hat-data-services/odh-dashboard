@@ -43,7 +43,7 @@ spec:
     - name: pathInRepo
       value: pipelines/container-build.yaml
   taskRunTemplate:
-    serviceAccountName: build-odh-mod-arch-model-registry-v2-25
+    serviceAccountName: build-pipeline-odh-mod-arch-model-registry-v2-25
   workspaces:
   - name: git-auth
     secret:
