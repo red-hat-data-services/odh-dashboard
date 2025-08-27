@@ -1,6 +1,5 @@
 apiVersion: tekton.dev/v1
 kind: PipelineRun
-#t1
 metadata:
   annotations:
     build.appstudio.openshift.io/repo: https://github.com/red-hat-data-services/odh-dashboard?rev={{revision}}
@@ -43,7 +42,7 @@ spec:
     - name: pathInRepo
       value: pipelines/container-build.yaml
   taskRunTemplate:
-    serviceAccountName: build-pipeline-odh-mod-arch-model-registry-v2-25
+    serviceAccountName: build-odh-mod-arch-model-registry-v2-25
   workspaces:
   - name: git-auth
     secret:
