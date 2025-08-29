@@ -4,8 +4,8 @@
 
 # Source code arguments - can be overridden for different modules
 ARG MODULE_NAME=model-registry
-ARG UI_SOURCE_CODE=packages/${MODULE_NAME}/upstream/frontend
-ARG BFF_SOURCE_CODE=packages/${MODULE_NAME}/upstream/bff
+ARG UI_SOURCE_CODE=./packages/${MODULE_NAME}/upstream/frontend
+ARG BFF_SOURCE_CODE=./packages/${MODULE_NAME}/upstream/bff
 
 # Set the base images for the build stages
 ARG NODE_BASE_IMAGE=registry.access.redhat.com/ubi9/nodejs-20:latest
@@ -26,7 +26,8 @@ WORKDIR /usr/src/workspace
 COPY --chown=default:root package.json package-lock.json* ./
 COPY --chown=default:root packages/plugin-core/ ./packages/plugin-core/
 COPY --chown=default:root packages/tsconfig/ ./packages/tsconfig/
-COPY --chown=default:root src/ ./src/
+#COPY --chown=default:root src/ ./src/
+COPY --chown=default:root ${UI_SOURCE_CODE}/src/ ./src/
 
 # Copy the specific module source code
 COPY --chown=default:root ${UI_SOURCE_CODE} ./${UI_SOURCE_CODE}
