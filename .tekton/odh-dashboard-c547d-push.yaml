@@ -28,6 +28,8 @@ spec:
     value: Dockerfile.konflux.modelregistry
   - name: path-context
     value: .
+  - name: prefetch-input
+    value: '[{"path":"frontend/packages/model-registry/upstream/frontend","type":"npm"},{"path":"frontend/packages/model-registry/upstream/bff","type":"gomod"}]'
   pipelineSpec:
     description: |
       This pipeline is ideal for building container images from a Containerfile while maintaining trust after pipeline customization.
@@ -63,7 +65,7 @@ spec:
       description: Skip checks against built image
       name: skip-checks
       type: string
-    - default: "false"
+    - default: "true"
       description: Execute the build with network isolation
       name: hermetic
       type: string
