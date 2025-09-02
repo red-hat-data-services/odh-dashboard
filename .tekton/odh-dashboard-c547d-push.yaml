@@ -30,6 +30,7 @@ spec:
     value: .
   - name: prefetch-input
     value: '[{"path":".","type":"npm"},{"path":"./frontend","type":"npm"},{"path":"packages/model-registry/upstream/frontend","type":"npm"},{"path":"packages/model-registry/upstream/bff","type":"gomod"}]'
+  pipelineSpec:
     description: |
       This pipeline is ideal for building container images from a Containerfile while maintaining trust after pipeline customization.
 
