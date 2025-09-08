@@ -32,6 +32,11 @@ spec:
     value: ./frontend/packages/model-registry
   - name: prefetch-input
     value: '[{"path":"frontend/packages/model-registry/upstream/frontend","type":"npm"},{"path":"frontend/packages/model-registry/upstream/bff","type":"gomod"}]'
+  - name: build-image-index
+    value: true
+  - name: build-platforms
+    value:
+    - linux/x86_64
   pipelineRef:
     resolver: git
     params:
@@ -40,7 +45,7 @@ spec:
     - name: revision
       value: '{{ target_branch }}'
     - name: pathInRepo
-      value: pipelines/container-build.yaml
+      value: pipelines/multi-arch-container-build.yaml
   taskRunTemplate:
     serviceAccountName: build-odh-mod-arch-model-registry-v2-25
   workspaces:
