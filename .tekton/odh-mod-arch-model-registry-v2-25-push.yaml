@@ -24,8 +24,15 @@ spec:
     value: '{{source_url}}'
   - name: revision
     value: '{{revision}}'
+  - name: additional-tags
+    value:
+    - '{{target_branch}}-{{revision}}'
+  - name: additional-labels
+    value:
+    - version=v2.25.0
+    - io.openshift.tags=odh-mod-arch-model-registry
   - name: output-image
-    value: quay.io/rhoai/odh-mod-arch-model-registry-rhel9:{{revision}}
+    value: quay.io/rhoai/odh-mod-arch-model-registry-rhel9:{{target_branch}}
   - name: dockerfile
     value: Dockerfile.konflux.modelregistry
   - name: path-context
