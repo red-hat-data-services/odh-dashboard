@@ -1,6 +1,10 @@
 import React from 'react';
 import ApplicationsPage from '@odh-dashboard/internal/pages/ApplicationsPage';
 import { Tab, Tabs, TabTitleText, TabContent, PageSection, Flex } from '@patternfly/react-core';
+import {
+  LineageCenterProvider,
+  useLineageCenter,
+} from '@odh-dashboard/internal/components/lineage/context/LineageCenterContext';
 import FeatureStoreProjectSelectorNavigator from './screens/components/FeatureStoreProjectSelectorNavigator';
 import FeatureStorePageTitle from './components/FeatureStorePageTitle';
 import FeatureStoreWarningAlert from './components/FeatureStoreWarningAlert';
@@ -20,8 +24,22 @@ type FeatureStoreProps = Omit<
   | 'removeChildrenTopPadding'
   | 'headerContent'
 >;
-const FeatureStore: React.FC<FeatureStoreProps> = ({ ...pageProps }) => {
+const FeatureStoreInner: React.FC<FeatureStoreProps> = ({ ...pageProps }) => {
   const [activeTabKey, setActiveTabKey] = React.useState<string | number>(FeatureStoreTabs.METRICS);
+  const { triggerCenter } = useLineageCenter();
+  const lineageTabRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    if (activeTabKey === FeatureStoreTabs.LINEAGE) {
+      triggerCenter();
+      requestAnimationFrame(() => {
+        lineageTabRef.current?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        });
+      });
+    }
+  }, [activeTabKey, triggerCenter]);
 
   return (
     <ApplicationsPage
@@ -52,8 +70,9 @@ const FeatureStore: React.FC<FeatureStoreProps> = ({ ...pageProps }) => {
     >
       <PageSection
         hasBodyWrapper={false}
-        style={{ height: '100%', minHeight: '600px' }}
+        style={{ height: '100%', minHeight: '600px', gap: 'unset' }}
         padding={{ default: 'noPadding' }}
+        isFilled={false}
       >
         <Tabs
           activeKey={activeTabKey}
@@ -63,6 +82,7 @@ const FeatureStore: React.FC<FeatureStoreProps> = ({ ...pageProps }) => {
           aria-label="Overview page"
           role="region"
           data-testid="feature-store-page"
+          isFilled={false}
         >
           <Tab
             eventKey={FeatureStoreTabs.METRICS}
@@ -76,7 +96,7 @@ const FeatureStore: React.FC<FeatureStoreProps> = ({ ...pageProps }) => {
               eventKey={FeatureStoreTabs.METRICS}
               activeKey={activeTabKey}
               hidden={FeatureStoreTabs.METRICS !== activeTabKey}
-              style={{ height: '100%' }}
+              style={{ height: '100%', marginTop: 'var(--pf-t--global--spacer--md)' }}
             >
               <Metrics />
             </TabContent>
@@ -90,6 +110,7 @@ const FeatureStore: React.FC<FeatureStoreProps> = ({ ...pageProps }) => {
           />
         </Tabs>
         <TabContent
+          ref={lineageTabRef}
           id={`tabContent-${FeatureStoreTabs.LINEAGE}`}
           eventKey={FeatureStoreTabs.LINEAGE}
           activeKey={activeTabKey}
@@ -100,6 +121,14 @@ const FeatureStore: React.FC<FeatureStoreProps> = ({ ...pageProps }) => {
         </TabContent>
       </PageSection>
     </ApplicationsPage>
+  );
+};
+
+const FeatureStore: React.FC<FeatureStoreProps> = (props) => {
+  return (
+    <LineageCenterProvider>
+      <FeatureStoreInner {...props} />
+    </LineageCenterProvider>
   );
 };
 
