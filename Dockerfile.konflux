@@ -57,7 +57,8 @@ WORKDIR /usr/src/app/backend
 CMD ["npm", "run", "start"]
 
 LABEL com.redhat.component="odh-dashboard-container" \
-      name="managed-open-data-hub/odh-dashboard-rhel8" \
+      name="rhoai/odh-dashboard-rhel9" \
+      cpe="cpe:/a:redhat:openshift_ai:2.23::el9" \
       description="odh-dashboard" \
       summary="odh-dashboard" \
       maintainer="['managed-open-data-hub@redhat.com']" \
