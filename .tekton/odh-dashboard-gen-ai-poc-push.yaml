@@ -29,7 +29,7 @@ spec:
     value:
     - linux/x86_64
   - name: dockerfile
-    value: Dockerfile.workspace
+    value: packages/gen-ai/Dockerfile.workspace
   - name: path-context
     value: .
   pipelineSpec:
