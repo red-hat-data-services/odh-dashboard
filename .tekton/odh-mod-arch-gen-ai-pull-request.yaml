@@ -4,17 +4,17 @@ metadata:
   annotations:
     build.appstudio.openshift.io/repo: https://github.com/red-hat-data-services/odh-dashboard?rev={{revision}}
     build.appstudio.redhat.com/commit_sha: '{{revision}}'
+    build.appstudio.redhat.com/pull_request_number: '{{pull_request_number}}'
     build.appstudio.redhat.com/target_branch: '{{target_branch}}'
-    pipelinesascode.tekton.dev/cancel-in-progress: "false"
+    pipelinesascode.tekton.dev/cancel-in-progress: "true"
+    pipelinesascode.tekton.dev/on-comment: "^/build-konflux"
+    pipelinesascode.tekton.dev/on-event: "[pull_request]"
     pipelinesascode.tekton.dev/max-keep-runs: "3"
-    pipelinesascode.tekton.dev/on-cel-expression: event == "push" && target_branch
-      == "rhoai-3.0"
-  creationTimestamp: null
   labels:
-    appstudio.openshift.io/application: rhoai-v3-0
-    appstudio.openshift.io/component: odh-mod-arch-gen-ai-v3-0
+    appstudio.openshift.io/application: automation
+    appstudio.openshift.io/component: pull-request-pipelines-odh-mod-arch-gen-ai
     pipelines.appstudio.openshift.io/type: build
-  name: odh-mod-arch-gen-ai-v3-0-on-push
+  name: odh-mod-arch-gen-ai-on-pull-request
   namespace: rhoai-tenant
 spec:
   params:
@@ -24,15 +24,15 @@ spec:
     value: '{{revision}}'
   - name: additional-tags
     value:
-    - '{{target_branch}}-{{revision}}'
+    - 'pr-{{pull_request_number}}-into-{{target_branch}}'
   - name: additional-labels
     value:
-    - version=v3.0
+    - version=on-pr-{{revision}}
     - io.openshift.tags=odh-mod-arch-gen-ai
   - name: output-image
-    value: quay.io/rhoai/odh-mod-arch-gen-ai-rhel9:{{target_branch}}
-  - name: build-image-index
-    value: true
+    value: quay.io/rhoai/pull-request-pipelines:odh-mod-arch-gen-ai-{{revision}}
+  - name: image-expires-after
+    value: 5d
   - name: build-platforms
     value:
     - linux/x86_64
@@ -41,11 +41,11 @@ spec:
     value: packages/gen-ai/Dockerfile.workspace
   - name: path-context
     value: .
+  - name: enable-slack-failure-notification
+    value: "false"
   - name: hermetic
     value: true
-  - name: prefetch-input
-    value: '[{"path":".","type":"npm"},{"path":"packages/gen-ai/frontend","type":"npm"},{"path":"packages/gen-ai/bff","type":"gomod"}]'
-    pipelineRef:
+  pipelineRef:
     resolver: git
     params:
     - name: url
@@ -55,7 +55,7 @@ spec:
     - name: pathInRepo
       value: pipelines/multi-arch-container-build.yaml
   taskRunTemplate:
-    serviceAccountName: build-pipeline-odh-mod-arch-gen-ai-v3-0
+    serviceAccountName: build-pipeline-pull-request-pipelines
   workspaces:
   - name: git-auth
     secret:
