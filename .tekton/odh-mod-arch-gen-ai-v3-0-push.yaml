@@ -10,7 +10,7 @@ metadata:
     pipelinesascode.tekton.dev/on-cel-expression: |
       event == "push"
       && target_branch == "rhoai-3.0"
-      && && ( "packages/gen-ai/***".pathChanged() || ".tekton/odh-dashboard-gen-ai-poc-push.yaml".pathChanged() )
+      && ( "packages/gen-ai/***".pathChanged() || ".tekton/odh-dashboard-gen-ai-poc-push.yaml".pathChanged() )
   labels:
     appstudio.openshift.io/application: rhoai-v3-0
     appstudio.openshift.io/component: odh-mod-arch-gen-ai-v3-0
