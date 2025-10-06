@@ -34,7 +34,7 @@ spec:
   - name: output-image
     value: quay.io/rhoai/odh-mod-arch-gen-ai-rhel9:{{target_branch}}
   - name: dockerfile
-    value: packages/gen-ai/Dockerfile.workspace
+    value: Dockerfile.konflux.genai
   - name: path-context
     value: .
   - name: hermetic
