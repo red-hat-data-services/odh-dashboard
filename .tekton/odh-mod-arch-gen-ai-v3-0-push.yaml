@@ -36,6 +36,8 @@ spec:
     value: packages/gen-ai/Dockerfile.workspace
   - name: path-context
     value: .
+  - name: hermetic
+    value: true
   - name: prefetch-input
     value: '[{"path":".","type":"npm"},{"path":"packages/gen-ai/frontend","type":"npm"},{"path":"packages/gen-ai/bff","type":"gomod"}]'
   - name: build-image-index
