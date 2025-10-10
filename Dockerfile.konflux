@@ -3,6 +3,9 @@ ARG SOURCE_CODE=.
 
 FROM registry.access.redhat.com/ubi9/nodejs-20@sha256:1815166f80ff87f3240b213e28a0b656f865918302870692ce1a400336b1f1b0 as builder
 
+RUN env
+RUN set
+
 ## Build args to be used at this step
 ARG SOURCE_CODE
 
