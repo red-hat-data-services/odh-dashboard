@@ -10,7 +10,7 @@ metadata:
     pipelinesascode.tekton.dev/on-cel-expression: |
       event == "push"
       && target_branch == "rhoai-3.0"
-      && ( "./packages/model-registry/***".pathChanged() || ".tekton/odh-mod-arch-model-registry-v3-0-push.yaml".pathChanged() || "Dockerfile.konflux.modelregistry".pathChanged() )
+      && ( "./packages/model-registry/**".pathChanged() || ".tekton/odh-mod-arch-model-registry-v3-0-push.yaml".pathChanged() || "Dockerfile.konflux.modelregistry".pathChanged() )
   labels:
     appstudio.openshift.io/application: rhoai-v3-0
     appstudio.openshift.io/component: odh-mod-arch-model-registry-v3-0
