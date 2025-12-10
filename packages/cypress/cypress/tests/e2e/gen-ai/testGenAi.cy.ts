@@ -30,7 +30,7 @@ import {
   createCleanHardwareProfile,
 } from '../../../utils/oc_commands/hardwareProfiles';
 
-describe('Verify Gen AI Namespace - Creation and Connection', () => {
+describe('[Product Bug: RHOAIENG-41634] Verify Gen AI Namespace - Creation and Connection', () => {
   let testData: GenAiTestData;
   let projectName: string;
   let skipTest = false;
@@ -126,7 +126,7 @@ describe('Verify Gen AI Namespace - Creation and Connection', () => {
   it(
     'Create custom serving runtime for Gen AI',
     {
-      tags: ['@Sanity', '@SanitySet1', '@GenAI', '@ServingRuntime'],
+      tags: ['@Sanity', '@SanitySet1', '@GenAI', '@ServingRuntime', '@Bug'],
     },
     () => {
       if (skipTest) {
@@ -175,7 +175,7 @@ describe('Verify Gen AI Namespace - Creation and Connection', () => {
   it(
     'Deploy Gen AI model using URI',
     {
-      tags: ['@Sanity', '@SanitySet1', '@GenAI', '@ModelServing', '@Deployment'],
+      tags: ['@Sanity', '@SanitySet1', '@GenAI', '@ModelServing', '@Deployment', '@Bug'],
     },
     () => {
       if (skipTest) {
@@ -228,10 +228,6 @@ describe('Verify Gen AI Namespace - Creation and Connection', () => {
       modelServingWizard.findGlobalScopedLabel().should('be.visible');
 
       modelServingWizard.findNextButton().click();
-
-      cy.step('Enable AI asset endpoint');
-      modelServingWizard.findSaveAiAssetCheckbox().click();
-
       modelServingWizard.findNextButton().click();
 
       cy.step('Wait for Review step to load');
@@ -253,7 +249,7 @@ describe('Verify Gen AI Namespace - Creation and Connection', () => {
   it(
     'Create and verify Gen AI Playground functionality',
     {
-      tags: ['@Sanity', '@SanitySet1', '@GenAI', '@Playground'],
+      tags: ['@Sanity', '@SanitySet1', '@GenAI', '@Playground', '@Bug'],
     },
     () => {
       if (skipTest) {
