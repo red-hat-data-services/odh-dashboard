@@ -533,13 +533,13 @@ describe('Model Training', () => {
 
       trainingJobDetailsDrawer.shouldBeOpen();
 
-      trainingJobDetailsDrawer.findTab('Training details').should('exist');
+      trainingJobDetailsDrawer.findTab('Training job details').should('exist');
       trainingJobDetailsDrawer.findTab('Resources').should('exist');
       trainingJobDetailsDrawer.findTab('Pods').should('exist');
       trainingJobDetailsDrawer.findTab('Logs').should('exist');
 
-      trainingJobDetailsDrawer.selectTab('Training details');
-      trainingJobDetailsDrawer.findActiveTabContent().should('contain', 'Progress');
+      trainingJobDetailsDrawer.selectTab('Training job details');
+      trainingJobDetailsDrawer.findActiveTabContent().should('contain', 'Job progress');
 
       trainingJobDetailsDrawer.selectTab('Resources');
       trainingJobDetailsDrawer.findActiveTabContent().should('contain', 'Node configurations');
@@ -608,7 +608,7 @@ describe('Model Training', () => {
       row.findNameLink().click();
 
       trainingJobDetailsDrawer.shouldBeOpen();
-      trainingJobDetailsDrawer.selectTab('Training details');
+      trainingJobDetailsDrawer.selectTab('Training job details');
 
       // Verify all sections are present
       trainingJobDetailsTab.findProgressSection().should('exist');
@@ -623,10 +623,10 @@ describe('Model Training', () => {
       row.findNameLink().click();
 
       trainingJobDetailsDrawer.shouldBeOpen();
-      trainingJobDetailsDrawer.selectTab('Training details');
+      trainingJobDetailsDrawer.selectTab('Training job details');
 
       // Check progress section
-      trainingJobDetailsTab.findProgressSection().should('contain', 'Progress');
+      trainingJobDetailsTab.findProgressSection().should('contain', 'Job progress');
       trainingJobDetailsTab.findEstimatedTimeRemainingValue().should('contain', '30 minutes');
       trainingJobDetailsTab.findStepsValue().should('contain', '3000 / 4690');
       trainingJobDetailsTab.findEpochsValue().should('contain', '3 / 5');
@@ -640,7 +640,7 @@ describe('Model Training', () => {
       row.findNameLink().click();
 
       trainingJobDetailsDrawer.shouldBeOpen();
-      trainingJobDetailsDrawer.selectTab('Training details');
+      trainingJobDetailsDrawer.selectTab('Training job details');
 
       // Check metrics section
       trainingJobDetailsTab.findMetricsSection().should('contain', 'Metrics');
@@ -719,7 +719,7 @@ describe('Model Training', () => {
       const firstRow = trainingJobTable.getTableRow('early-job');
       firstRow.findNameLink().click();
       trainingJobDetailsDrawer.shouldBeOpen();
-      trainingJobDetailsDrawer.selectTab('Training details');
+      trainingJobDetailsDrawer.selectTab('Training job details');
 
       trainingJobDetailsTab.findEstimatedTimeRemainingValue().should('contain', '1 hour');
       trainingJobDetailsTab.findStepsValue().should('contain', '100 / 1000');
@@ -1376,31 +1376,6 @@ describe('Model Training', () => {
       trainingJobStatusModal.findEventLogs().should('be.visible');
     });
 
-    it('should display pause button for running jobs', () => {
-      modelTrainingGlobal.visit(projectName);
-
-      const row = trainingJobTable.getTableRow('image-classification-job');
-      row.findStatus().click();
-
-      trainingJobStatusModal.shouldBeOpen();
-      // TODO: RHOAIENG-37578 - Retry and Pause/Resume button tests commented out
-      // trainingJobStatusModal.findPauseResumeButton().should('be.visible');
-      // trainingJobStatusModal.findPauseResumeButton().should('contain', 'Pause Job');
-    });
-
-    it('should display retry button for failed jobs', () => {
-      modelTrainingGlobal.visit(projectName);
-
-      const row = trainingJobTable.getTableRow('failed-training-job');
-      row.findStatus().click();
-
-      trainingJobStatusModal.shouldBeOpen();
-      // TODO: RHOAIENG-37578 - Retry and Pause/Resume button tests commented out
-      // trainingJobStatusModal.findRetryButton().should('be.visible');
-      // trainingJobStatusModal.findRetryButton().should('contain', 'Retry Job');
-      // trainingJobStatusModal.findPauseResumeButton().should('not.exist');
-    });
-
     it('should display delete button', () => {
       modelTrainingGlobal.visit(projectName);
 
@@ -1409,7 +1384,7 @@ describe('Model Training', () => {
 
       trainingJobStatusModal.shouldBeOpen();
       trainingJobStatusModal.findDeleteButton().should('be.visible');
-      trainingJobStatusModal.findDeleteButton().should('contain', 'Delete Job');
+      trainingJobStatusModal.findDeleteButton().should('contain', 'Delete job');
     });
 
     it('should open delete modal when clicking delete button', () => {
