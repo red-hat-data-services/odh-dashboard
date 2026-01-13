@@ -25,7 +25,7 @@ spec:
   - name: output-image
     value: quay.io/redhat-user-workloads/rhoai-tenant/mod-arch-maas-poc:{{revision}}
   - name: dockerfile
-    value: packages/gen-ai/Dockerfile.workspace
+    value: packages/maas/Dockerfile.workspace
   - name: path-context
     value: .
   pipelineSpec:
