@@ -60,3 +60,4 @@ spec:
     secret:
       secretName: '{{ git_auth_secret }}'
 status: {}
+# re-trigger
