@@ -1,6 +1,6 @@
 apiVersion: tekton.dev/v1
 kind: PipelineRun
-#test
+# retrigger Konflux builds via commit due to problem with reruns in Konflux UI/annotations: https://redhat-internal.slack.com/archives/C04PZ7H0VA8/p1768991407327089
 metadata:
   annotations:
     build.appstudio.openshift.io/repo: https://github.com/red-hat-data-services/odh-dashboard?rev={{revision}}
@@ -16,7 +16,7 @@ metadata:
     appstudio.openshift.io/application: rhoai-v3-3
     appstudio.openshift.io/component: odh-mod-arch-gen-ai-v3-3
     pipelines.appstudio.openshift.io/type: build
-  name: odh-mod-arch-gen-ai-v3-3-on-push 
+  name: odh-mod-arch-gen-ai-v3-3-on-push
   namespace: rhoai-tenant
 spec:
   params:
