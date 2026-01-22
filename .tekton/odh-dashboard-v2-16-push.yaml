@@ -11,7 +11,6 @@ metadata:
       event == "push" 
       && target_branch == "rhoai-2.16"
       && ( !".tekton/**".pathChanged() || ".tekton/odh-dashboard-v2-16-push.yaml".pathChanged() )
-  creationTimestamp:
   labels:
     appstudio.openshift.io/application: rhoai-v2-16
     appstudio.openshift.io/component: odh-dashboard-v2-16
@@ -29,10 +28,6 @@ spec:
   - name: additional-tags
     value:
     - '{{target_branch}}-{{revision}}'
-  - name: additional-labels
-    value:
-    - version=v2.16.4
-    - io.openshift.tags=odh-dashboard
   - name: output-image
     value: quay.io/rhoai/odh-dashboard-rhel8:{{target_branch}}
   - name: dockerfile
@@ -52,6 +47,8 @@ spec:
     value: "true"
   - name: build-image-index
     value: "false"
+  - name: rhoai-version
+    value: "2.16.4"
   pipelineRef:
     resolver: git
     params:
