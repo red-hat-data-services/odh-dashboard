@@ -12,7 +12,6 @@ metadata:
       == "rhoai-2.25" && ( "./packages/model-registry/***".pathChanged()
       || ".tekton/odh-mod-arch-model-registry-v2-25-push.yaml".pathChanged() || "Dockerfile.konflux.modelregistry".pathChanged()
       )
-  creationTimestamp: null
   labels:
     appstudio.openshift.io/application: rhoai-v2-25
     appstudio.openshift.io/component: odh-mod-arch-model-registry-v2-25
@@ -28,10 +27,8 @@ spec:
   - name: additional-tags
     value:
     - '{{target_branch}}-{{revision}}'
-  - name: additional-labels
-    value:
-    - version=v2.25.2
-    - io.openshift.tags=odh-mod-arch-model-registry
+  - name: rhoai-version
+    value: "2.25.2"
   - name: output-image
     value: quay.io/rhoai/odh-mod-arch-model-registry-rhel9:{{target_branch}}
   - name: dockerfile
