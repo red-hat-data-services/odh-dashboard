@@ -12,7 +12,7 @@ metadata:
     pipelinesascode.tekton.dev/on-cel-expression: |
       event == "push"
       && target_branch == "rhoai-3.4-ea.1"
-      && ( !".tekton/**".pathChanged() || ".tekton/odh-dashboard-v3-4-push.yaml".pathChanged() )
+      && ( !".tekton/**".pathChanged() || ".tekton/odh-mod-arch-maas-v3-4-ea-1-push.yaml".pathChanged() )
   labels:
     appstudio.openshift.io/application: rhoai-v3-4-ea-1
     appstudio.openshift.io/component: odh-mod-arch-maas-v3-4-ea-1
