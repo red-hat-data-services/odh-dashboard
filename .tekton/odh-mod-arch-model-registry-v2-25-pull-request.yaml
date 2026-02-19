@@ -51,6 +51,8 @@ spec:
     value: '[{"path":".","type":"npm"},{"path":"packages/model-registry/upstream/frontend","type":"npm"},{"path":"packages/model-registry/upstream/bff","type":"gomod"}]'
   - name: build-image-index
     value: true
+  - name: rhoai-version
+    value: "2.25.0"
   pipelineRef:
     resolver: git
     params:
