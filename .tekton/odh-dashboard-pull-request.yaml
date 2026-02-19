@@ -50,14 +50,14 @@ spec:
   - name: prefetch-input
     value: |
       [
-        {"type": "npm", "path": "."}, 
-        {"type": "npm", "path": "frontend"}, 
-        {"type": "npm", "path": "backend"}
+        {"type": "npm", "path": "."}
       ]
   - name: build-image-index
     value: true
   - name: enable-slack-failure-notification
     value: "false"
+  - name: rhoai-version
+    value: "2.25.0"
   pipelineRef:
     resolver: git
     params:
