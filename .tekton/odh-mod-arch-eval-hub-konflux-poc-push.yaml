@@ -28,6 +28,13 @@ spec:
     value: packages/eval-hub/Dockerfile.workspace
   - name: path-context
     value: .
+  - name: build-source-image
+    value: true
+  - name: hermetic
+    value: true
+  - name: prefetch-input
+    value: '[{"path":".","type":"npm"},{"path":"packages/eval-hub/frontend","type":"npm"},{"path":"packages/eval-hub/bff","type":"gomod"}]'
+  
   pipelineSpec:
     description: |
       This pipeline is ideal for building container images from a Containerfile while maintaining trust after pipeline customization.
