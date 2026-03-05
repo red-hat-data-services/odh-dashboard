@@ -1,7 +1,7 @@
 # Build arguments
 ARG SOURCE_CODE=.
 
-FROM registry.access.redhat.com/ubi9/nodejs-22@sha256:04e9f3020875f3f6e99b9a96fe55e35e1b5c38974a1765a19153102a90abf967 as builder
+FROM registry.access.redhat.com/ubi9/nodejs-22@sha256:c22b81d0f1882facb78a992cf75ff673ac2ec273248b652bed2a812c3e5ecc6b as builder
 
 ## Build args to be used at this step
 ARG SOURCE_CODE
@@ -41,7 +41,7 @@ RUN npm prune --omit=dev
 # These Go binaries are NOT needed at runtime and are NOT FIPS compliant
 RUN rm -rf node_modules/esbuild node_modules/@esbuild node_modules/.bin/esbuild
 
-FROM registry.access.redhat.com/ubi9/nodejs-22@sha256:04e9f3020875f3f6e99b9a96fe55e35e1b5c38974a1765a19153102a90abf967 as runtime
+FROM registry.access.redhat.com/ubi9/nodejs-22@sha256:c22b81d0f1882facb78a992cf75ff673ac2ec273248b652bed2a812c3e5ecc6b as runtime
 
 WORKDIR /usr/src/app
 
