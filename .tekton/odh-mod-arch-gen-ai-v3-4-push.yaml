@@ -1,22 +1,24 @@
 apiVersion: tekton.dev/v1
 kind: PipelineRun
-#test
 metadata:
   annotations:
     build.appstudio.openshift.io/repo: https://github.com/red-hat-data-services/odh-dashboard?rev={{revision}}
     build.appstudio.redhat.com/commit_sha: '{{revision}}'
     build.appstudio.redhat.com/target_branch: '{{target_branch}}'
+    pipelinesascode.tekton.dev/cancel-in-progress: "false"
     pipelinesascode.tekton.dev/max-keep-runs: "3"
     build.appstudio.openshift.io/build-nudge-files: "build/operator-nudging.yaml"
     pipelinesascode.tekton.dev/on-cel-expression: |
       event == "push"
       && target_branch == "rhoai-3.4"
-      && ( "packages/gen-ai/**".pathChanged() || ".tekton/odh-mod-arch-gen-ai-v3-4-push.yaml".pathChanged() )
+      && ( "packages/gen-ai/**".pathChanged() 
+      || ".tekton/odh-mod-arch-gen-ai-v3-4-push.yaml".pathChanged() 
+      || "Dockerfile.konflux.gen-ai".pathChanged() )
   labels:
     appstudio.openshift.io/application: rhoai-v3-4
     appstudio.openshift.io/component: odh-mod-arch-gen-ai-v3-4
     pipelines.appstudio.openshift.io/type: build
-  name: odh-mod-arch-gen-ai-v3-4-on-push 
+  name: odh-mod-arch-gen-ai-v3-4-on-push
   namespace: rhoai-tenant
 spec:
   timeouts:
@@ -41,7 +43,21 @@ spec:
   - name: hermetic
     value: true
   - name: prefetch-input
-    value: '[{"path":".","type":"npm"},{"path":"packages/gen-ai/frontend","type":"npm"},{"path":"packages/gen-ai/bff","type":"gomod"}]'
+    value: |
+      [
+        {
+          "path": ".",
+          "type": "npm"
+        },
+        {
+          "path": "packages/gen-ai/frontend",
+          "type": "npm"
+        },
+        {
+          "path": "packages/gen-ai/bff",
+          "type": "gomod"
+        }
+      ]
   - name: build-source-image
     value: true
   - name: build-image-index

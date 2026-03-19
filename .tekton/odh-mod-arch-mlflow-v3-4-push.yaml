@@ -14,7 +14,7 @@ metadata:
       && ( "packages/mlflow/**".pathChanged() || ".tekton/odh-mod-arch-mlflow-v3-4-push.yaml".pathChanged() )
   labels:
     appstudio.openshift.io/application: rhoai-v3-4
-    appstudio.openshift.io/component: odh-mod-arch-mlflow-v3-4
+    appstudio.openshift.io/component: odh-mod-arch-mlflow-v3-4 
     pipelines.appstudio.openshift.io/type: build
   name: odh-mod-arch-mlflow-v3-4-on-push 
   namespace: rhoai-tenant

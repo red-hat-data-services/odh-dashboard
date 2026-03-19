@@ -11,16 +11,17 @@ metadata:
     pipelinesascode.tekton.dev/on-cel-expression: |
       event == "push"
       && target_branch == "rhoai-3.4"
-      && ( !".tekton/**".pathChanged() || ".tekton/odh-dashboard-v3-4-push.yaml".pathChanged() )
+      && ( "packages/eval-hub/**".pathChanged() || ".tekton/odh-mod-arch-eval-hub-v3-4-push.yaml".pathChanged() || "Dockerfile.konflux.eval-hub".pathChanged() )
   labels:
     appstudio.openshift.io/application: rhoai-v3-4
-    appstudio.openshift.io/component: odh-dashboard-v3-4
+    appstudio.openshift.io/component: odh-mod-arch-eval-hub-v3-4
     pipelines.appstudio.openshift.io/type: build
-  name: odh-dashboard-v3-4-on-push
+  name: odh-mod-arch-eval-hub-v3-4-on-push
   namespace: rhoai-tenant
 spec:
   timeouts:
-    pipeline: 8h
+    tasks: 2h
+    pipeline: 4h
   params:
   - name: git-url
     value: '{{source_url}}'
@@ -30,11 +31,11 @@ spec:
     value:
     - '{{target_branch}}-{{revision}}'
   - name: output-image
-    value: quay.io/rhoai/odh-dashboard-rhel9:{{target_branch}}
+    value: quay.io/rhoai/odh-mod-arch-eval-hub-rhel9:{{target_branch}}
   - name: rhoai-version
     value: "3.4.0"
   - name: dockerfile
-    value: Dockerfile.konflux
+    value: Dockerfile.konflux.eval-hub
   - name: path-context
     value: .
   - name: hermetic
@@ -43,8 +44,16 @@ spec:
     value: |
       [
         {
-          "type": "npm",
-          "path": "."
+          "path": ".",
+          "type": "npm"
+        },
+        {
+          "path": "packages/eval-hub/frontend",
+          "type": "npm"
+        },
+        {
+          "path": "packages/eval-hub/bff",
+          "type": "gomod"
         }
       ]
   - name: build-source-image
@@ -54,9 +63,9 @@ spec:
   - name: build-platforms
     value:
     - linux/x86_64
+    - linux-m2xlarge/arm64
     - linux/ppc64le
     - linux/s390x
-    - linux-m2xlarge/arm64
   pipelineRef:
     resolver: git
     params:
@@ -67,7 +76,7 @@ spec:
     - name: pathInRepo
       value: pipelines/multi-arch-container-build.yaml
   taskRunTemplate:
-    serviceAccountName: build-pipeline-odh-dashboard-v3-4
+    serviceAccountName: build-pipeline-odh-mod-arch-eval-hub-v3-4
   workspaces:
   - name: git-auth
     secret:
