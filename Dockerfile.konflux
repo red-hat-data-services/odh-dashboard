@@ -1,7 +1,7 @@
 # Build arguments
 ARG SOURCE_CODE=.
 
-FROM registry.access.redhat.com/ubi9/nodejs-22@sha256:7b6c9b51d5ce751f8aa22c403ac132be068f8a131f53d547d097158420fb4032 as builder
+FROM registry.access.redhat.com/ubi9/nodejs-22@sha256:d4a687c72950936d298c98d37bd1be962449af336ebd6c8aa00b94971e6894c0 as builder
 
 ## Build args to be used at this step
 ARG SOURCE_CODE
@@ -44,7 +44,7 @@ RUN node scripts/prepare-production-manifest.js \
 # These Go binaries are NOT needed at runtime and are NOT FIPS compliant
 RUN rm -rf node_modules/esbuild node_modules/@esbuild node_modules/.bin/esbuild
 
-FROM registry.access.redhat.com/ubi9/nodejs-22@sha256:7b6c9b51d5ce751f8aa22c403ac132be068f8a131f53d547d097158420fb4032 as runtime
+FROM registry.access.redhat.com/ubi9/nodejs-22@sha256:d4a687c72950936d298c98d37bd1be962449af336ebd6c8aa00b94971e6894c0 as runtime
 
 WORKDIR /usr/src/app
 
