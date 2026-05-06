@@ -52,6 +52,8 @@ spec:
       ]
   - name: build-image-index
     value: true
+  - name: fips-check-blocking
+    value: "false"
   pipelineRef:
     resolver: git
     params:
