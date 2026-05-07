@@ -29,6 +29,8 @@ spec:
     value:
     - version=on-pr-{{revision}}
     - io.openshift.tags=odh-mod-arch-model-registry
+  - name: rhoai-version
+    value: "3.3.3"
   - name: output-image
     value: quay.io/rhoai/pull-request-pipelines:odh-mod-arch-model-registry-{{revision}}
   - name: dockerfile
