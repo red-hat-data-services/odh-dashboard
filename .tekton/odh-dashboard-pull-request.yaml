@@ -8,7 +8,7 @@ metadata:
     build.appstudio.redhat.com/pull_request_number: "{{pull_request_number}}"
     pipelinesascode.tekton.dev/max-keep-runs: "3"
     pipelinesascode.tekton.dev/on-comment: "^/build-konflux"
-    pipelinesascode.tekton.dev/on-event: "[pull_request]"
+    pipelinesascode.tekton.dev/on-target-branch: "[rhoai-3.3]"
     pipelinesascode.tekton.dev/cancel-in-progress: "true"
   labels:
     appstudio.openshift.io/application: automation
@@ -31,6 +31,8 @@ spec:
     value:
     - version=on-pr-{{revision}}
     - io.openshift.tags=odh-dashboard
+  - name: rhoai-version
+    value: "3.3.3"
   - name: output-image
     value: quay.io/rhoai/pull-request-pipelines:odh-dashboard-{{revision}}
   - name: build-platforms
@@ -54,6 +56,8 @@ spec:
       ]
   - name: build-image-index
     value: true
+  - name: fips-check-blocking
+    value: "false"
   - name: enable-slack-failure-notification
     value: "false"
   pipelineRef:
