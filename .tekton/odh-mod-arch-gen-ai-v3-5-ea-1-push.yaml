@@ -14,7 +14,7 @@ metadata:
       && target_branch == "rhoai-3.5-ea.1"
       && ( "packages/gen-ai/**".pathChanged() 
       || ".tekton/odh-mod-arch-gen-ai-v3-5-ea-1-push.yaml".pathChanged() 
-      || "Dockerfile.konflux.gen-ai".pathChanged() )
+      || "Dockerfile.konflux.genai".pathChanged() )
   labels:
     appstudio.openshift.io/application: rhoai-v3-5-ea-1
     appstudio.openshift.io/component: odh-mod-arch-gen-ai-v3-5-ea-1
