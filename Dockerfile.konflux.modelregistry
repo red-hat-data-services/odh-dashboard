@@ -10,7 +10,7 @@ ARG BFF_SOURCE_CODE=./packages/${MODULE_NAME}/upstream/bff
 # Set the base images for the build stages
 ARG NODE_BASE_IMAGE=registry.access.redhat.com/ubi9/nodejs-20@sha256:74cc7b1d13592b1e425074f434b90e470ab209da85fd1fdb8e6e9e4cabaec51a
 ARG GOLANG_BASE_IMAGE=registry.access.redhat.com/ubi9/go-toolset:1.25@sha256:90a36bc2013b3fcb28e2a4b082c9b895d7c2c679e58b95aed9721970f3339d0e
-ARG DISTROLESS_BASE_IMAGE=registry.access.redhat.com/ubi9-minimal@sha256:457cb288730d29e2a59823b3b56341466fa94f3158e399c5ab2c4409fee0c562
+ARG DISTROLESS_BASE_IMAGE=registry.access.redhat.com/ubi9-minimal@sha256:d1578df342655d728de7c0850a2bea216193143486891362bf3e7793feedf6a8
 
 # UI build stage
 FROM ${NODE_BASE_IMAGE} AS ui-builder
