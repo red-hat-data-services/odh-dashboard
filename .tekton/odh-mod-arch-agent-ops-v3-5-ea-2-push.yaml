@@ -11,7 +11,9 @@ metadata:
     pipelinesascode.tekton.dev/on-cel-expression: |
       event == "push"
       && target_branch == "rhoai-3.5-ea.2"
-      && ( files.all.exists(p, !p.matches('^\\.tekton/')) || ".tekton/odh-mod-arch-agent-ops-v3-5-ea-2-push.yaml".pathChanged() )
+      && ( "packages/agent-ops/**".pathChanged()
+      || ".tekton/odh-mod-arch-agent-ops-v3-5-ea-2-push.yaml".pathChanged()
+      || "Dockerfile.konflux.agent-ops".pathChanged() )
   labels:
     appstudio.openshift.io/application: rhoai-v3-5-ea-2
     appstudio.openshift.io/component: odh-mod-arch-agent-ops-v3-5-ea-2
@@ -19,6 +21,9 @@ metadata:
   name: odh-mod-arch-agent-ops-v3-5-ea-2-on-push
   namespace: rhoai-tenant
 spec:
+  timeouts:
+    tasks: 2h
+    pipeline: 4h
   params:
   - name: git-url
     value: '{{source_url}}'
@@ -39,7 +44,7 @@ spec:
     value: true
   - name: prefetch-input
     value: |
-      [{"type": "npm", "path": "."}]
+      [{"type": "npm", "path": "."}, {"type": "npm", "path": "packages/agent-ops/frontend"}]
   - name: build-source-image
     value: true
   - name: build-image-index
