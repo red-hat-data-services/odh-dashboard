@@ -44,7 +44,20 @@ spec:
     value: true
   - name: prefetch-input
     value: |
-      [{"type": "npm", "path": "."}, {"type": "npm", "path": "packages/agent-ops/frontend"}]
+      [
+        {
+          "path": ".",
+          "type": "npm"
+        },
+        {
+          "path": "packages/agent-ops/frontend",
+          "type": "npm"
+        },
+        {
+          "path": "packages/agent-ops/bff",
+          "type": "gomod"
+        }
+      ]
   - name: build-source-image
     value: true
   - name: build-image-index
