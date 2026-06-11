@@ -173,6 +173,10 @@ class MySubscriptionsPage {
   findCreateApiKeyButton(): Cypress.Chainable<JQuery<HTMLElement>> {
     return cy.findByTestId('create-api-key-button');
   }
+
+  findColumnSortButton(columnLabel: string): Cypress.Chainable<JQuery<HTMLElement>> {
+    return this.findApiKeysTable().find('thead').contains('th', columnLabel).findByRole('button');
+  }
 }
 
 class APIKeyTableRow extends TableRow {
@@ -317,6 +321,20 @@ class CreateApiKeyModal extends Modal {
 
   findSubscriptionModelsTable(): Cypress.Chainable<JQuery<HTMLElement>> {
     return this.find().findByTestId('subscription-models-table');
+  }
+
+  findSubscriptionModelDisplayName(modelName: string): Cypress.Chainable<JQuery<HTMLElement>> {
+    return this.find()
+      .findByTestId('subscription-models-table')
+      .contains('tr', modelName)
+      .findByTestId('table-row-title');
+  }
+
+  findSubscriptionModelDescription(modelName: string): Cypress.Chainable<JQuery<HTMLElement>> {
+    return this.find()
+      .findByTestId('subscription-models-table')
+      .contains('tr', modelName)
+      .findByTestId('table-row-title-description');
   }
 
   findSubscriptionModelRateLimit(modelName: string): Cypress.Chainable<JQuery<HTMLElement>> {
