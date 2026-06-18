@@ -14,14 +14,6 @@ RUN CGO_ENABLED=1 GOOS=linux go build -a -ldflags="-s -w" -tags strictfipsruntim
 
 FROM registry.access.redhat.com/ubi9/ubi-minimal@sha256:1bc3c5c15720506a0cf48adfdf8b623dfe704377e007d7bbae8d14876392ca6a
 
-LABEL com.redhat.component="odh-dashboard-operator-container" \
-      name="managed-open-data-hub/odh-dashboard-operator-rhel9" \
-      summary="ODH Dashboard Operator" \
-      description="Dashboard Module Controller for Red Hat OpenShift AI" \
-      io.k8s.display-name="ODH Dashboard Operator" \
-      io.k8s.description="Dashboard Module Controller for Red Hat OpenShift AI" \
-      io.openshift.tags="rhods,rhoai,odh,dashboard-operator"
-
 WORKDIR /
 
 COPY --from=builder /tmp/manager .
@@ -31,3 +23,13 @@ RUN chmod -R g+w /opt/manifests/dashboard/
 USER 65532:65532
 
 ENTRYPOINT ["/manager"]
+
+LABEL com.redhat.component="odh-dashboard-operator-container" \
+      name="managed-open-data-hub/odh-dashboard-operator-rhel9" \
+      description="odh-dashboard-operator" \
+      summary="odh-dashboard-operator" \
+      maintainer="['managed-open-data-hub@redhat.com']" \
+      io.openshift.expose-services="" \
+      io.k8s.display-name="odh-dashboard-operator" \
+      io.k8s.description="odh-dashboard-operator" \
+      com.redhat.license_terms="https://www.redhat.com/licenses/Red_Hat_Standard_EULA_20191108.pdf"
