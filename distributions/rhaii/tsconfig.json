@@ -3,18 +3,8 @@
   "compilerOptions": {
     "rootDir": "..",
     "baseUrl": "./src",
-    "outDir": "./dist",
-    "rootDirs": [
-      "./src",
-      "../base/types"
-    ] /* overlays base/types/ onto src/ for virtual module type declarations */
+    "outDir": "./dist"
   },
-  "include": [
-    "src/**/*.ts",
-    "src/**/*.tsx",
-    "../base/src/**/*.ts",
-    "../base/src/**/*.tsx",
-    "../base/types/**/*.d.ts"
-  ],
+  "include": ["src/**/*.ts", "src/**/*.tsx", "../base/src/**/*.ts", "../base/src/**/*.tsx"],
   "exclude": ["node_modules", "dist", "public"]
 }

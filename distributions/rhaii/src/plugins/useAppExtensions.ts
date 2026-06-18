@@ -6,7 +6,12 @@ import type {
   MastheadToolbarItemExtension,
 } from '@odh-dashboard/plugin-core/extension-points';
 
-const extensions: Extension[] = [
+/**
+ * Temporary scaffold extensions for demo purposes.
+ * These will be replaced with real odh-dashboard extensions (e.g. model-serving)
+ * once they are decoupled and ready to integrate into RHAII.
+ */
+const scaffoldExtensions: Extension[] = [
   {
     type: 'app.navigation/section',
     properties: {
@@ -27,24 +32,33 @@ const extensions: Extension[] = [
     type: 'app.route',
     properties: {
       path: '/scaffold',
-      component: () => import('./ScaffoldPage'),
+      component: () => import('../ScaffoldPage'),
     },
   } satisfies RouteExtension,
   {
     type: 'app.route',
     properties: {
       path: '/',
-      component: () => import('./RedirectToScaffold'),
+      component: () => import('../RedirectToScaffold'),
     },
   } satisfies RouteExtension,
   {
     type: 'app.masthead/toolbar-item',
     properties: {
       id: 'auth-placeholder',
-      component: () => import('./components/AuthPlaceholder'),
+      component: () => import('../components/AuthPlaceholder'),
       position: 'trailing',
     },
   } satisfies MastheadToolbarItemExtension,
 ];
 
-export default extensions;
+const pluginExtensions: Record<string, Extension[]> = {
+  scaffold: scaffoldExtensions,
+};
+
+// Sync stub — returns loaded: true immediately. Replace with async fetching
+// (useState/useEffect) when real plugin discovery lands.
+export const useAppExtensions = (): [Record<string, Extension[]>, boolean] => [
+  pluginExtensions,
+  true,
+];
