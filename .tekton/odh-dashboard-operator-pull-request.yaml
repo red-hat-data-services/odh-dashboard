@@ -34,7 +34,7 @@ spec:
     value: "false"
   - name: prefetch-input
     value: |
-      [{"type": "npm", "path": "."}]
+      [{"type": "npm", "path": "."} , {"type": "gomod", "path": "dashboard-operator"}]
   - name: build-platforms
     value:
     - linux/x86_64
