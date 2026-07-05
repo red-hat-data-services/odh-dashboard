@@ -1,4 +1,4 @@
-const GEN_AI_DEV_FLAG = 'devFeatureFlags=genAiStudio=true';
+const GEN_AI_DEV_FLAG = 'devFeatureFlags=genAiStudio=true,modelAsService=false';
 
 class GenAiPlayground {
   navigate(projectName: string) {
