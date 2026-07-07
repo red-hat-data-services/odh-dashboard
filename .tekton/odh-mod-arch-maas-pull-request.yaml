@@ -7,14 +7,16 @@ metadata:
     build.appstudio.redhat.com/target_branch: '{{target_branch}}'
     build.appstudio.redhat.com/pull_request_number: "{{pull_request_number}}"
     pipelinesascode.tekton.dev/max-keep-runs: "3"
-    pipelinesascode.tekton.dev/on-comment: "^/build-konflux$|^/build-konflux-odh-dashboard"
-    pipelinesascode.tekton.dev/on-target-branch: "[rhoai-3.3]"
+    pipelinesascode.tekton.dev/on-comment: "^/build-konflux$|^/build-konflux-maas"
+    pipelinesascode.tekton.dev/on-label: "[kfbuild-all, kfbuild-maas]"
+    pipelinesascode.tekton.dev/on-target-branch: "[{{target_branch}}]"
+    pipelinesascode.tekton.dev/on-event: "[pull_request]"
     pipelinesascode.tekton.dev/cancel-in-progress: "true"
   labels:
     appstudio.openshift.io/application: automation
-    appstudio.openshift.io/component: pull-request-pipelines-odh-dashboard
+    appstudio.openshift.io/component: pull-request-pipelines-odh-mod-arch-maas
     pipelines.appstudio.openshift.io/type: build
-  name: odh-dashboard-on-pull-request
+  name: odh-mod-arch-maas-on-pull-request-83741
   namespace: rhoai-tenant
 spec:
   timeouts:
@@ -30,34 +32,27 @@ spec:
   - name: additional-labels
     value:
     - version=on-pr-{{revision}}
-    - io.openshift.tags=odh-dashboard
-  - name: rhoai-version
-    value: "3.3.3"
+    - io.openshift.tags=odh-mod-arch-maas
   - name: output-image
-    value: quay.io/rhoai/pull-request-pipelines:odh-dashboard-{{revision}}
+    value: quay.io/rhoai/pull-request-pipelines:odh-mod-arch-maas-{{revision}}
   - name: build-platforms
     value:
     - linux/x86_64
+    - linux-m2xlarge/arm64
     - linux/ppc64le
     - linux/s390x
-    - linux-m2xlarge/arm64
   - name: image-expires-after
     value: 5d
   - name: dockerfile
-    value: Dockerfile.konflux
+    value: Dockerfile.konflux.maas
   - name: path-context
     value: .
   - name: hermetic
     value: true
   - name: prefetch-input
-    value: |
-      [
-        {"type": "npm", "path": "."}
-      ]
+    value: '[{"path":".","type":"npm"},{"path":"packages/maas/frontend","type":"npm"},{"path":"packages/maas/bff","type":"gomod"}]'
   - name: build-image-index
     value: true
-  - name: fips-check-blocking
-    value: "false"
   - name: enable-slack-failure-notification
     value: "false"
   pipelineRef:
