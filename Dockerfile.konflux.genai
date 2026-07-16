@@ -92,6 +92,12 @@ COPY --from=ui-builder /usr/src/workspace/${UI_SOURCE_CODE}/dist ./static/
 COPY --from=bff-builder /usr/src/app/openapi/ ./openapi/
 USER 65532:65532
 
+# Suppress protobuf duplicate-registration panic caused by mlflow-go's
+# stub trace.proto conflicting with the OTel SDK's real trace.proto.
+# Remove once the mlflow-go proto conflict is resolved (e.g. mlflow-go
+# adopts go.opentelemetry.io/proto/otlp directly).
+ENV GOLANG_PROTOBUF_REGISTRATION_CONFLICT=warn
+
 # Expose port 8080
 EXPOSE 8080
 
