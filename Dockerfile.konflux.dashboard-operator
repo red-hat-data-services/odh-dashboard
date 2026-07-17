@@ -4,6 +4,7 @@ USER root
 
 ARG TARGETOS
 ARG TARGETARCH
+ARG OPERATOR_VERSION=unknown
 
 WORKDIR /usr/src/app
 
@@ -14,7 +15,9 @@ COPY dashboard-operator/cmd/ cmd/
 COPY dashboard-operator/api/ api/
 COPY dashboard-operator/internal/ internal/
 
-RUN CGO_ENABLED=1 GOOS=${TARGETOS:-linux} GOARCH=${TARGETARCH:-amd64} go build -a -ldflags="-s -w" -tags strictfipsruntime -o /tmp/manager ./cmd/manager
+RUN CGO_ENABLED=1 GOOS=${TARGETOS:-linux} GOARCH=${TARGETARCH:-amd64} go build -a \
+    -ldflags="-s -w -X 'github.com/opendatahub-io/odh-dashboard/dashboard-operator/internal/controller.Version=${OPERATOR_VERSION}'" \
+    -tags strictfipsruntime -o /tmp/manager ./cmd/manager
 
 FROM registry.access.redhat.com/ubi9/ubi-minimal@sha256:062c52ff973065752b0965787649db2bcf551a6c727a00e95a3eb42cebadbdab
 
