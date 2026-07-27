@@ -7,7 +7,7 @@ ARG UI_SOURCE_CODE=./distributions/${MODULE_NAME}/frontend
 ARG BFF_SOURCE_CODE=./distributions/${MODULE_NAME}/bff
 
 # Set the base images for the build stages
-ARG NODE_BASE_IMAGE=registry.access.redhat.com/ubi9/nodejs-22@sha256:4bcc19fdb67a5f0a568375e45eb8e324ecbbc17431944e213786a537092d812f
+ARG NODE_BASE_IMAGE=registry.access.redhat.com/ubi9/nodejs-22@sha256:148f9b515d897c0dba3e7bdb821c8bba3e0c3df946bf082ece9b4f453411e7ab
 ARG GOLANG_BASE_IMAGE=registry.access.redhat.com/ubi9/go-toolset:1.25@sha256:90a36bc2013b3fcb28e2a4b082c9b895d7c2c679e58b95aed9721970f3339d0e
 ARG DISTROLESS_BASE_IMAGE=registry.access.redhat.com/ubi9-minimal@sha256:2e8edce823a48e51858f1fad3ff4cbf6875ce8a3f86b9eecf298bc2050c8652a
 
