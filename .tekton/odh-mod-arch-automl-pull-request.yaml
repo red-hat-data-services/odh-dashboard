@@ -38,9 +38,9 @@ spec:
   - name: build-platforms
     value:
     - linux/x86_64
+    - linux-m2xlarge/arm64
     - linux/ppc64le
     - linux/s390x
-    - linux-m2xlarge/arm64
   - name: image-expires-after
     value: 5d
   - name: dockerfile
@@ -51,6 +51,8 @@ spec:
     value: true
   - name: prefetch-input
     value: '[{"path":".","type":"npm"},{"path":"packages/automl/frontend","type":"npm"},{"path":"packages/automl/bff","type":"gomod"}]'
+  - name: build-source-image
+    value: true
   - name: build-image-index
     value: true
   - name: enable-slack-failure-notification
