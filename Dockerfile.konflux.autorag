@@ -8,9 +8,9 @@ ARG UI_SOURCE_CODE=./packages/${MODULE_NAME}/frontend
 ARG BFF_SOURCE_CODE=./packages/${MODULE_NAME}/bff
 
 # Set the base images for the build stages
-ARG NODE_BASE_IMAGE=registry.access.redhat.com/ubi9/nodejs-22@sha256:2c3bb588fae7d9d1e5acd1afd77a61cc8cbae2d0d3f85bb7ec03bb3275ba2420
+ARG NODE_BASE_IMAGE=registry.access.redhat.com/ubi9/nodejs-22@sha256:de0ec3cba702e28f2ea3c232e8e1b53aa0acee4d25f5acfb458afe22a7b66709
 ARG GOLANG_BASE_IMAGE=registry.access.redhat.com/ubi9/go-toolset:1.26@sha256:5d26ff5606bd6590930e7cfc202b510e3fe2c7a7a1720860f444ab49c45128cb
-ARG DISTROLESS_BASE_IMAGE=registry.access.redhat.com/ubi9-minimal@sha256:57c8151c51445a07e503dab9dc9211dc3cdeac9d45ed81a10954b7d770659b3b
+ARG DISTROLESS_BASE_IMAGE=registry.access.redhat.com/ubi9-minimal@sha256:dd334afa72444fa46238fcf9e6bd399245adf746378735348cf84b9dfdca38f1
 
 # UI build stage
 FROM ${NODE_BASE_IMAGE} AS ui-builder
@@ -69,20 +69,27 @@ ARG BFF_SOURCE_CODE
 ARG TARGETOS
 ARG TARGETARCH
 
-WORKDIR /usr/src/app
+# Layout mirrors the monorepo so the go.mod replace directive
+# (../../autox-core/services) resolves correctly inside the container.
 
-# Copy the Go Modules manifests
-COPY ${BFF_SOURCE_CODE}/go.mod ${BFF_SOURCE_CODE}/go.sum ./
+WORKDIR /usr/src/workspace
+
+# Copy module manifests first for dependency caching
+COPY packages/autox-core/services/go.mod packages/autox-core/services/go.sum ./packages/autox-core/services/
+COPY ${BFF_SOURCE_CODE}/go.mod ${BFF_SOURCE_CODE}/go.sum ./${BFF_SOURCE_CODE}/
 
 # Download dependencies
+WORKDIR /usr/src/workspace/${BFF_SOURCE_CODE}
 RUN go mod download
 
-# Copy the go source files
+# Copy source files
+COPY packages/autox-core/services/ /usr/src/workspace/packages/autox-core/services/
 COPY ${BFF_SOURCE_CODE}/cmd/ cmd/
 COPY ${BFF_SOURCE_CODE}/internal/ internal/
 
 # Build the Go application
-RUN CGO_ENABLED=1 GOOS=${TARGETOS:-linux} GOARCH=${TARGETARCH} go build -a -ldflags="-s -w" -tags strictfipsruntime -o bff ./cmd
+RUN CGO_ENABLED=1 GOOS="${TARGETOS:-linux}" GOARCH="${TARGETARCH}" \
+    go build -a -ldflags="-s -w" -tags strictfipsruntime -o /tmp/bff ./cmd
 
 # Final stage
 FROM ${DISTROLESS_BASE_IMAGE}
@@ -90,7 +97,7 @@ FROM ${DISTROLESS_BASE_IMAGE}
 ARG UI_SOURCE_CODE
 
 WORKDIR /
-COPY --from=bff-builder /usr/src/app/bff ./
+COPY --from=bff-builder /tmp/bff ./
 COPY --from=ui-builder /usr/src/workspace/${UI_SOURCE_CODE}/dist ./static/
 USER 65532:65532
 
