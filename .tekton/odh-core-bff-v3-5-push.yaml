@@ -63,3 +63,4 @@ spec:
       - name: redhat-appstudio-staginguser-pull-secret
   timeouts:
     pipeline: 2h
+#restart
