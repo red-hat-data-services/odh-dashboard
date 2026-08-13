@@ -1,5 +1,6 @@
 
 apiVersion: tekton.dev/v1
+# konflux build manual retrigger - 2026-08-12 17:56:09
 kind: PipelineRun
 metadata:
   annotations:
@@ -63,3 +64,4 @@ spec:
       - name: redhat-appstudio-staginguser-pull-secret
   timeouts:
     pipeline: 2h
+#restart
