@@ -33,8 +33,9 @@ spec:
   - name: enable-slack-failure-notification
     value: "false"
   - name: prefetch-input
-    value: |
-      [{"type": "npm", "path": "."}]
+    value: '[{"type": "npm", "path": "."}, {"type": "npm", "path": "packages/notebooks/upstream/workspaces/frontend"}, {"type": "gomod", "path": "packages/notebooks/upstream/workspaces/backend"}, {"type": "gomod", "path": "packages/notebooks/upstream/workspaces/controller"}]'
+  - name: build-image-index
+    value: true
   - name: build-platforms
     value:
     - linux/x86_64
