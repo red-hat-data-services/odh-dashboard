@@ -44,7 +44,7 @@ USER default
 # Install workspace dependencies first (this creates node_modules at workspace level)
 RUN npm cache clean --force
 # Install all workspace dependencies (includes root + any copied workspaces)
-# Do not use --omit=optional: rspack needs @rspack/binding-* native optional deps
+# Do not use: rspack needs @rspack/binding-* native optional deps
 RUN npm ci --ignore-scripts
 
 # Set up the specific module
