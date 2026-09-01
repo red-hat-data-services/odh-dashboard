@@ -15,7 +15,7 @@ COPY --chown=default:root ${SOURCE_CODE} /usr/src/app
 USER default
 
 RUN npm install -g pnpm@11.22.0
-RUN pnpm install --frozen-lockfile --offline
+RUN pnpm install --frozen-lockfile --offline --ignore-scripts
 
 ENV TURBO_TELEMETRY_DISABLED=1
 

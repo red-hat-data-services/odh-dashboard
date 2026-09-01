@@ -54,7 +54,7 @@ USER default
 
 # Install pnpm and workspace dependencies
 RUN npm install -g pnpm@11.22.0
-RUN pnpm install --frozen-lockfile --offline
+RUN pnpm install --frozen-lockfile --offline --ignore-scripts
 
 # Build the module
 WORKDIR /usr/src/workspace/${UI_SOURCE_CODE}
