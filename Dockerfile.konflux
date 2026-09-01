@@ -14,9 +14,8 @@ COPY --chown=default:root ${SOURCE_CODE} /usr/src/app
 # Change file ownership to the assemble user
 USER default
 
-RUN npm cache clean --force
-
-RUN npm ci --ignore-scripts
+RUN npm install -g pnpm@11.22.0
+RUN pnpm install --frozen-lockfile --offline --ignore-scripts
 
 ENV TURBO_TELEMETRY_DISABLED=1
 
@@ -29,7 +28,7 @@ ENV DOC_LINK="https://docs.redhat.com/en/documentation/red_hat_openshift_ai/"
 ENV SUPPORT_LINK="https://access.redhat.com/support/cases/#/case/new/open-case?caseCreate=true"
 ENV COMMUNITY_LINK=""
 
-RUN npm run build
+RUN pnpm run build
 
 FROM registry.access.redhat.com/ubi9/nodejs-22@sha256:57ad03c5db9382cd266af665819f60e5b1490fc27ee589320159df59f9eb453b as runtime
 
