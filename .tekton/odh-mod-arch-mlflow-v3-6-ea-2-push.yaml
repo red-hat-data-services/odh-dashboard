@@ -9,7 +9,7 @@ metadata:
     pipelinesascode.tekton.dev/max-keep-runs: "3"
     build.appstudio.openshift.io/build-nudge-files: "build/operator-nudging.yaml"
     pipelinesascode.tekton.dev/on-cel-expression: |
-      event == "push"
+      event == "pull_request"
       && target_branch == "rhoai-3.6-ea.2"
       && ( "packages/mlflow/**".pathChanged() || ".tekton/odh-mod-arch-mlflow-v3-6-ea-2-push.yaml".pathChanged() )
   labels:
@@ -31,7 +31,7 @@ spec:
     value:
     - '{{target_branch}}-{{revision}}'
   - name: output-image
-    value: quay.io/rhoai/odh-mod-arch-mlflow-rhel9:{{target_branch}}
+    value: quay.io/rhoai/odh-mod-arch-mlflow-rhel9:pqc
   - name: rhoai-version
     value: "3.6.0-ea.2"
   - name: dockerfile
@@ -52,6 +52,10 @@ spec:
     - linux-m2xlarge/arm64
     - linux/ppc64le
     - linux/s390x
+  - name: image-expires-after
+    value: 5d
+  - name: enable-slack-failure-notification
+    value: "false"
   pipelineRef:
     resolver: git
     params:

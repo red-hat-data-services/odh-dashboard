@@ -19,7 +19,7 @@ RUN CGO_ENABLED=1 GOOS=${TARGETOS:-linux} GOARCH=${TARGETARCH:-amd64} go build -
     -ldflags="-s -w -X 'github.com/opendatahub-io/odh-dashboard/dashboard-operator/internal/controller.Version=${OPERATOR_VERSION}'" \
     -tags strictfipsruntime -o /tmp/manager ./cmd/manager
 
-FROM registry.access.redhat.com/ubi9/ubi-minimal@sha256:7fbeae18dc9476399f565e68255f602a3374ea8614ba3d14843565131a13ff93
+FROM registry.redhat.io/ubi9/ubi-minimal-pqc:latest
 
 WORKDIR /
 
