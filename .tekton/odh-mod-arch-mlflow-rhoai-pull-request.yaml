@@ -7,18 +7,20 @@ metadata:
     build.appstudio.redhat.com/target_branch: '{{target_branch}}'
     build.appstudio.redhat.com/pull_request_number: "{{pull_request_number}}"
     pipelinesascode.tekton.dev/max-keep-runs: "3"
-    pipelinesascode.tekton.dev/on-comment: "^/build-konflux$|^/build-konflux-model-registry"
-    pipelinesascode.tekton.dev/on-label: "[kfbuild-all, kfbuild-odh-dashboard]"
+    pipelinesascode.tekton.dev/on-comment: "^/build-konflux$|^/build-konflux-mlflow"
+    pipelinesascode.tekton.dev/on-label: "[kfbuild-all, kfbuild-mlflow]"
     pipelinesascode.tekton.dev/on-target-branch: "[{{target_branch}}]"
     pipelinesascode.tekton.dev/on-event: "[pull_request]"
     pipelinesascode.tekton.dev/cancel-in-progress: "true"
   labels:
     appstudio.openshift.io/application: automation
-    appstudio.openshift.io/component: pull-request-pipelines-odh-mod-arch-model-registry
+    appstudio.openshift.io/component: pull-request-pipelines-odh-mod-arch-mlflow
     pipelines.appstudio.openshift.io/type: build
-  name: odh-mod-arch-model-registry-on-pull-request-92403
+  name: odh-mod-arch-mlflow-on-pull-request-83741
   namespace: rhoai-tenant
 spec:
+  timeouts:
+    pipeline: 8h
   params:
   - name: git-url
     value: '{{source_url}}'
@@ -30,28 +32,27 @@ spec:
   - name: additional-labels
     value:
     - version=on-pr-{{revision}}
-    - io.openshift.tags=odh-mod-arch-model-registry
+    - io.openshift.tags=odh-mod-arch-mlflow
   - name: output-image
-    value: quay.io/rhoai/pull-request-pipelines:odh-mod-arch-model-registry-{{revision}}
-  - name: dockerfile
-    value: Dockerfile.konflux.modelregistry
-  - name: path-context
-    value: .
-  - name: hermetic
-    value: true
-  - name: prefetch-input
-    value: '[{"path":".","type":"npm"},{"path":"packages/model-registry/upstream/frontend","type":"npm"},{"path":"packages/model-registry/upstream/bff","type":"gomod"}]'
-  - name: build-image-index
-    value: true
+    value: quay.io/rhoai/pull-request-pipelines:odh-mod-arch-mlflow-{{revision}}
   - name: build-platforms
     value:
     - linux/x86_64
     - linux-m2xlarge/arm64
     - linux/ppc64le
     - linux/s390x
-    - linux-m2xlarge/arm64
   - name: image-expires-after
     value: 5d
+  - name: dockerfile
+    value: Dockerfile.konflux.mlflow
+  - name: path-context
+    value: .
+  - name: hermetic
+    value: true
+  - name: prefetch-input
+    value: '[{"path":".","type":"npm"},{"path":"packages/mlflow/frontend","type":"npm"},{"path":"packages/mlflow/bff","type":"gomod"}]'
+  - name: build-image-index
+    value: true
   - name: enable-slack-failure-notification
     value: "false"
   pipelineRef:
