@@ -8,9 +8,9 @@ ARG UI_SOURCE_CODE=./packages/${MODULE_NAME}/frontend
 ARG BFF_SOURCE_CODE=./packages/${MODULE_NAME}/bff
 
 # SHA-pinned base images for RHOAI builds
-ARG NODE_BASE_IMAGE=registry.access.redhat.com/ubi9/nodejs-22@sha256:PLACEHOLDER_NODEJS_DIGEST
-ARG GOLANG_BASE_IMAGE=registry.access.redhat.com/ubi9/go-toolset@sha256:PLACEHOLDER_GOLANG_DIGEST
-ARG DISTROLESS_BASE_IMAGE=registry.access.redhat.com/ubi9-minimal@sha256:PLACEHOLDER_UBI_MINIMAL_DIGEST
+ARG NODE_BASE_IMAGE=registry.access.redhat.com/ubi9/nodejs-22@sha256:a38a749f3a37a1c033932b4c13f3052f4958aa0eb7dbb0761cb3b5536ffe6878
+ARG GOLANG_BASE_IMAGE=registry.access.redhat.com/ubi9/go-toolset@sha256:5e68f09a652ac6627a83c57655e42e24575efb278b54336039c9308607fc6b21
+ARG DISTROLESS_BASE_IMAGE=registry.access.redhat.com/ubi9-minimal@sha256:7fbeae18dc9476399f565e68255f602a3374ea8614ba3d14843565131a13ff93
 
 # UI build stage
 FROM ${NODE_BASE_IMAGE} AS ui-builder
