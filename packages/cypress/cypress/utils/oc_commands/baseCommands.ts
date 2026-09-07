@@ -123,8 +123,10 @@ export const applyOpenShiftYaml = (
   // Write YAML to a temp file so `oc apply -f <path>` does not put secrets on argv.
   // log: false keeps Cypress from printing file contents (often Secret YAML) to CI logs.
   return cy.writeFile(tempFileName, yamlContent, { log: false }).then(() => {
+    // Use return_code, not status — status is read-only in zsh.
     const ocCommand =
-      `oc apply ${ns} -f ${tempFileName}; status=$?; ` + `rm -f -- ${tempFileName}; exit $status`;
+      `oc apply ${ns} -f ${tempFileName}; return_code=$?; ` +
+      `rm -f -- ${tempFileName}; exit $return_code`;
     return execWithOutput(ocCommand);
   });
 };
