@@ -39,6 +39,9 @@ RUN mkdir /usr/src/app/logs && chmod 775 /usr/src/app/logs
 
 USER 1001:0
 
+# RHOAIENG-94264
+RUN update-crypto-policies --set DEFAULT:PQ --no-reload
+
 COPY --chown=default:root --from=builder /usr/src/app/frontend/public /usr/src/app/frontend/public
 COPY --chown=default:root --from=builder /usr/src/app/backend/dist /usr/src/app/backend/dist
 COPY --chown=default:root --from=builder /usr/src/app/.env /usr/src/app/.env
