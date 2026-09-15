@@ -19,6 +19,7 @@ RUN npm cache clean --force
 RUN npm ci --ignore-scripts
 
 ENV TURBO_TELEMETRY_DISABLED=1
+ENV NODE_OPTIONS="--max-old-space-size=4096"
 
 # Set Red Hat Openshift AI logo and links
 ENV ODH_LOGO=../images/rhoai-logo.svg
