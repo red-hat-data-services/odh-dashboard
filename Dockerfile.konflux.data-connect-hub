@@ -1,16 +1,16 @@
-# Multi-stage workspace-aware Dockerfile for Module Federation packages (Downstream RHOAI)
-# SHA-pinned base images for Konflux builds — digests are managed by Renovate after initial merge.
-# Build from repository root: docker build --file Dockerfile.konflux.data-connect-hub .
+# Multi-stage workspace-aware Dockerfile for Module Federation packages (RHOAI downstream)
+# This Dockerfile is designed to build federated modules that depend on workspace packages
+# Build from repository root: docker build --file ./Dockerfile.konflux.data-connect-hub .
 
-# Source code arguments
+# Source code arguments - can be overridden for different modules
 ARG MODULE_NAME=data-connect-hub
 ARG UI_SOURCE_CODE=./packages/${MODULE_NAME}/frontend
 ARG BFF_SOURCE_CODE=./packages/${MODULE_NAME}/bff
 
-# SHA-pinned base images
+# SHA-pinned base images for RHOAI builds
 ARG NODE_BASE_IMAGE=registry.access.redhat.com/ubi9/nodejs-22@sha256:6d86fecb222cfc477376a582665e55741cf403240a83bee2b59331c77a4dce96
 ARG GOLANG_BASE_IMAGE=registry.access.redhat.com/ubi9/go-toolset:1.26@sha256:685ccca486cc2c82b0818d835abecb1aed7a396e76ba416cfc47c28067f5d365
-ARG DISTROLESS_BASE_IMAGE=registry.access.redhat.com/ubi9-minimal@sha256:e5161a7d7d99cf22e4f34b72e111211a399d956d9b0e8714da18e9c4c8151041
+ARG DISTROLESS_BASE_IMAGE=registry.redhat.io/ubi9/ubi-minimal-pqc@sha256:a3f7ca6346ee5ca1867d1dcc79b011c5c711bf7a3e43c7cece3323d6d1ef5ac0
 
 # UI build stage
 FROM ${NODE_BASE_IMAGE} AS ui-builder
@@ -83,14 +83,6 @@ FROM ${DISTROLESS_BASE_IMAGE}
 
 ARG UI_SOURCE_CODE
 
-LABEL com.redhat.component="odh-data-connect-hub-container" \
-      name="managed-open-data-hub/odh-data-connect-hub-rhel9" \
-      summary="ODH Data Connect Hub Module" \
-      description="Data Connect Hub module for Red Hat OpenShift AI Dashboard" \
-      io.k8s.display-name="ODH Data Connect Hub" \
-      io.k8s.description="Data Connect Hub module for Red Hat OpenShift AI Dashboard" \
-      io.openshift.tags="rhods,rhoai,odh,data-connect-hub"
-
 WORKDIR /
 COPY --from=bff-builder /usr/src/app/bff ./
 COPY --from=ui-builder /usr/src/workspace/${UI_SOURCE_CODE}/dist ./static/
@@ -100,3 +92,13 @@ USER 65532:65532
 EXPOSE 8080
 
 ENTRYPOINT ["/bff"]
+
+LABEL com.redhat.component="odh-mod-arch-data-connect-hub-container" \
+      name="managed-open-data-hub/odh-mod-arch-data-connect-hub-rhel9" \
+      description="odh-mod-arch-data-connect-hub" \
+      summary="odh-mod-arch-data-connect-hub" \
+      maintainer="['managed-open-data-hub@redhat.com']" \
+      io.openshift.expose-services="" \
+      io.k8s.display-name="odh-mod-arch-data-connect-hub" \
+      io.k8s.description="odh-mod-arch-data-connect-hub" \
+      com.redhat.license_terms="https://www.redhat.com/licenses/Red_Hat_Standard_EULA_20191108.pdf"
