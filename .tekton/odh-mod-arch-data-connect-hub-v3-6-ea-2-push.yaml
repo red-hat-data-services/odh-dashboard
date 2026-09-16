@@ -39,8 +39,7 @@ spec:
   - name: hermetic
     value: true
   - name: prefetch-input
-    value: |
-      [{"type": "npm", "path": "."}]
+    value: '[{"path":".","type":"npm"},{"path":"packages/data-connect-hub/frontend","type":"npm"},{"path":"packages/data-connect-hub/bff","type":"gomod"}]'
   - name: build-platforms
     value:
     - linux/x86_64
