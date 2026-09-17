@@ -17,13 +17,20 @@ import {
   Spinner,
   Button,
   AlertActionLink,
+  Icon,
 } from '@patternfly/react-core';
-import { CheckCircleIcon, TimesCircleIcon } from '@patternfly/react-icons';
+import { CheckCircleIcon, ExclamationTriangleIcon, TimesCircleIcon } from '@patternfly/react-icons';
 import {
   PAGE_TITLES,
   ERROR_MESSAGES,
   EMPTY_STATE_TEXT,
+  PREVIEW_ALERTS,
 } from '~/app/pages/modelCatalogSettings/constants';
+import {
+  isPreviewModelGatedAccessDenied,
+  previewHasGatedAccessDeniedModels,
+} from '~/app/pages/modelCatalogSettings/utils/modelCatalogSettingsUtils';
+import { CatalogSourcePreviewModel } from '~/app/modelCatalogTypes';
 import { UseSourcePreviewResult } from '~/app/pages/modelCatalogSettings/useSourcePreview';
 import { CatalogSettingsPreviewTab } from '~/app/shared/catalogSettings/hooks/previewTypes';
 import PreviewButton from './PreviewButton';
@@ -47,6 +54,15 @@ const PreviewPanel: React.FC<PreviewPanelProps> = ({ preview }) => {
   const { items, hasMore } = tabStates[activeTab];
   const previewError = error;
 
+  const hasGatedAccessDeniedModels = React.useMemo(
+    () =>
+      previewHasGatedAccessDeniedModels([
+        ...tabStates[CatalogSettingsPreviewTab.INCLUDED].items,
+        ...tabStates[CatalogSettingsPreviewTab.EXCLUDED].items,
+      ]),
+    [tabStates],
+  );
+
   const onPreview = () => handlePreview();
   const onLoadMore = () => handleLoadMore();
 
@@ -54,6 +70,22 @@ const PreviewPanel: React.FC<PreviewPanelProps> = ({ preview }) => {
     handleTabChange(
       tabIndex === 0 ? CatalogSettingsPreviewTab.INCLUDED : CatalogSettingsPreviewTab.EXCLUDED,
     );
+  };
+
+  const renderModelIcon = (model: CatalogSourcePreviewModel) => {
+    if (isPreviewModelGatedAccessDenied(model)) {
+      return (
+        <Icon status="warning">
+          <ExclamationTriangleIcon aria-label="Gated access warning" />
+        </Icon>
+      );
+    }
+
+    if (model.included) {
+      return <CheckCircleIcon color="green" aria-label="Included model" />;
+    }
+
+    return <TimesCircleIcon color="red" aria-label="Excluded model" />;
   };
 
   const renderEmptyState = () => {
@@ -119,6 +151,17 @@ const PreviewPanel: React.FC<PreviewPanelProps> = ({ preview }) => {
 
     return (
       <>
+        {hasGatedAccessDeniedModels && (
+          <Alert
+            variant="warning"
+            isInline
+            title={PREVIEW_ALERTS.GATED_ACCESS_REQUIRED_TITLE}
+            className="pf-v6-u-mb-md"
+            data-testid="preview-gated-access-alert"
+          >
+            {PREVIEW_ALERTS.GATED_ACCESS_REQUIRED_BODY}
+          </Alert>
+        )}
         <Tabs
           activeKey={activeTab === CatalogSettingsPreviewTab.INCLUDED ? 0 : 1}
           onSelect={handleTabSelect}
@@ -128,7 +171,7 @@ const PreviewPanel: React.FC<PreviewPanelProps> = ({ preview }) => {
           <Tab eventKey={1} title={<TabTitleText>Models excluded</TabTitleText>} />
         </Tabs>
         <div className="pf-v6-u-mt-md">
-          {hasFormChanged && (
+          {hasFormChanged && canPreview && (
             <Alert
               variant="info"
               isInline
@@ -150,16 +193,7 @@ const PreviewPanel: React.FC<PreviewPanelProps> = ({ preview }) => {
               </strong>
               <List isPlain className="pf-v6-u-mt-md">
                 {items.map((model) => (
-                  <ListItem
-                    key={model.name}
-                    icon={
-                      model.included ? (
-                        <CheckCircleIcon color="green" />
-                      ) : (
-                        <TimesCircleIcon color="red" />
-                      )
-                    }
-                  >
+                  <ListItem key={model.name} icon={renderModelIcon(model)}>
                     {model.name}
                   </ListItem>
                 ))}
