@@ -1,7 +1,7 @@
 # Build arguments
 ARG SOURCE_CODE=.
 
-FROM registry.access.redhat.com/ubi9/nodejs-22@sha256:57ad03c5db9382cd266af665819f60e5b1490fc27ee589320159df59f9eb453b as builder
+FROM registry.access.redhat.com/ubi9/nodejs-22@sha256:1fda929ce9a6a42a9f12286b5616f5b9fdd55aca98b045659fd6ceac5fa5e515 as builder
 
 ## Build args to be used at this step
 ARG SOURCE_CODE
@@ -31,11 +31,15 @@ ENV COMMUNITY_LINK=""
 
 RUN pnpm run build
 
-FROM registry.access.redhat.com/ubi9/nodejs-22@sha256:57ad03c5db9382cd266af665819f60e5b1490fc27ee589320159df59f9eb453b as runtime
+FROM registry.access.redhat.com/ubi9/nodejs-22@sha256:1fda929ce9a6a42a9f12286b5616f5b9fdd55aca98b045659fd6ceac5fa5e515 as runtime
 
 WORKDIR /usr/src/app
 
 RUN mkdir /usr/src/app/logs && chmod 775 /usr/src/app/logs
+
+# RHOAIENG-94264
+USER 0
+RUN update-crypto-policies --set DEFAULT:PQ --no-reload
 
 USER 1001:0
 
