@@ -3,11 +3,32 @@ import { Popover, Button, Label } from '@patternfly/react-core';
 import { PendingIcon } from '@patternfly/react-icons';
 import { fireMiscTrackingEvent } from '@odh-dashboard/internal/concepts/analyticsTracking/segmentIOUtils';
 import {
+  AddProviderReferenceSource,
   ExternalModelsInfoPopoverLocation,
   ExternalModelsInfoPopoverTarget,
   ExternalModelsInfoPopoverViewedProperties,
   MaaSEvents,
 } from '~/app/types/event-tracking';
+
+export type CreateExternalModelLocationState = {
+  addProviderReferenceSource: AddProviderReferenceSource;
+};
+
+export const getAddProviderReferenceSourceFromLocationState = (
+  state: unknown,
+): AddProviderReferenceSource | undefined => {
+  if (typeof state !== 'object' || state === null || !('addProviderReferenceSource' in state)) {
+    return undefined;
+  }
+  const { addProviderReferenceSource } = state;
+  if (
+    addProviderReferenceSource === AddProviderReferenceSource.TOOLBAR ||
+    addProviderReferenceSource === AddProviderReferenceSource.EMPTY_LIST
+  ) {
+    return addProviderReferenceSource;
+  }
+  return undefined;
+};
 
 export enum ExternalModelsFilterOptions {
   keyword = 'keyword',
@@ -28,6 +49,9 @@ export const deploymentsExternalPath = (namespace: string): string =>
 
 export const createExternalModelPath = (namespace: string): string =>
   `${deploymentsExternalPath(namespace)}/register`;
+
+export const editExternalModelPath = (namespace: string, modelName: string): string =>
+  `${deploymentsExternalPath(namespace)}/${encodeURIComponent(modelName)}/edit`;
 
 /** Matches CRD maxLength for spec.modelName and spec.externalProviderRefs[].targetModel. */
 export const EXTERNAL_MODEL_FIELD_MAX_LENGTH = 253;
@@ -50,6 +74,13 @@ export const PROVIDER_REFERENCE_API_FORMATS = {
 } as const;
 
 export type ProviderReferenceApiFormat = keyof typeof PROVIDER_REFERENCE_API_FORMATS;
+
+export const ProviderSource = {
+  EXISTING: 'existing',
+  CREATE_NEW: 'create-new',
+} as const;
+
+export type ProviderSourceType = (typeof ProviderSource)[keyof typeof ProviderSource];
 
 export const PROVIDER_REFERENCE_API_FORMAT_OPTIONS = Object.entries(
   PROVIDER_REFERENCE_API_FORMATS,
