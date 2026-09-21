@@ -54,7 +54,7 @@ USER default
 
 # Install pnpm and workspace dependencies
 RUN npm install -g pnpm@11.22.0
-RUN pnpm install --frozen-lockfile --offline --ignore-scripts
+RUN CYPRESS_INSTALL_BINARY=0 pnpm install --frozen-lockfile --offline
 
 # Build the module
 WORKDIR /usr/src/workspace/${UI_SOURCE_CODE}
