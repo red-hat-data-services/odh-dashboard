@@ -16,7 +16,9 @@ import { ensureAdminOcSession } from '../../../utils/oc_commands/baseCommands';
 import { retryableBefore } from '../../../utils/retryableHooks';
 import { generateTestUUID } from '../../../utils/uuidGenerator';
 
-describe('Verify Hugging Face catalog source add, validate, and preview', () => {
+// The Hugging Face access-token flow is gated by the CatalogHuggingFaceApiKey
+// temp feature flag and is disabled for the current release window.
+describe.skip('Verify Hugging Face catalog source add, validate, and preview', () => {
   let testData: Record<string, string>;
   let hfApiKey: string;
   const testRunId = generateTestUUID();
