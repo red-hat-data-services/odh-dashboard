@@ -31,6 +31,7 @@ import {
   CLEAR_ACCESS_TOKEN_MODAL,
 } from '~/app/pages/modelCatalogSettings/constants';
 import { ModelCatalogAccessTokenClearOutcome } from '~/app/pages/modelCatalogSettings/tracking/modelCatalogSourcesTracking';
+import { TempDevFeature, useTempDevFeatureAvailable } from '~/app/hooks/useTempDevFeatureAvailable';
 
 type CredentialsSectionProps = {
   formData: ManageSourceFormData;
@@ -63,6 +64,10 @@ const CredentialsSection: React.FC<CredentialsSectionProps> = ({
   const [isClearing, setIsClearing] = React.useState(false);
 
   const isOrganizationValid = validateOrganization(formData.organization);
+
+  const accessTokenFeatureEnabled = useTempDevFeatureAvailable(
+    TempDevFeature.CatalogHuggingFaceApiKey,
+  );
 
   const isTokenLocked = hasExistingApiKey && !formData.tokenModified;
 
@@ -242,7 +247,7 @@ const CredentialsSection: React.FC<CredentialsSectionProps> = ({
     <>
       <FormSection title={FORM_LABELS.CREDENTIALS} data-testid="credentials-section">
         {organizationFormGroup}
-        {accessTokenFormGroup}
+        {accessTokenFeatureEnabled && accessTokenFormGroup}
       </FormSection>
       <Modal
         variant={ModalVariant.small}

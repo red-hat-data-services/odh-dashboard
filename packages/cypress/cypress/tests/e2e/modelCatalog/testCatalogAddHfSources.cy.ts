@@ -16,6 +16,9 @@ import { ensureAdminOcSession } from '../../../utils/oc_commands/baseCommands';
 import { retryableBefore } from '../../../utils/retryableHooks';
 import { generateTestUUID } from '../../../utils/uuidGenerator';
 
+const CATALOG_HUGGING_FACE_API_KEY_FLAG =
+  'devFeatureFlags=KF+MR+Upstream%3A+Catalog+HuggingFace+API+Key=true';
+
 describe('Verify Hugging Face catalog source add, validate, and preview', () => {
   let testData: Record<string, string>;
   let hfApiKey: string;
@@ -54,7 +57,7 @@ describe('Verify Hugging Face catalog source add, validate, and preview', () => 
   it(
     'Add a Hugging Face source with public, gated, and private models via token validation and preview',
     {
-      tags: ['@Sanity', '@SanitySet4', '@Dashboard', '@ModelCatalog', '@NonConcurrent'],
+      tags: ['@Dashboard', '@ModelCatalog', '@NonConcurrent', '@Featureflagged'],
     },
     () => {
       const publicModelFull = `${testData.organization}/${testData.publicModel}`;
@@ -68,7 +71,7 @@ describe('Verify Hugging Face catalog source add, validate, and preview', () => 
       ].join(', ');
 
       cy.step('Log into the application as admin');
-      cy.visitWithLogin('/', LDAP_ADMIN_USER);
+      cy.visitWithLogin(`/?${CATALOG_HUGGING_FACE_API_KEY_FLAG}`, LDAP_ADMIN_USER);
 
       cy.step('Navigate to Model catalog settings and open Add source');
       modelCatalogSettings.visit();
