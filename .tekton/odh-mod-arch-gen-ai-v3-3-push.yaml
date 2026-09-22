@@ -11,7 +11,7 @@ metadata:
     pipelinesascode.tekton.dev/on-cel-expression: |
       event == "push"
       && target_branch == "rhoai-3.3"
-      && ( "packages/gen-ai/**".pathChanged() || ".tekton/odh-mod-arch-gen-ai-v3-3-push.yaml".pathChanged() )
+      && ( "packages/gen-ai/**".pathChanged() || "Dockerfile.konflux.genai".pathChanged() || ".tekton/odh-mod-arch-gen-ai-v3-3-push.yaml".pathChanged() )
   labels:
     appstudio.openshift.io/application: rhoai-v3-3
     appstudio.openshift.io/component: odh-mod-arch-gen-ai-v3-3
