@@ -16,9 +16,6 @@ import { ensureAdminOcSession } from '../../../utils/oc_commands/baseCommands';
 import { retryableBefore } from '../../../utils/retryableHooks';
 import { generateTestUUID } from '../../../utils/uuidGenerator';
 
-const CATALOG_HUGGING_FACE_API_KEY_FLAG =
-  'devFeatureFlags=KF+MR+Upstream%3A+Catalog+HuggingFace+API+Key=true';
-
 describe('Verify Hugging Face catalog source add, validate, and preview', () => {
   let testData: Record<string, string>;
   let hfApiKey: string;
@@ -71,7 +68,7 @@ describe('Verify Hugging Face catalog source add, validate, and preview', () => 
       ].join(', ');
 
       cy.step('Log into the application as admin');
-      cy.visitWithLogin(`/?${CATALOG_HUGGING_FACE_API_KEY_FLAG}`, LDAP_ADMIN_USER);
+      cy.visitWithLogin('/', LDAP_ADMIN_USER);
 
       cy.step('Navigate to Model catalog settings and open Add source');
       modelCatalogSettings.visit();
@@ -79,6 +76,13 @@ describe('Verify Hugging Face catalog source add, validate, and preview', () => 
       manageSourcePage.findAddSourceTitle().should('exist');
       manageSourcePage.findSourceTypeHuggingFace().should('be.checked');
       manageSourcePage.findCredentialsSection().should('exist');
+      cy.window().then((win) => {
+        expect(win.setTempFeatureFlagAvailable).to.be.a('function');
+        win.setTempFeatureFlagAvailable?.(true);
+      });
+      cy.reload();
+      manageSourcePage.findAddSourceTitle().should('exist');
+      manageSourcePage.findAccessTokenInput().should('exist');
 
       cy.step('Enter valid credentials and verify eye toggle');
       manageSourcePage.findOrganizationInput().clear().type(testData.organization);
