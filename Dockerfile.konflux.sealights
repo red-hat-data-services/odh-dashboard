@@ -1,7 +1,7 @@
 # Build arguments
 ARG SOURCE_CODE=.
 
-FROM registry.access.redhat.com/ubi9/nodejs-22@sha256:1fda929ce9a6a42a9f12286b5616f5b9fdd55aca98b045659fd6ceac5fa5e515 AS builder
+FROM registry.access.redhat.com/ubi9/nodejs-22@sha256:bb046ef111dd20f890fe9879a37df8e829ed661177fae2339ba7eeb495f46c60 AS builder
 
 ## Build args to be used at this step
 ARG SOURCE_CODE
@@ -62,7 +62,7 @@ RUN rm -rf ./frontend/public
 RUN mv -v sl_build ./frontend/public
 ## END SEALIGHTS
 
-FROM registry.access.redhat.com/ubi9/nodejs-22@sha256:1fda929ce9a6a42a9f12286b5616f5b9fdd55aca98b045659fd6ceac5fa5e515 AS runtime
+FROM registry.access.redhat.com/ubi9/nodejs-22@sha256:bb046ef111dd20f890fe9879a37df8e829ed661177fae2339ba7eeb495f46c60 AS runtime
 
 WORKDIR /usr/src/app
 
