@@ -51,26 +51,19 @@ COPY --chown=default:root ${UI_SOURCE_CODE} ./${UI_SOURCE_CODE}
 # Change file ownership to the assemble user
 USER default
 
-# Install pnpm and workspace dependencies
+# Install pnpm and workspace dependencies. Lifecycle scripts are restricted by
+# pnpm-workspace.yaml allowBuilds; Cypress binary installation is disabled explicitly.
 RUN npm install -g pnpm@11.22.0
-RUN CYPRESS_INSTALL_BINARY=0 pnpm install --frozen-lockfile --offline
+RUN CYPRESS_INSTALL_BINARY=0 pnpm install --frozen-lockfile --offline # NOSONAR
 
 # Build the module
 WORKDIR /usr/src/workspace/${UI_SOURCE_CODE}
 RUN pnpm run build:prod
 
-# MaaS Consumer Portal compilation consumes MaaS and GenAI frontend source directly. They are
-# independently locked workspaces, so install their production-build inputs in
-# their own node_modules directories before compiling the portal.
-WORKDIR /usr/src/workspace/packages/maas/frontend
-RUN npm ci --ignore-scripts
-WORKDIR /usr/src/workspace/packages/gen-ai/frontend
-RUN npm ci --ignore-scripts
-
 # The MaaS Consumer Portal is a root workspace and its Rspack config writes to public/
 # (rather than the Core BFF frontend's dist/ directory).
 WORKDIR /usr/src/workspace
-RUN npm run build:prod --workspace @odh-dashboard/maas-consumer-portal-distribution
+RUN pnpm --filter @odh-dashboard/maas-consumer-portal-distribution run build:prod
 
 # BFF build stage
 FROM ${GOLANG_BASE_IMAGE} AS bff-builder

@@ -1,7 +1,7 @@
 # Build arguments
 ARG SOURCE_CODE=.
 
-FROM registry.access.redhat.com/ubi9/nodejs-22@sha256:1fda929ce9a6a42a9f12286b5616f5b9fdd55aca98b045659fd6ceac5fa5e515 as builder
+FROM registry.access.redhat.com/ubi9/nodejs-22@sha256:1fda929ce9a6a42a9f12286b5616f5b9fdd55aca98b045659fd6ceac5fa5e515 AS builder
 
 ## Build args to be used at this step
 ARG SOURCE_CODE
@@ -14,8 +14,10 @@ COPY --chown=default:root ${SOURCE_CODE} /usr/src/app
 # Change file ownership to the assemble user
 USER default
 
+# Lifecycle scripts are restricted by pnpm-workspace.yaml allowBuilds; Cypress
+# binary installation is disabled explicitly.
 RUN npm install -g pnpm@11.22.0
-RUN CYPRESS_INSTALL_BINARY=0 pnpm install --frozen-lockfile --offline
+RUN CYPRESS_INSTALL_BINARY=0 pnpm install --frozen-lockfile --offline # NOSONAR
 
 ENV TURBO_TELEMETRY_DISABLED=1
 ENV NODE_OPTIONS=--max-old-space-size=8192
@@ -31,7 +33,7 @@ ENV COMMUNITY_LINK=""
 
 RUN pnpm run build
 
-FROM registry.access.redhat.com/ubi9/nodejs-22@sha256:1fda929ce9a6a42a9f12286b5616f5b9fdd55aca98b045659fd6ceac5fa5e515 as runtime
+FROM registry.access.redhat.com/ubi9/nodejs-22@sha256:1fda929ce9a6a42a9f12286b5616f5b9fdd55aca98b045659fd6ceac5fa5e515 AS runtime
 
 WORKDIR /usr/src/app
 
