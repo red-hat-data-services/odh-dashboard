@@ -31,22 +31,29 @@ ENV COMMUNITY_LINK=""
 
 RUN npm run build
 
-FROM registry.access.redhat.com/ubi9/nodejs-22@sha256:8381addcd57c52b55f65c8402e331c2d6e7c9895a0f5575d03336cfc02e785fd as runtime
+# RHOAIENG-94264: Generate the policy in the builder so the minimal runtime
+# does not need crypto-policies-scripts or its Python dependencies.
+USER 0
+RUN update-crypto-policies --set DEFAULT:PQ --no-reload
+
+FROM registry.access.redhat.com/ubi9/nodejs-22-minimal@sha256:9823eba78a979ab9b4346a91678d74518bdeb1fc762752689bf1354cbc492b54 as runtime
+
+COPY --from=builder /etc/crypto-policies /etc/crypto-policies
+
+USER 1001:0
+
+# The base image includes curl; verify it is available for startup,
+# liveness, and readiness probes without fetching RPMs in the hermetic build.
+RUN curl --version
 
 WORKDIR /usr/src/app
 
 RUN mkdir /usr/src/app/logs && chmod 775 /usr/src/app/logs
 
-# RHOAIENG-94264
-USER 0
-RUN update-crypto-policies --set DEFAULT:PQ --no-reload
-
-USER 1001:0
-
-COPY --chown=default:root --from=builder /usr/src/app/frontend/public /usr/src/app/frontend/public
-COPY --chown=default:root --from=builder /usr/src/app/backend/dist /usr/src/app/backend/dist
-COPY --chown=default:root --from=builder /usr/src/app/.env /usr/src/app/.env
-COPY --chown=default:root --from=builder /usr/src/app/data /usr/src/app/data
+COPY --chown=1001:0 --from=builder /usr/src/app/frontend/public /usr/src/app/frontend/public
+COPY --chown=1001:0 --from=builder /usr/src/app/backend/dist /usr/src/app/backend/dist
+COPY --chown=1001:0 --from=builder /usr/src/app/.env /usr/src/app/.env
+COPY --chown=1001:0 --from=builder /usr/src/app/data /usr/src/app/data
 
 WORKDIR /usr/src/app/backend
 
