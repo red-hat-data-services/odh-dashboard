@@ -34,7 +34,7 @@ spec:
     value: "false"
   - name: prefetch-input
     value: |
-      [{"type": "npm", "path": "."} , {"type": "gomod", "path": "dashboard-operator"}]
+      [{"type": "gomod", "path": "dashboard-operator"}]
   - name: build-args
     value:
     - OPERATOR_VERSION={{revision}}
