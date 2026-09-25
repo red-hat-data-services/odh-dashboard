@@ -50,7 +50,7 @@ spec:
   - name: hermetic
     value: true
   - name: prefetch-input
-    value: '[{"path":".","type":"npm"},{"path":"packages/autorag/frontend","type":"npm"},{"path":"packages/autorag/bff","type":"gomod"}]'
+    value: '[{"path":".","type":"pnpm"},{"path":"packages/autorag/bff","type":"gomod"}]'
   - name: build-source-image
     value: true
   - name: build-image-index

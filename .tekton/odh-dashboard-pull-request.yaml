@@ -52,7 +52,7 @@ spec:
   - name: prefetch-input
     value: |
       [
-        {"type": "npm", "path": "."}
+        {"type": "pnpm", "path": "."}
       ]
   - name: build-image-index
     value: true

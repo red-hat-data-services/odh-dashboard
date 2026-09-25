@@ -37,11 +37,7 @@ spec:
       [
         {
           "path": ".",
-          "type": "npm"
-        },
-        {
-          "path": "packages/data-registry/frontend",
-          "type": "npm"
+          "type": "pnpm"
         },
         {
           "path": "packages/data-registry/bff",
