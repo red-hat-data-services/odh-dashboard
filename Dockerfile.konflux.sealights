@@ -41,7 +41,7 @@ ARG COMMIT=
 # Keep Sealights isolated from the pnpm workspace and reuse this pinned installation
 # in the runtime image.
 USER root
-RUN npm install --prefix /opt/sealights slnodejs@6.1.1067 # NOSONAR
+RUN npm install --prefix /opt/sealights slnodejs@6.1.1067 --ignore-scripts # NOSONAR
 
 RUN --mount=type=secret,id=sealights-credentials/token \
     SEALIGHTS_TOKEN="$(cat /run/secrets/sealights-credentials/token)" && \
