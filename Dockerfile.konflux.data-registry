@@ -9,7 +9,7 @@ ARG BFF_SOURCE_CODE=./packages/${MODULE_NAME}/bff
 
 # SHA-pinned base images for RHOAI builds
 ARG NODE_BASE_IMAGE=registry.access.redhat.com/ubi9/nodejs-22@sha256:510a73eeff392500e22eadf976686dbd16c27eaa1a8808f8f51b29fec950f68c
-ARG GOLANG_BASE_IMAGE=registry.access.redhat.com/ubi9/go-toolset@sha256:0a4666f7a4eb0644c97a73cba198eb268691b270d97831822689e7a2088f87be
+ARG GOLANG_BASE_IMAGE=registry.access.redhat.com/ubi9/go-toolset:1.26@sha256:0a4666f7a4eb0644c97a73cba198eb268691b270d97831822689e7a2088f87be
 ARG DISTROLESS_BASE_IMAGE=registry.redhat.io/ubi9/ubi-minimal-pqc@sha256:22c70d6d7fa920df140c5facdce1f42178642ca7613590da5466f69418ddf57a
 
 # UI build stage
@@ -43,7 +43,7 @@ USER default
 
 # Install pnpm and workspace dependencies. Lifecycle scripts are restricted by
 # pnpm-workspace.yaml allowBuilds; Cypress binary installation is disabled explicitly.
-RUN npm install -g pnpm@11.22.0 # NOSONAR
+RUN npm install -g pnpm@11.22.0 --ignore-scripts # NOSONAR
 RUN CYPRESS_INSTALL_BINARY=0 pnpm install --frozen-lockfile --offline # NOSONAR
 
 # Build the module

@@ -16,7 +16,7 @@ USER default
 
 # Install pnpm and workspace dependencies. Lifecycle scripts are restricted by
 # pnpm-workspace.yaml allowBuilds; Cypress binary installation is disabled explicitly.
-RUN npm install -g pnpm@11.22.0 # NOSONAR
+RUN npm install -g pnpm@11.22.0 --ignore-scripts # NOSONAR
 RUN CYPRESS_INSTALL_BINARY=0 pnpm install --frozen-lockfile --offline # NOSONAR
 
 ENV TURBO_TELEMETRY_DISABLED=1
@@ -45,11 +45,27 @@ RUN npm install --prefix /opt/sealights slnodejs@6.1.1067 --ignore-scripts # NOS
 
 RUN --mount=type=secret,id=sealights-credentials/token \
     SEALIGHTS_TOKEN="$(cat /run/secrets/sealights-credentials/token)" && \
-    /opt/sealights/node_modules/.bin/slnodejs scan --token "${SEALIGHTS_TOKEN}" --buildsessionid "${SEALIGHTS_BSID}" --scm none --workspacepath "./frontend/public" --es6Modules --scmProvider github --scmBaseUrl https://github.com/red-hat-data-services/odh-dashboard/ --uniqueModuleId frontend
+    /opt/sealights/node_modules/.bin/slnodejs scan \
+    --token "${SEALIGHTS_TOKEN}" \
+    --buildsessionid "${SEALIGHTS_BSID}" \
+    --scm none \
+    --workspacepath "./frontend/public" \
+    --es6Modules \
+    --scmProvider github \
+    --scmBaseUrl https://github.com/red-hat-data-services/odh-dashboard/ \
+    --uniqueModuleId frontend
 
 RUN --mount=type=secret,id=sealights-credentials/token \
     SEALIGHTS_TOKEN="$(cat /run/secrets/sealights-credentials/token)" && \
-    /opt/sealights/node_modules/.bin/slnodejs scan --token "${SEALIGHTS_TOKEN}" --buildsessionid "${SEALIGHTS_BSID}" --scm none --workspacepath "./backend/dist" --es6Modules --scmProvider github --scmBaseUrl https://github.com/red-hat-data-services/odh-dashboard/ --uniqueModuleId backend
+    /opt/sealights/node_modules/.bin/slnodejs scan \
+    --token "${SEALIGHTS_TOKEN}" \
+    --buildsessionid "${SEALIGHTS_BSID}" \
+    --scm none \
+    --workspacepath "./backend/dist" \
+    --es6Modules \
+    --scmProvider github \
+    --scmBaseUrl https://github.com/red-hat-data-services/odh-dashboard/ \
+    --uniqueModuleId backend
 
 RUN --mount=type=secret,id=sealights-credentials/token \
     SEALIGHTS_TOKEN="$(cat /run/secrets/sealights-credentials/token)" && \
