@@ -50,7 +50,7 @@ spec:
   - name: hermetic
     value: true
   - name: prefetch-input
-    value: '[{"path":".","type":"pnpm"},{"path":"packages/gen-ai/bff","type":"gomod"}]'
+    value: '[{"path":".","type":"pnpm"},{"path":"packages/gen-ai/bff","type":"gomod"},{"path":".","type":"generic"}]'
   - name: build-image-index
     value: true
   - name: enable-slack-failure-notification

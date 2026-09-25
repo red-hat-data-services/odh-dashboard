@@ -51,7 +51,7 @@ spec:
     value: true
   - name: prefetch-input
     value: |
-      [{"type": "pnpm", "path": "."}, {"type": "gomod", "path": "packages/agent-ops/bff"}]
+      [{"type": "pnpm", "path": "."}, {"type": "gomod", "path": "packages/agent-ops/bff"}, {"type": "generic", "path": "."}]
   - name: build-image-index
     value: true
   - name: enable-slack-failure-notification

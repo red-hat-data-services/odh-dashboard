@@ -50,7 +50,7 @@ spec:
   - name: hermetic
     value: true
   - name: prefetch-input
-    value: '[{"path":".","type":"pnpm"},{"path":"packages/automl/bff","type":"gomod"}]'
+    value: '[{"path":".","type":"pnpm"},{"path":"packages/automl/bff","type":"gomod"},{"path":".","type":"generic"}]'
   - name: build-source-image
     value: true
   - name: build-image-index
