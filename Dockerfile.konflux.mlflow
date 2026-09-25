@@ -24,7 +24,8 @@ WORKDIR /usr/src/workspace
 
 ### Workspace setup
 # Copy root workspace manifest and lockfile for pnpm workspace resolution
-COPY --chown=default:root package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+# Hermeto rewrites .npmrc to point pnpm at its prefetched, offline tarball mirror.
+COPY --chown=default:root package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
 # Copy the frontend workspace manifest so its dependencies can be resolved if referenced
 COPY --chown=default:root frontend/package.json ./frontend/
 # Copy required shared workspace packages needed for module builds
