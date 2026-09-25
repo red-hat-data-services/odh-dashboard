@@ -16,7 +16,7 @@ USER default
 
 # Install pnpm and workspace dependencies. Lifecycle scripts are restricted by
 # pnpm-workspace.yaml allowBuilds; Cypress binary installation is disabled explicitly.
-RUN npm install -g pnpm@11.22.0
+RUN npm install -g pnpm@11.22.0 # NOSONAR
 RUN CYPRESS_INSTALL_BINARY=0 pnpm install --frozen-lockfile --offline # NOSONAR
 
 ENV TURBO_TELEMETRY_DISABLED=1
@@ -70,11 +70,12 @@ RUN mkdir /usr/src/app/logs && chmod 775 /usr/src/app/logs
 
 USER 1001:0
 
-COPY --chown=1001:0 --from=builder /usr/src/app/frontend/public /usr/src/app/frontend/public
-COPY --chown=1001:0 --from=builder /usr/src/app/backend/dist /usr/src/app/backend/dist
-COPY --chown=1001:0 --from=builder /usr/src/app/.env /usr/src/app/.env
-COPY --chown=1001:0 --from=builder /usr/src/app/data /usr/src/app/data
-COPY --chown=1001:0 --from=builder /opt/sealights /opt/sealights
+# Runtime assets are immutable; keep them root-owned so the application user cannot modify them.
+COPY --chown=0:0 --from=builder /usr/src/app/frontend/public /usr/src/app/frontend/public
+COPY --chown=0:0 --from=builder /usr/src/app/backend/dist /usr/src/app/backend/dist
+COPY --chown=0:0 --from=builder /usr/src/app/.env /usr/src/app/.env
+COPY --chown=0:0 --from=builder /usr/src/app/data /usr/src/app/data
+COPY --chown=0:0 --from=builder /opt/sealights /opt/sealights
 
 WORKDIR /usr/src/app/backend
 
