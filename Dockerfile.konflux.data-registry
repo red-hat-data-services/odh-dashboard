@@ -9,7 +9,7 @@ ARG BFF_SOURCE_CODE=./packages/${MODULE_NAME}/bff
 
 # SHA-pinned base images for RHOAI builds
 ARG NODE_BASE_IMAGE=registry.access.redhat.com/ubi9/nodejs-22@sha256:510a73eeff392500e22eadf976686dbd16c27eaa1a8808f8f51b29fec950f68c
-ARG GOLANG_BASE_IMAGE=registry.access.redhat.com/ubi9/go-toolset@sha256:0a4666f7a4eb0644c97a73cba198eb268691b270d97831822689e7a2088f87be
+ARG GOLANG_BASE_IMAGE=registry.access.redhat.com/ubi9/go-toolset:1.26@sha256:0a4666f7a4eb0644c97a73cba198eb268691b270d97831822689e7a2088f87be
 ARG DISTROLESS_BASE_IMAGE=registry.redhat.io/ubi9/ubi-minimal-pqc@sha256:22c70d6d7fa920df140c5facdce1f42178642ca7613590da5466f69418ddf57a
 
 # UI build stage
@@ -23,16 +23,21 @@ ARG PLATFORM_MODE
 WORKDIR /usr/src/workspace
 
 ### Workspace setup
-# Copy root workspace manifest first (allows npm to compute workspace graph)
-COPY --chown=default:root package.json package-lock.json* ./
+# Copy root workspace manifest and lockfile for pnpm workspace resolution
+# Hermeto rewrites .npmrc to point pnpm at its prefetched, offline tarball mirror.
+COPY --chown=default:root package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
 # Copy the frontend workspace manifest so its dependencies can be resolved if referenced
 COPY --chown=default:root frontend/package.json ./frontend/
 # Copy required shared workspace packages needed for module builds
 COPY --chown=default:root packages/app-config/ ./packages/app-config/
 COPY --chown=default:root packages/plugin-core/ ./packages/plugin-core/
+COPY --chown=default:root packages/foundation/ ./packages/foundation/
+COPY --chown=default:root packages/k8s-core/ ./packages/k8s-core/
+COPY --chown=default:root packages/ui-core/ ./packages/ui-core/
 COPY --chown=default:root packages/tsconfig/ ./packages/tsconfig/
 # Copy only the frontend source (not the entire frontend build artifacts) for cross-module imports
 COPY --chown=default:root frontend/src/ ./frontend/src/
+COPY --chown=default:root scripts/ ./scripts/
 
 # Copy the specific module source code
 COPY --chown=default:root ${UI_SOURCE_CODE} ./${UI_SOURCE_CODE}
@@ -40,19 +45,16 @@ COPY --chown=default:root ${UI_SOURCE_CODE} ./${UI_SOURCE_CODE}
 # Change file ownership to the assemble user
 USER default
 
-# Install workspace dependencies first (this creates node_modules at workspace level)
-RUN npm cache clean --force
-# Install all workspace dependencies (includes root + any copied workspaces)
-RUN npm ci --ignore-scripts
-
-# Set up the specific module
-WORKDIR /usr/src/workspace/${UI_SOURCE_CODE}
-
-# Install module dependencies
-RUN npm ci --ignore-scripts
+# Install pnpm and workspace dependencies. Lifecycle scripts are restricted by
+# pnpm-workspace.yaml allowBuilds; Cypress binary installation is disabled explicitly.
+RUN mkdir -p /tmp/pnpm && tar -xzf /cachi2/output/deps/generic/pnpm-11.22.0.tgz -C /tmp/pnpm --strip-components=1 # NOSONAR
+RUN mkdir -p /opt/app-root/src/.npm-global/bin
+RUN ln -s /tmp/pnpm/bin/pnpm.mjs /opt/app-root/src/.npm-global/bin/pnpm && ln -s /tmp/pnpm/bin/pnpx.mjs /opt/app-root/src/.npm-global/bin/pnpx # NOSONAR
+RUN CYPRESS_INSTALL_BINARY=0 pnpm install --frozen-lockfile --offline # NOSONAR
 
 # Build the module
-RUN npm run build:prod
+WORKDIR /usr/src/workspace/${UI_SOURCE_CODE}
+RUN pnpm run build:prod
 
 # BFF build stage
 FROM ${GOLANG_BASE_IMAGE} AS bff-builder

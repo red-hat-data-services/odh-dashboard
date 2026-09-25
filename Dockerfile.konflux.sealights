@@ -1,7 +1,7 @@
 # Build arguments
 ARG SOURCE_CODE=.
 
-FROM registry.access.redhat.com/ubi9/nodejs-22@sha256:510a73eeff392500e22eadf976686dbd16c27eaa1a8808f8f51b29fec950f68c as builder
+FROM registry.access.redhat.com/ubi9/nodejs-22@sha256:510a73eeff392500e22eadf976686dbd16c27eaa1a8808f8f51b29fec950f68c AS builder
 
 ## Build args to be used at this step
 ARG SOURCE_CODE
@@ -14,11 +14,15 @@ COPY --chown=default:root ${SOURCE_CODE} /usr/src/app
 # Change file ownership to the assemble user
 USER default
 
-RUN npm cache clean --force
-
-RUN npm ci --ignore-scripts
+# Install pnpm and workspace dependencies. Lifecycle scripts are restricted by
+# pnpm-workspace.yaml allowBuilds; Cypress binary installation is disabled explicitly.
+RUN mkdir -p /tmp/pnpm && tar -xzf /cachi2/output/deps/generic/pnpm-11.22.0.tgz -C /tmp/pnpm --strip-components=1 # NOSONAR
+RUN mkdir -p /opt/app-root/src/.npm-global/bin
+RUN ln -s /tmp/pnpm/bin/pnpm.mjs /opt/app-root/src/.npm-global/bin/pnpm && ln -s /tmp/pnpm/bin/pnpx.mjs /opt/app-root/src/.npm-global/bin/pnpx # NOSONAR
+RUN CYPRESS_INSTALL_BINARY=0 pnpm install --frozen-lockfile --offline # NOSONAR
 
 ENV TURBO_TELEMETRY_DISABLED=1
+ENV NODE_OPTIONS=--max-old-space-size=8192
 
 # Set Red Hat Openshift AI logo and links
 ENV ODH_LOGO=../images/rhoai-logo.svg
@@ -29,45 +33,54 @@ ENV DOC_LINK="https://docs.redhat.com/en/documentation/red_hat_openshift_ai/"
 ENV SUPPORT_LINK="https://access.redhat.com/support/cases/#/case/new/open-case?caseCreate=true"
 ENV COMMUNITY_LINK=""
 
-RUN npm run build
+RUN pnpm run build
 
 ## BEGIN SEALIGHTS
 ARG SEALIGHTS_BUILD_NAME=
 ARG SEALIGHTS_BSID=
 ARG COMMIT=
 
-RUN npm install slnodejs@6.1.1067
-
+# Keep Sealights isolated from the pnpm workspace and reuse this pinned installation
+# in the runtime image.
 USER root
+RUN npm install --prefix /opt/sealights slnodejs@6.1.1067 --ignore-scripts # NOSONAR
 
 RUN --mount=type=secret,id=sealights-credentials/token \
-    SEALIGHTS_TOKEN="$(cat /run/secrets/sealights-credentials/token)"  && cd ./frontend && \
-    ./node_modules/.bin/slnodejs scan --token "${SEALIGHTS_TOKEN}" --buildsessionid "${SEALIGHTS_BSID}" --scm none --workspacepath "./public" --es6Modules --scmProvider github --scmBaseUrl https://github.com/red-hat-data-services/odh-dashboard/  --uniqueModuleId frontend && \
-    cd ..
+    SEALIGHTS_TOKEN="$(cat /run/secrets/sealights-credentials/token)" && \
+    /opt/sealights/node_modules/.bin/slnodejs scan \
+    --token "${SEALIGHTS_TOKEN}" \
+    --buildsessionid "${SEALIGHTS_BSID}" \
+    --scm none \
+    --workspacepath "./frontend/public" \
+    --es6Modules \
+    --scmProvider github \
+    --scmBaseUrl https://github.com/red-hat-data-services/odh-dashboard/ \
+    --uniqueModuleId frontend
 
 RUN --mount=type=secret,id=sealights-credentials/token \
-    SEALIGHTS_TOKEN="$(cat /run/secrets/sealights-credentials/token)"  && cd ./backend && \
-    ../node_modules/.bin/slnodejs scan --token "${SEALIGHTS_TOKEN}" --buildsessionid "${SEALIGHTS_BSID}" --scm none --workspacepath "./dist" --es6Modules --scmProvider github --scmBaseUrl https://github.com/red-hat-data-services/odh-dashboard/  --uniqueModuleId backend && \
-    cd ..
+    SEALIGHTS_TOKEN="$(cat /run/secrets/sealights-credentials/token)" && \
+    /opt/sealights/node_modules/.bin/slnodejs scan \
+    --token "${SEALIGHTS_TOKEN}" \
+    --buildsessionid "${SEALIGHTS_BSID}" \
+    --scm none \
+    --workspacepath "./backend/dist" \
+    --es6Modules \
+    --scmProvider github \
+    --scmBaseUrl https://github.com/red-hat-data-services/odh-dashboard/ \
+    --uniqueModuleId backend
 
 RUN --mount=type=secret,id=sealights-credentials/token \
-    SEALIGHTS_TOKEN="$(cat /run/secrets/sealights-credentials/token)"  && \
-    ./node_modules/.bin/slnodejs buildend --token "${SEALIGHTS_TOKEN}" --buildsessionid "${SEALIGHTS_BSID}" --ok
+    SEALIGHTS_TOKEN="$(cat /run/secrets/sealights-credentials/token)" && \
+    /opt/sealights/node_modules/.bin/slnodejs buildend --token "${SEALIGHTS_TOKEN}" --buildsessionid "${SEALIGHTS_BSID}" --ok
 
 RUN --mount=type=secret,id=sealights-credentials/token \
-    SEALIGHTS_TOKEN="$(cat /run/secrets/sealights-credentials/token)"  && \
-    ./node_modules/.bin/slnodejs instrument --token "${SEALIGHTS_TOKEN}" --buildsessionid "${SEALIGHTS_BSID}" --workspacepath "./frontend/public" --outputpath sl_build --labid sl_LabId_ReplaceMe
+    SEALIGHTS_TOKEN="$(cat /run/secrets/sealights-credentials/token)" && \
+    /opt/sealights/node_modules/.bin/slnodejs instrument --token "${SEALIGHTS_TOKEN}" --buildsessionid "${SEALIGHTS_BSID}" --workspacepath "./frontend/public" --outputpath sl_build --labid sl_LabId_ReplaceMe
 RUN rm -rf ./frontend/public
 RUN mv -v sl_build ./frontend/public
-
-USER default
 ## END SEALIGHTS
 
-# Install only production dependencies
-# This is needed to remove the dev dependencies that were installed in the previous step
-RUN npm prune --omit=dev
-
-FROM registry.access.redhat.com/ubi9/nodejs-22@sha256:510a73eeff392500e22eadf976686dbd16c27eaa1a8808f8f51b29fec950f68c as runtime
+FROM registry.access.redhat.com/ubi9/nodejs-22@sha256:510a73eeff392500e22eadf976686dbd16c27eaa1a8808f8f51b29fec950f68c AS runtime
 
 WORKDIR /usr/src/app
 
@@ -75,22 +88,17 @@ RUN mkdir /usr/src/app/logs && chmod 775 /usr/src/app/logs
 
 USER 1001:0
 
-COPY --chown=default:root --from=builder /usr/src/app/frontend/public /usr/src/app/frontend/public
-COPY --chown=default:root --from=builder /usr/src/app/backend/package.json /usr/src/app/backend/package.json
-COPY --chown=default:root --from=builder /usr/src/app/backend/node_modules /usr/src/app/backend/node_modules
-COPY --chown=default:root --from=builder /usr/src/app/backend/dist /usr/src/app/backend/dist
-COPY --chown=default:root --from=builder /usr/src/app/package.json /usr/src/app/package.json
-COPY --chown=default:root --from=builder /usr/src/app/package-lock.json /usr/src/app/package-lock.json
-COPY --chown=default:root --from=builder /usr/src/app/node_modules /usr/src/app/node_modules
-COPY --chown=default:root --from=builder /usr/src/app/.npmrc /usr/src/app/.npmrc
-COPY --chown=default:root --from=builder /usr/src/app/.env /usr/src/app/.env
-COPY --chown=default:root --from=builder /usr/src/app/data /usr/src/app/data
+# Runtime assets are immutable; keep them root-owned so the application user cannot modify them.
+COPY --chown=0:0 --from=builder /usr/src/app/frontend/public /usr/src/app/frontend/public
+COPY --chown=0:0 --from=builder /usr/src/app/backend/dist /usr/src/app/backend/dist
+COPY --chown=0:0 --from=builder /usr/src/app/.env /usr/src/app/.env
+COPY --chown=0:0 --from=builder /usr/src/app/data /usr/src/app/data
+COPY --chown=0:0 --from=builder /opt/sealights /opt/sealights
 
 WORKDIR /usr/src/app/backend
 
 # BEGIN SEALIGHTS
-RUN npm install slnodejs
-ENV NODE_OPTIONS="--require ./node_modules/slnodejs/lib/preload.js"
+ENV NODE_OPTIONS="--require /opt/sealights/node_modules/slnodejs/lib/preload.js"
 
 ARG SEALIGHTS_BSID=
 ENV SL_BUILD_SESSION_ID=$SEALIGHTS_BSID
@@ -104,7 +112,9 @@ RUN chmod +r ${SL_TOKENFILE}
 USER 1001:0
 # END SEALIGHTS
 
-CMD ["npm", "run", "start"]
+ENV NODE_ENV=production
+ENV IP=127.0.0.1
+CMD ["node", "./dist/server.js"]
 
 LABEL com.redhat.component="odh-dashboard-container" \
       name="managed-open-data-hub/odh-dashboard-rhel8" \
