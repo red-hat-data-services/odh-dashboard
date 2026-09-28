@@ -44,21 +44,7 @@ spec:
   - name: hermetic
     value: true
   - name: prefetch-input
-    value: |
-      [
-        {
-          "path": ".",
-          "type": "npm"
-        },
-        {
-          "path": "packages/agent-ops/frontend",
-          "type": "npm"
-        },
-        {
-          "path": "packages/agent-ops/bff",
-          "type": "gomod"
-        }
-      ]
+    value: '[{"path":".","type":"pnpm"},{"path":"packages/agent-ops/bff","type":"gomod"},{"path":".","type":"generic"}]'
   - name: build-source-image
     value: true
   - name: build-image-index

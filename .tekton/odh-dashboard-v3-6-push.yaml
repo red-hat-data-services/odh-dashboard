@@ -42,13 +42,7 @@ spec:
   - name: hermetic
     value: true
   - name: prefetch-input
-    value: |
-      [
-        {
-          "type": "npm",
-          "path": "."
-        }
-      ]
+    value: '[{"path":".","type":"pnpm"},{"path":".","type":"generic"}]'
   - name: build-source-image
     value: true
   - name: build-image-index

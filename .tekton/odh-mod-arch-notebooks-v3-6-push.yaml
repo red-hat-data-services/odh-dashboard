@@ -39,7 +39,7 @@ spec:
   - name: hermetic
     value: true
   - name: prefetch-input
-    value: '[{"type": "npm", "path": "."}, {"type": "npm", "path": "packages/notebooks/upstream/workspaces/frontend"}, {"type": "gomod", "path": "packages/notebooks/upstream/workspaces/backend"}, {"type": "gomod", "path": "packages/notebooks/upstream/workspaces/controller"}]'
+    value: '[{"path":".","type":"pnpm"},{"path":"packages/notebooks/upstream/workspaces/frontend","type":"npm"},{"path":"packages/notebooks/upstream/workspaces/backend","type":"gomod"},{"path":"packages/notebooks/upstream/workspaces/controller","type":"gomod"},{"path":".","type":"generic"}]'
   - name: build-platforms
     value:
     - linux/x86_64
