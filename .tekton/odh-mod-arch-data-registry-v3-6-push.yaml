@@ -39,21 +39,7 @@ spec:
   - name: hermetic
     value: true
   - name: prefetch-input
-    value: |
-      [
-        {
-          "path": ".",
-          "type": "npm"
-        },
-        {
-          "path": "packages/data-registry/frontend",
-          "type": "npm"
-        },
-        {
-          "path": "packages/data-registry/bff",
-          "type": "gomod"
-        }
-      ]
+    value: '[{"path":".","type":"pnpm"},{"path":"packages/data-registry/bff","type":"gomod"},{"path":".","type":"generic"}]'
   - name: build-platforms
     value:
     - linux/x86_64
