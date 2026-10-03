@@ -40,7 +40,7 @@ RUN pnpm run build
 USER 0
 RUN update-crypto-policies --set DEFAULT:PQ --no-reload
 
-FROM registry.access.redhat.com/ubi9/nodejs-22-minimal@sha256:9823eba78a979ab9b4346a91678d74518bdeb1fc762752689bf1354cbc492b54 AS runtime
+FROM registry.access.redhat.com/ubi9/nodejs-22-minimal@sha256:ca1c79182159009eb15a041bc6bb16f390a4e738b9d57d6cc4975f3b2981788b AS runtime
 
 COPY --from=builder /etc/crypto-policies /etc/crypto-policies
 
