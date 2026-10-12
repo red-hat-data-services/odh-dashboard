@@ -7,7 +7,11 @@ import type { UserAuthConfig } from '../types';
 
 // MaaS Wizard Field helpers for the model deployment wizard
 class MaaSWizardField {
-  findSaveAsMaaSCheckbox() {
+  findProjectMembersRadio() {
+    return cy.findByTestId('project-members-radio');
+  }
+
+  findSubscribedUsersRadio() {
     return cy.findByTestId('maas/save-as-maas-checkbox');
   }
 }
@@ -212,6 +216,10 @@ class APIKeyTableRow extends TableRow {
     return this.find().findByTestId('subscription-detail-link');
   }
 
+  findSubscriptionGovernanceLink(): Cypress.Chainable<JQuery<HTMLElement>> {
+    return this.find().findByTestId('subscription-governance-link');
+  }
+
   findOwner(): Cypress.Chainable<JQuery<HTMLElement>> {
     return this.find().findByTestId('api-key-owner');
   }
@@ -329,20 +337,55 @@ class CreateApiKeyModal extends Modal {
     return this.find().findByTestId('api-key-description-input');
   }
 
-  findExpirationToggle(): Cypress.Chainable<JQuery<HTMLElement>> {
-    return this.find().findByTestId('api-key-expiration-toggle');
+  findExpirationModeToggle(): Cypress.Chainable<JQuery<HTMLElement>> {
+    return this.find().findByTestId('api-key-expiration-mode-toggle');
   }
 
-  findExpirationOption(value: string): Cypress.Chainable<JQuery<HTMLElement>> {
-    return cy.findByTestId(`api-key-expiration-option-${value}`);
+  findExpirationModeOption(
+    mode: 'max' | 'onDate' | 'after',
+  ): Cypress.Chainable<JQuery<HTMLElement>> {
+    return cy.findByTestId(`api-key-expiration-mode-${mode}`);
   }
 
-  findCustomDaysInput(): Cypress.Chainable<JQuery<HTMLElement>> {
-    return this.find().findByTestId('api-key-custom-days-input');
+  selectExpirationMode(mode: 'max' | 'onDate' | 'after'): void {
+    this.findExpirationModeToggle().click();
+    this.findExpirationModeOption(mode).click();
   }
 
-  findCustomDaysErrorMessage(): Cypress.Chainable<JQuery<HTMLElement>> {
-    return this.find().findByTestId('api-key-custom-days-error-message');
+  // Use .find() (not findByTestId) so .should('not.exist') works after leaving on-date mode.
+  findExpirationDatePicker(): Cypress.Chainable<JQuery<HTMLElement>> {
+    return this.find().find('[data-testid="api-key-expiration-date-picker"]');
+  }
+
+  findExpirationDateInput(): Cypress.Chainable<JQuery<HTMLInputElement>> {
+    return this.findExpirationDatePicker().find('input');
+  }
+
+  findAfterDaysInput(): Cypress.Chainable<JQuery<HTMLElement>> {
+    return this.find().find('[data-testid="api-key-expiration-after-days-input"]');
+  }
+
+  findExpirationHelper(): Cypress.Chainable<JQuery<HTMLElement>> {
+    return this.find().findByTestId('api-key-expiration-helper');
+  }
+
+  /** Sets after-days mode and enters a day count. */
+  setAfterDays(days: number): void {
+    this.selectExpirationMode('after');
+    this.findAfterDaysInput().clear().type(String(days)).blur();
+  }
+
+  /** Sets on-date mode and enters today + days (YYYY-MM-DD). */
+  setExpirationDaysFromToday(days: number): void {
+    this.selectExpirationMode('onDate');
+    const date = new Date();
+    date.setDate(date.getDate() + days);
+    const value = [
+      date.getFullYear(),
+      String(date.getMonth() + 1).padStart(2, '0'),
+      String(date.getDate()).padStart(2, '0'),
+    ].join('-');
+    this.findExpirationDateInput().clear().type(value).blur();
   }
 
   findSubmitButton(): Cypress.Chainable<JQuery<HTMLElement>> {
@@ -456,6 +499,35 @@ class CopyApiKeyModal extends Modal {
 
   findCloseButton(): Cypress.Chainable<JQuery<HTMLElement>> {
     return cy.findByTestId('close-api-key-button');
+  }
+
+  findModelDocumentation(): Cypress.Chainable<JQuery<HTMLElement>> {
+    return this.find().find('#api-key-model-documentation');
+  }
+
+  findAvailableModelsToggle(): Cypress.Chainable<JQuery<HTMLElement>> {
+    return this.find().findByTestId('api-key-available-models-toggle');
+  }
+
+  findAvailableModelsOption(value: string): Cypress.Chainable<JQuery<HTMLElement>> {
+    return cy.findByTestId(`api-key-available-models-option-${value}`);
+  }
+
+  selectAvailableModel(value: string): void {
+    this.findAvailableModelsToggle().click();
+    this.findAvailableModelsOption(value).click();
+  }
+
+  findSubscriptionID(): Cypress.Chainable<JQuery<HTMLElement>> {
+    return this.find().find('#api-key-subscription-id');
+  }
+
+  findModelID(): Cypress.Chainable<JQuery<HTMLElement>> {
+    return this.find().find('#api-key-model-id');
+  }
+
+  findBaseURL(): Cypress.Chainable<JQuery<HTMLElement>> {
+    return this.find().find('#api-key-base-url');
   }
 }
 
@@ -1868,6 +1940,14 @@ class ExternalModelsPage {
   findAddExternalModelButton(): Cypress.Chainable<JQuery<HTMLElement>> {
     return cy.findByTestId('add-external-model-button');
   }
+
+  findMaaSPublishedPostDeployAlert() {
+    return cy.findByTestId('maas-published-post-deploy-alert');
+  }
+
+  findMaaSPublishedPostDeployAlertLink() {
+    return cy.findByTestId('maas-published-post-deploy-alert-link');
+  }
 }
 
 class ProviderRefTableRow extends Contextual<HTMLElement> {
@@ -1932,6 +2012,14 @@ class CreateExternalModelPage {
 
   findDisplayNameInput(): Cypress.Chainable<JQuery<HTMLElement>> {
     return cy.findByTestId('external-model-name-desc-name');
+  }
+
+  findEditResourceNameButton(): Cypress.Chainable<JQuery<HTMLElement>> {
+    return cy.findByTestId('external-model-name-desc-editResourceLink');
+  }
+
+  findResourceNameInput(): Cypress.Chainable<JQuery<HTMLElement>> {
+    return cy.findByTestId('external-model-name-desc-resourceName');
   }
 
   findDescriptionInput(): Cypress.Chainable<JQuery<HTMLElement>> {
