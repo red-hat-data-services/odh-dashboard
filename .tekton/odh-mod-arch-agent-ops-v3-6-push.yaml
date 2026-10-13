@@ -12,7 +12,7 @@ metadata:
     pipelinesascode.tekton.dev/on-cel-expression: |
       event == "push"
       && target_branch == "rhoai-3.6"
-      && ( "packages/agent-ops/**".pathChanged()
+      && ( "packages/agent-ops/**".pathChanged() || "prefetch/pnpm/**".pathChanged()
       || ".tekton/odh-mod-arch-agent-ops-v3-6-push.yaml".pathChanged()
       || "Dockerfile.konflux.agent-ops".pathChanged() )
   labels:
@@ -44,7 +44,7 @@ spec:
   - name: hermetic
     value: true
   - name: prefetch-input
-    value: '[{"path":".","type":"pnpm"},{"path":"packages/agent-ops/bff","type":"gomod"},{"path":".","type":"generic"}]'
+    value: '[{"path":".","type":"pnpm"},{"path":"prefetch/pnpm","type":"npm"},{"path":"packages/agent-ops/bff","type":"gomod"},{"path":".","type":"generic"}]'
   - name: build-source-image
     value: true
   - name: build-image-index

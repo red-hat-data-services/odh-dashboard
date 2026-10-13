@@ -12,7 +12,7 @@ metadata:
     pipelinesascode.tekton.dev/on-cel-expression: |
       event == "push"
       && target_branch == "rhoai-3.6"
-      && ( "packages/maas/**".pathChanged() 
+      && ( "packages/maas/**".pathChanged() || "prefetch/pnpm/**".pathChanged() 
       || ".tekton/odh-mod-arch-maas-v3-6-push.yaml".pathChanged() 
       || "Dockerfile.konflux.maas".pathChanged() )
   labels:
@@ -44,7 +44,7 @@ spec:
   - name: hermetic
     value: true
   - name: prefetch-input
-    value: '[{"path":".","type":"pnpm"},{"path":"packages/maas/bff","type":"gomod"},{"path":".","type":"generic"}]'
+    value: '[{"path":".","type":"pnpm"},{"path":"prefetch/pnpm","type":"npm"},{"path":"packages/maas/bff","type":"gomod"},{"path":".","type":"generic"}]'
   - name: build-source-image
     value: true
   - name: build-image-index
