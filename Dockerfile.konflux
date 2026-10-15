@@ -16,9 +16,10 @@ USER default
 
 # Lifecycle scripts are restricted by pnpm-workspace.yaml allowBuilds; Cypress
 # binary installation is disabled explicitly.
-RUN mkdir -p /tmp/pnpm && tar -xzf /cachi2/output/deps/generic/pnpm-11.22.0.tgz -C /tmp/pnpm --strip-components=1 # NOSONAR
-RUN mkdir -p /opt/app-root/src/.npm-global/bin
-RUN ln -s /tmp/pnpm/bin/pnpm.mjs /opt/app-root/src/.npm-global/bin/pnpm && ln -s /tmp/pnpm/bin/pnpx.mjs /opt/app-root/src/.npm-global/bin/pnpx # NOSONAR
+# Install the pinned pnpm CLI from the npm-prefetched bootstrap package.
+ENV PATH="/usr/src/app/prefetch/pnpm/node_modules/.bin:${PATH}"
+RUN npm ci --prefix ./prefetch/pnpm --prefer-offline --ignore-scripts --no-audit --no-fund --no-progress \
+    && test "$(pnpm --version)" = "11.22.0" # NOSONAR
 RUN CYPRESS_INSTALL_BINARY=0 pnpm install --frozen-lockfile --offline # NOSONAR
 
 ENV TURBO_TELEMETRY_DISABLED=1
