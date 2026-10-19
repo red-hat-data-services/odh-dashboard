@@ -48,7 +48,7 @@ const EvaluateTab: React.FC<EvaluateTabProps> = ({
     >
       <StackItem>
         <Title headingLevel="h2" size="lg">
-          My benchmark suites
+          My benchmark collections
         </Title>
       </StackItem>
       <StackItem>

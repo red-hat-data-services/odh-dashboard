@@ -4,7 +4,6 @@ import { mockNamespace } from '~/__mocks__/mockNamespace';
 import { mockUserSettings } from '~/__mocks__/mockUserSettings';
 import { mockEvalHubHealth } from '~/__mocks__/mockEvalHubHealth';
 import { mockEvaluationJob } from '~/__mocks__/mockEvaluationJob';
-import { mockKueueAvailability } from '~/__mocks__/mockKueueAvailability';
 import {
   mockCollectionsListResponse,
   mockCuratedBenchmarkSuiteCollections,
@@ -41,12 +40,6 @@ const setupIntercepts = () => {
     mockCollectionsListResponse(mockCuratedBenchmarkSuiteCollections()),
   );
   cy.interceptApi('GET /api/:apiVersion/evaluations/providers', { path: API_VERSION }, []);
-  cy.interceptApi(
-    'GET /api/:apiVersion/kueue/availability',
-    { path: API_VERSION },
-    mockKueueAvailability(),
-  );
-  cy.interceptApi('GET /api/:apiVersion/hardwareprofiles', { path: API_VERSION }, { items: [] });
   cy.interceptApi('GET /api/:apiVersion/inferenceservices', { path: API_VERSION }, { items: [] });
   cy.intercept('GET', '/_bff/mlflow/api/v1/experiments*', {
     body: { data: { experiments: [] } },
@@ -101,7 +94,7 @@ const prepareRunForm = () => {
     .findRunDescription()
     .should(
       'contain.text',
-      'An unchanged copy of this benchmark suite will be reused if one already exists in your project; otherwise, it will be copied before the evaluation starts.',
+      'An unchanged copy of this collection will be reused if one already exists in your project; otherwise, it will be copied before the evaluation starts.',
     );
   startEvaluationRunPage.findModelPickerToggle().click();
   startEvaluationRunPage.findExternalModelOption().click();
@@ -256,7 +249,7 @@ describe('Curated benchmark suite Run CTA', () => {
 
     cy.wait(['@cloneCuratedSuite', '@createCuratedSuiteRun', '@deleteCopiedSuite']);
     startEvaluationRunPage
-      .findNotificationTitle('Failed to start evaluation and remove copied suite')
+      .findNotificationTitle('Failed to start evaluation and remove copied collection')
       .should('exist');
     startEvaluationRunPage.findNotificationMessage(/Cleanup error:/).should('exist');
   });
@@ -327,7 +320,7 @@ describe('Curated benchmark suite Run CTA', () => {
 
     cy.wait('@tenantCollectionsFailure');
     startEvaluationRunPage
-      .findNotificationTitle('Failed to find existing suite copy')
+      .findNotificationTitle('Failed to find existing collection copy')
       .should('exist');
     cy.get('@unexpectedClone.all').should('have.length', 0);
     cy.get('@unexpectedRun.all').should('have.length', 0);

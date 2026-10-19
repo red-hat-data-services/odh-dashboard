@@ -209,6 +209,45 @@ func TestIntegration_MaaSPortalConditionMigration(t *testing.T) {
 			}
 			assert.Equal(t, tt.wantReady, conditionStatus(updated, string(common.ConditionTypeReady)))
 			assert.Equal(t, tt.wantPhase, updated.Status.Phase)
+
+			// Backdate persisted conditions to expose timestamp churn even when
+			// consecutive reconciliations occur within the same second.
+			oldTime := metav1.NewTime(time.Unix(1, 0))
+			for i := range updated.Status.Conditions {
+				updated.Status.Conditions[i].LastTransitionTime = oldTime
+			}
+			require.NoError(t, k8sClient.Status().Update(ctx, updated))
+			stable := getDashboard(t)
+			for range 2 {
+				reconcile(t, r)
+				updated = getDashboard(t)
+				assert.Equal(t, stable.Status, updated.Status)
+				assert.Equal(t, stable.ResourceVersion, updated.ResourceVersion, "stable status must not generate update events")
+			}
+
+			// A previous canonical failure must not block recovery. A reason or
+			// severity change alone must preserve the time; a status change must not.
+			for _, previousStatus := range []metav1.ConditionStatus{metav1.ConditionFalse, metav1.ConditionTrue} {
+				updated = getDashboard(t)
+				conditions.RemoveStatusCondition(updated, ctrlpkg.ConditionMaaSPortalAvailable)
+				conditions.SetStatusCondition(updated, common.Condition{
+					Type: ctrlpkg.ConditionMaaSPortalAvailable, Status: previousStatus,
+					Reason: "MaaSPortalFederationConfigMapFailed", Message: "previous reconciliation failed",
+					Severity: common.ConditionSeverityError, LastTransitionTime: oldTime,
+				})
+				require.NoError(t, k8sClient.Status().Update(ctx, updated))
+				reconcile(t, r)
+				recovered := conditions.FindStatusCondition(getDashboard(t), ctrlpkg.ConditionMaaSPortalAvailable)
+				require.NotNil(t, recovered)
+				assert.Equal(t, portal.Status, recovered.Status)
+				assert.Equal(t, tt.wantReason, recovered.Reason)
+				assert.Equal(t, tt.wantReady, conditionStatus(getDashboard(t), string(common.ConditionTypeReady)))
+				if previousStatus == recovered.Status {
+					assert.True(t, oldTime.Equal(&recovered.LastTransitionTime))
+				} else {
+					assert.True(t, recovered.LastTransitionTime.After(oldTime.Time))
+				}
+			}
 		})
 	}
 }
@@ -249,7 +288,7 @@ func TestIntegration_CoreDashboardAndMaaSPortalRoutesShareGateway(t *testing.T) 
 		path string
 	}{
 		{name: "rhods-dashboard", path: "/"},
-		{name: "maas-portal", path: "/maas-consumer-portal"},
+		{name: "maas-portal", path: "/maas-portal"},
 	} {
 		t.Run(tt.name, func(t *testing.T) {
 			route := &gatewayv1.HTTPRoute{}
@@ -318,6 +357,9 @@ func TestIntegration_MaaSPortalLifecycle(t *testing.T) {
 	deployment := &appsv1.Deployment{}
 	require.NoError(t, k8sClient.Get(ctx, types.NamespacedName{Name: "maas-portal", Namespace: integrationNamespace}, deployment))
 	deployment.Status.ObservedGeneration = deployment.Generation
+	deployment.Status.Replicas = 1
+	deployment.Status.ReadyReplicas = 1
+	deployment.Status.AvailableReplicas = 1
 	deployment.Status.Conditions = []appsv1.DeploymentCondition{{Type: appsv1.DeploymentAvailable, Status: corev1.ConditionTrue}}
 	require.NoError(t, k8sClient.Status().Update(ctx, deployment))
 	for _, name := range []string{"maas-ui", "gen-ai-ui"} {
@@ -337,17 +379,22 @@ func TestIntegration_MaaSPortalLifecycle(t *testing.T) {
 	require.Len(t, route.Spec.Rules[0].Matches, 1)
 	require.NotNil(t, route.Spec.Rules[0].Matches[0].Path)
 	assert.Equal(t, gatewayv1.PathMatchExact, *route.Spec.Rules[0].Matches[0].Path.Type)
-	assert.Equal(t, "/maas-consumer-portal", *route.Spec.Rules[0].Matches[0].Path.Value)
+	assert.Equal(t, "/maas-portal", *route.Spec.Rules[0].Matches[0].Path.Value)
 	require.Len(t, route.Spec.Rules[1].Matches, 1)
 	require.NotNil(t, route.Spec.Rules[1].Matches[0].Path)
 	assert.Equal(t, gatewayv1.PathMatchPathPrefix, *route.Spec.Rules[1].Matches[0].Path.Type)
-	assert.Equal(t, "/maas-consumer-portal", *route.Spec.Rules[1].Matches[0].Path.Value)
+	assert.Equal(t, "/maas-portal", *route.Spec.Rules[1].Matches[0].Path.Value)
 
 	// Model an upgrade from the previous bundle. Applying this object with the
 	// operator's field owner means the next reconciliation must remove the
-	// formerly-owned hostname field without replacing the route.
+	// formerly-owned hostname and retire the browser prefix without replacing
+	// the route's resource identity.
 	preFixRoute := route.DeepCopy()
 	preFixRoute.Spec.Hostnames = []gatewayv1.Hostname{"test.example.com"}
+	for i := range preFixRoute.Spec.Rules {
+		preFixRoute.Spec.Rules[i].Matches[0].Path.Value = new("/maas-consumer-portal")
+	}
+	preFixRoute.Spec.Rules[0].Filters[0].RequestRedirect.Path.ReplaceFullPath = new("/maas-consumer-portal/")
 	preFixObject, err := runtime.DefaultUnstructuredConverter.ToUnstructured(preFixRoute)
 	require.NoError(t, err)
 	preFix := &unstructured.Unstructured{Object: preFixObject}
@@ -366,10 +413,28 @@ func TestIntegration_MaaSPortalLifecycle(t *testing.T) {
 		{Type: string(gatewayv1.RouteConditionResolvedRefs), Status: metav1.ConditionTrue, ObservedGeneration: route.Generation},
 	}}}
 	require.NoError(t, k8sClient.Status().Update(ctx, route))
+	for range 2 {
+		result := reconcile(t, r)
+		assert.Equal(t, ctrlpkg.MaaSPortalRetryInterval, result.RequeueAfter)
+		assert.Equal(t, "MigrationPending", conditionReason(getDashboard(t), ctrlpkg.ConditionMaaSPortalAvailable))
+		require.NoError(t, k8sClient.Get(ctx, types.NamespacedName{Name: "maas-portal", Namespace: integrationNamespace}, route))
+		assert.Equal(t, previousRouteUID, route.GetUID())
+		assert.Equal(t, preFixRoute.Spec, route.Spec, "healthy old replicas must retain the old browser prefix while rollout is stalled")
+		assert.Empty(t, getDashboard(t).Status.MaaSPortalURL, "do not publish the new URL before prefix cutover")
+	}
+	require.NoError(t, k8sClient.Get(ctx, types.NamespacedName{Name: "maas-portal", Namespace: integrationNamespace}, deployment))
+	assert.Zero(t, deployment.Status.UpdatedReplicas)
+	deployment.Status.ObservedGeneration = deployment.Generation
+	deployment.Status.UpdatedReplicas = 1
+	require.NoError(t, k8sClient.Status().Update(ctx, deployment))
 	reconcile(t, r)
 	require.NoError(t, k8sClient.Get(ctx, types.NamespacedName{Name: "maas-portal", Namespace: integrationNamespace}, route))
 	assert.Equal(t, previousRouteUID, route.GetUID(), "removing hostnames must update the existing HTTPRoute")
 	assert.Empty(t, route.Spec.Hostnames)
+	for _, rule := range route.Spec.Rules {
+		assert.Equal(t, "/maas-portal", *rule.Matches[0].Path.Value, "reconciliation must retire the previous browser prefix")
+	}
+	assert.Equal(t, "/maas-portal/", *route.Spec.Rules[0].Filters[0].RequestRedirect.Path.ReplaceFullPath)
 	for i := range route.Status.Parents[0].Conditions {
 		route.Status.Parents[0].Conditions[i].ObservedGeneration = route.Generation
 	}
@@ -382,7 +447,8 @@ func TestIntegration_MaaSPortalLifecycle(t *testing.T) {
 	assert.Equal(t, common.PhaseReady, updated.Status.Phase)
 	assert.Equal(t, metav1.ConditionTrue, conditionStatus(updated, string(common.ConditionTypeReady)))
 	assert.Equal(t, metav1.ConditionTrue, conditionStatus(updated, "MaaSPortalAvailable"))
-	assert.Equal(t, "https://test.example.com/maas-consumer-portal/", updated.Status.MaaSPortalURL)
+	assert.Equal(t, "https://test.example.com/maas-portal/", updated.Status.MaaSPortalURL)
+	assert.Equal(t, updated.Status.MaaSPortalURL, updated.Status.MaaSConsumerPortalURL)
 
 	// Updating a portal input reapplies the complete bundle, but retains the
 	// previous URL until the Deployment and HTTPRoute have observed the update.
@@ -398,7 +464,7 @@ func TestIntegration_MaaSPortalLifecycle(t *testing.T) {
 	require.NoError(t, k8sClient.Get(ctx, types.NamespacedName{Name: "maas-portal", Namespace: integrationNamespace}, route))
 	assert.Equal(t, previousRouteUID, route.GetUID(), "gateway-domain changes must update the existing HTTPRoute")
 	assert.Empty(t, route.Spec.Hostnames, "gateway-domain changes must not restore route hostnames")
-	assert.Equal(t, "https://test.example.com/maas-consumer-portal/", getDashboard(t).Status.MaaSPortalURL)
+	assert.Equal(t, "https://test.example.com/maas-portal/", getDashboard(t).Status.MaaSPortalURL)
 
 	deployment.Status.ObservedGeneration = deployment.Generation
 	require.NoError(t, k8sClient.Status().Update(ctx, deployment))
@@ -407,7 +473,7 @@ func TestIntegration_MaaSPortalLifecycle(t *testing.T) {
 	}
 	require.NoError(t, k8sClient.Status().Update(ctx, route))
 	reconcile(t, r)
-	assert.Equal(t, "https://updated.example.com/maas-consumer-portal/", getDashboard(t).Status.MaaSPortalURL)
+	assert.Equal(t, "https://updated.example.com/maas-portal/", getDashboard(t).Status.MaaSPortalURL)
 
 	// A transient bundle apply error reports an actionable condition, requests a
 	// retry, and retains the previously verified endpoint.
@@ -433,7 +499,7 @@ func TestIntegration_MaaSPortalLifecycle(t *testing.T) {
 	assert.Equal(t, ctrlpkg.MaaSPortalRetryInterval, result.RequeueAfter)
 	updated = getDashboard(t)
 	assert.Equal(t, "MaaSPortalDeployFailed", conditionReason(updated, "MaaSPortalAvailable"))
-	assert.Equal(t, "https://updated.example.com/maas-consumer-portal/", updated.Status.MaaSPortalURL)
+	assert.Equal(t, "https://updated.example.com/maas-portal/", updated.Status.MaaSPortalURL)
 
 	// service-ca normally creates this unlabelled Secret; model it explicitly to
 	// verify portal removal does not rely on owner-reference garbage collection.
@@ -752,7 +818,7 @@ func TestIntegration_MaaSPortalLegacyResourceMigration(t *testing.T) {
 	for range 2 {
 		current := getDashboard(t)
 		assert.Equal(t, metav1.ConditionTrue, conditionStatus(current, ctrlpkg.ConditionMaaSPortalAvailable), "post-cutover deletion must not hide the serving portal")
-		assert.Equal(t, "https://test.example.com/maas-consumer-portal/", current.Status.MaaSPortalURL)
+		assert.Equal(t, "https://test.example.com/maas-portal/", current.Status.MaaSPortalURL)
 		assert.Equal(t, current.Status.MaaSPortalURL, current.Status.MaaSConsumerPortalURL)
 		require.NoError(t, k8sClient.Get(ctx, client.ObjectKeyFromObject(legacySecret), legacySecret))
 		require.NotNil(t, legacySecret.DeletionTimestamp)

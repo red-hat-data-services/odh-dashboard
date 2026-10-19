@@ -23,10 +23,12 @@ import {
   Dropdown,
   DropdownList,
   DropdownItem,
+  Divider,
   Toolbar,
   ToolbarContent,
   ToolbarGroup,
   ToolbarItem,
+  Tooltip,
 } from '@patternfly/react-core';
 import { FilterIcon, EllipsisVIcon } from '@patternfly/react-icons';
 import { Table, Thead, Tr, Th, Tbody, Td, ThProps } from '@patternfly/react-table';
@@ -40,12 +42,13 @@ import {
   isConnectionError,
 } from '~/app/api/dataRegistry';
 import { useNotification } from '~/app/hooks/useNotification';
-import { assetDetailUrl, projectConnectionsUrl } from '~/app/utilities/routes';
+import { assetDetailUrl, projectConnectionUrl } from '~/app/utilities/routes';
 import { getFormatBadge, FORMAT_OPTIONS } from '~/app/utilities/formatUtils';
 import AccessDeniedError from '~/app/components/errors/AccessDeniedError';
 import ConnectionError from '~/app/components/errors/ConnectionError';
 import ConnectionRefLink from '~/app/components/ConnectionRefLink';
 import { ConnectionModel } from '~/app/types';
+import { getConnectionKey } from '~/app/utilities/connectionUtils';
 import ServiceUnavailableError from '~/app/components/errors/ServiceUnavailableError';
 import noAssetsImage from '~/images/no-assets.png';
 import DeleteAssetModal from './DeleteAssetModal';
@@ -59,6 +62,9 @@ type RegistryTableProps = {
   labels: string[];
   project: string;
   connections?: ConnectionModel[];
+  connectionDisplayData?: ConnectionModel[];
+  connectionsLoaded?: boolean;
+  connectionsError?: Error;
   onManageCollections: (onReturnToEdit?: () => void) => void;
   onManageLabels: (onReturnToEdit?: () => void) => void;
   onRegisterData: () => void;
@@ -103,8 +109,13 @@ const CATEGORY_LABELS: Record<FilterCategory, string> = {
   format: 'Format',
 };
 
+const REGISTRY_SEARCH_PLACEHOLDER = 'Filter by name, description, properties or labels';
+
 const EMPTY_REGISTRY_DESCRIPTION =
-  'Data assets point to the exact location within a connection where information is located, and can be used across workbenches and pipelines in your project. To get started, create a data asset.';
+  'To help users in your organization discover and understand external data, create a data asset. Data assets are metadata records that store information like location, format, and schema, but not the data itself.';
+
+const ASSET_LOCATION_INFO =
+  'This column shows the connection or path for each data asset. If both are specified, the connection is shown.';
 
 const EmptyRegistryStateIcon: React.FC<React.ImgHTMLAttributes<HTMLImageElement>> = ({
   className,
@@ -126,12 +137,18 @@ const RegistryTable: React.FC<RegistryTableProps> = ({
   labels,
   project,
   connections = [],
+  connectionDisplayData,
+  connectionsLoaded = false,
+  connectionsError,
   onManageCollections,
   onManageLabels,
   onRegisterData,
   onRetry,
   hasWriteAccess = true,
 }) => {
+  const displayConnections = connectionDisplayData ?? connections;
+  const hasExistingDchConnectionReferences =
+    loaded && assets.some((asset) => asset.rawAsset?.connection_ref?.type === 'dch');
   const notification = useNotification();
   const [searchText, setSearchText] = React.useState('');
   const [filterCategory, setFilterCategory] = React.useState<FilterCategory>('labels');
@@ -505,20 +522,22 @@ const RegistryTable: React.FC<RegistryTableProps> = ({
               <ToolbarItem>{renderValueDropdown()}</ToolbarItem>
               {/* Search */}
               <ToolbarItem>
-                <SearchInput
-                  placeholder="Filter by name, description, properties or labels"
-                  value={searchText}
-                  onChange={(_event, value) => {
-                    setSearchText(value);
-                    setPage(1);
-                  }}
-                  onClear={() => {
-                    setSearchText('');
-                    setPage(1);
-                  }}
-                  data-testid="asset-search"
-                  className="odh-data-registry-registry-table__search"
-                />
+                <Tooltip content={REGISTRY_SEARCH_PLACEHOLDER}>
+                  <SearchInput
+                    placeholder={REGISTRY_SEARCH_PLACEHOLDER}
+                    value={searchText}
+                    onChange={(_event, value) => {
+                      setSearchText(value);
+                      setPage(1);
+                    }}
+                    onClear={() => {
+                      setSearchText('');
+                      setPage(1);
+                    }}
+                    data-testid="asset-search"
+                    className="odh-data-registry-registry-table__search"
+                  />
+                </Tooltip>
               </ToolbarItem>
             </ToolbarGroup>
             {/* Register data button */}
@@ -700,13 +719,26 @@ const RegistryTable: React.FC<RegistryTableProps> = ({
           ) : null}
         </Toolbar>
 
-        <Table aria-label="Registry assets" data-testid="registry-table">
+        <Table
+          aria-label="Registry assets"
+          borders={assets.length > 0}
+          data-testid="registry-table"
+        >
           {assets.length > 0 ? (
             <Thead>
               <Tr>
                 <Th sort={getSortParams(0)}>Name</Th>
                 <Th sort={getSortParams(1)}>Format</Th>
-                <Th sort={getSortParams(2)}>Asset location</Th>
+                <Th
+                  sort={getSortParams(2)}
+                  info={{
+                    popover: ASSET_LOCATION_INFO,
+                    ariaLabel: 'Asset location information',
+                    className: 'odh-data-registry-registry-table__asset-location-info',
+                  }}
+                >
+                  Asset location
+                </Th>
                 <Th>Labels</Th>
                 <Th screenReaderText="Actions" />
               </Tr>
@@ -758,10 +790,15 @@ const RegistryTable: React.FC<RegistryTableProps> = ({
             ) : (
               paginatedAssets.map((asset) => {
                 const badge = getFormatBadge(asset.format);
+                const assetTypeLabel = asset.assetType === 'table' ? 'Structured' : 'Unstructured';
                 const assetKey = JSON.stringify([asset.assetType, asset.collection, asset.name]);
-                const connectionType = connections.find(
-                  (connection) => connection.name === asset.connectionRef,
-                )?.connectionType;
+                const connectionRef = asset.rawAsset?.connection_ref;
+                const connectionType = connectionRef
+                  ? displayConnections.find(
+                      (connection) =>
+                        getConnectionKey(connection) === getConnectionKey(connectionRef),
+                    )?.connectionType
+                  : undefined;
                 const assetTestId = (prefix: string) =>
                   `${prefix}-${asset.assetType}-${asset.collection}-${asset.name}`;
                 return (
@@ -789,20 +826,30 @@ const RegistryTable: React.FC<RegistryTableProps> = ({
                       ) : null}
                     </Td>
                     <Td dataLabel="Format">
-                      <Label variant="outline" color={badge.color}>
-                        {FORMAT_OPTIONS.find(
-                          (option) =>
-                            option.value === asset.format && option.assetType === asset.assetType,
-                        )?.label || asset.format}
-                      </Label>
+                      <Flex
+                        direction={{ default: 'column' }}
+                        alignItems={{ default: 'alignItemsCenter' }}
+                      >
+                        <Label variant="outline" color={badge.color}>
+                          {FORMAT_OPTIONS.find(
+                            (option) =>
+                              option.value === asset.format && option.assetType === asset.assetType,
+                          )?.label || asset.format}
+                        </Label>
+                        <Content component="small" className="pf-v6-u-text-color-subtle">
+                          {assetTypeLabel}
+                        </Content>
+                      </Flex>
                     </Td>
                     <Td dataLabel="Asset location">
-                      {asset.rawAsset?.connection_ref ? (
+                      {asset.connectionRef ? (
                         <>
                           <ConnectionRefLink
-                            connectionRef={asset.rawAsset.connection_ref}
-                            connections={connections}
-                            linkTo={projectConnectionsUrl(project)}
+                            connectionRef={asset.rawAsset?.connection_ref ?? asset.connectionRef}
+                            connections={displayConnections}
+                            connectionsLoaded={connectionsLoaded}
+                            connectionsError={connectionsError}
+                            linkTo={(ref) => projectConnectionUrl(project, ref)}
                           />
                           {connectionType ? (
                             <Content component="small" data-testid="connection-type">
@@ -811,7 +858,7 @@ const RegistryTable: React.FC<RegistryTableProps> = ({
                           ) : null}
                         </>
                       ) : (
-                        asset.connectionRef || asset.location
+                        asset.location
                       )}
                     </Td>
                     <Td dataLabel="Labels">
@@ -864,10 +911,12 @@ const RegistryTable: React.FC<RegistryTableProps> = ({
                           >
                             Edit
                           </DropdownItem>
+                          <Divider component="li" />
                           <DropdownItem
                             key="delete"
                             onClick={() => setDeleteAsset(asset)}
                             isDisabled={!hasWriteAccess}
+                            isDanger
                             data-testid={assetTestId('asset-delete')}
                           >
                             Delete
@@ -885,7 +934,6 @@ const RegistryTable: React.FC<RegistryTableProps> = ({
       {deleteAsset ? (
         <DeleteAssetModal
           assetName={deleteAsset.name}
-          assetType={deleteAsset.assetType}
           onDelete={() => handleDelete(deleteAsset)}
           onClose={() => setDeleteAsset(null)}
         />
@@ -898,6 +946,7 @@ const RegistryTable: React.FC<RegistryTableProps> = ({
           project={project}
           collection={editAsset.collection}
           name={editAsset.name}
+          hasExistingDchConnectionReferences={hasExistingDchConnectionReferences}
           onClose={handleEditClosed}
           onSaved={handleEditSaved}
           onManageCollections={

@@ -24,8 +24,67 @@ class InfrastructurePage {
     return cy.findByTestId('infrastructure-tab-workloads');
   }
 
+  findAdmissionsTab() {
+    return cy.findByTestId('workload-overview-tab-admissions');
+  }
+
+  findAdmissionTimeWindow() {
+    return cy.findByTestId('admission-time-window');
+  }
+
+  selectAdmissionTimeWindow(timeWindow: '1h' | '24h' | '7d' | '30d') {
+    this.findAdmissionTimeWindow().click();
+    cy.findByTestId(timeWindow).click();
+    return this;
+  }
+
+  findAdmissionMetricCharts() {
+    return cy.findByTestId('admission-metric-charts');
+  }
+
+  findAdmissionMetricValue(metricId: string) {
+    return cy.findByTestId(`admission-metric-value-${metricId}`);
+  }
+
+  findAdmissionMetricChartLoading(metricId: string) {
+    return cy.findByTestId(`admission-metric-chart-loading-${metricId}`);
+  }
+
+  findAdmissionMetricValueLoading(metricId: string) {
+    return cy.findByTestId(`admission-metric-value-loading-${metricId}`);
+  }
+
+  findAdmissionMetricsError() {
+    return cy.findByTestId('admission-metrics-error');
+  }
+
   findWorkloadsSection() {
     return cy.findByTestId('infrastructure-workloads');
+  }
+
+  findWorkloadsCard() {
+    return cy.findByTestId('infrastructure-workloads-card');
+  }
+
+  scrollToWorkloadsCard() {
+    this.findWorkloadsCard().scrollIntoView();
+    return this;
+  }
+
+  findWorkloadOverview() {
+    return cy.findByTestId('workload-overview');
+  }
+
+  findWorkloadCount(bucket: string) {
+    return cy.findByTestId(`workload-count-${bucket}`);
+  }
+
+  findViewInTableButton() {
+    return cy.findByRole('button', { name: 'View in table' });
+  }
+
+  findWorkloadsTableSection() {
+    return cy.findByTestId('infrastructure-workloads-table-section');
   }
 
   findWorkloadRow(name: string, options?: Cypress.Timeoutable) {
@@ -64,6 +123,10 @@ class InfrastructurePage {
 
   findWorkloadsEmptyState() {
     return cy.findByTestId('infrastructure-workloads-empty');
+  }
+
+  findWorkloadsError() {
+    return cy.findByTestId('infrastructure-workloads-error');
   }
 
   findWorkloadsPartialFailure() {

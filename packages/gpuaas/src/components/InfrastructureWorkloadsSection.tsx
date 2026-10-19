@@ -2,10 +2,10 @@ import * as React from 'react';
 import { ProjectsContext } from '@odh-dashboard/ui-core/context/ProjectsContext';
 import ProjectSelector from '@odh-dashboard/ui-core/components/projectSelector/ProjectSelector';
 import { relativeTime } from '@odh-dashboard/internal/utilities/time';
+// eslint-disable-next-line @odh-dashboard/no-restricted-imports
 import useProjectNotebookStates from '@odh-dashboard/internal/pages/projects/notebook/useProjectNotebookStates';
 import {
   Alert,
-  AlertActionCloseButton,
   Bullseye,
   Button,
   Content,
@@ -22,11 +22,13 @@ import {
 } from '@patternfly/react-core';
 import { PlusCircleIcon, SyncAltIcon } from '@patternfly/react-icons';
 import InfrastructureWorkloadsTable from './InfrastructureWorkloadsTable';
+import WorkloadOverview from './WorkloadOverview';
 import useInfrastructureWorkloads from '../hooks/useInfrastructureWorkloads';
+import useWorkloadStatusFilters from '../hooks/useWorkloadStatusFilters';
+import { isKueueManagedDataScienceProject } from '../utils/kueueProjects';
 import {
   INFRASTRUCTURE_WORKLOADS_EMPTY_BODY,
   INFRASTRUCTURE_WORKLOADS_EMPTY_TITLE,
-  INFRASTRUCTURE_WORKLOADS_PARTIAL_FAILURE_TITLE,
 } from '../const';
 import './InfrastructureWorkloadsSection.scss';
 
@@ -115,7 +117,12 @@ type InfrastructureWorkloadsContentProps = {
   loaded: boolean;
   error?: Error;
   workloads: React.ComponentProps<typeof InfrastructureWorkloadsTable>['workloads'];
+  kueueAvailable: boolean;
+  canAccessAdminMetrics: boolean;
+  namespace?: string;
+  refreshTrigger: number;
   kueueEnabled: boolean;
+  hardwareProfilesLoading: boolean;
   notebookStates: React.ComponentProps<typeof InfrastructureWorkloadsTable>['notebookStates'];
   failedSources: string[];
 };
@@ -124,20 +131,36 @@ const InfrastructureWorkloadsContent: React.FC<InfrastructureWorkloadsContentPro
   loaded,
   error,
   workloads,
+  kueueAvailable,
+  canAccessAdminMetrics,
+  namespace,
+  refreshTrigger,
   kueueEnabled,
+  hardwareProfilesLoading,
   notebookStates,
   failedSources,
 }) => {
-  const [isPartialFailureDismissed, setIsPartialFailureDismissed] = React.useState(false);
-  const failedSourcesKey = failedSources.join(',');
-
+  const workloadsTableRef = React.useRef<HTMLDivElement>(null);
+  const scrollToWorkloadsTable = React.useCallback(() => {
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => {
+        workloadsTableRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    });
+  }, []);
+  const workloadStatusFilters = useWorkloadStatusFilters(
+    workloads,
+    notebookStates,
+    scrollToWorkloadsTable,
+  );
+  const { setOverviewStatusFilters } = workloadStatusFilters;
   React.useEffect(() => {
-    setIsPartialFailureDismissed(false);
-  }, [failedSourcesKey]);
-
+    setOverviewStatusFilters([]);
+  }, [namespace, setOverviewStatusFilters]);
+  const hasBlockingWorkloadFailure = failedSources.length > 0 && workloads.length === 0;
   if (!loaded) {
     return (
-      <Bullseye data-testid="infrastructure-workloads-loading">
+      <Bullseye style={{ minHeight: '50vh' }} data-testid="infrastructure-workloads-loading">
         <Spinner />
       </Bullseye>
     );
@@ -154,32 +177,48 @@ const InfrastructureWorkloadsContent: React.FC<InfrastructureWorkloadsContentPro
     );
   }
 
-  if (failedSources.length > 0 && !isPartialFailureDismissed) {
+  if (hasBlockingWorkloadFailure) {
+    return (
+      <Alert
+        isInline
+        variant="danger"
+        title="Unable to load workloads"
+        data-testid="infrastructure-workloads-error"
+      >
+        Workload data could not be loaded. Refresh to try again.
+      </Alert>
+    );
+  }
+
+  if (failedSources.length > 0) {
     return (
       <Stack hasGutter>
         <StackItem>
-          <Alert
-            isInline
-            variant="warning"
-            title={INFRASTRUCTURE_WORKLOADS_PARTIAL_FAILURE_TITLE}
-            data-testid="infrastructure-workloads-partial-error"
-            actionClose={
-              <AlertActionCloseButton
-                data-testid="infrastructure-workloads-partial-error-close"
-                onClose={() => setIsPartialFailureDismissed(true)}
-              />
-            }
-          >
-            {failedSources.join(', ')} could not be loaded. Refresh to try again.
-          </Alert>
+          <WorkloadOverview
+            workloads={workloadStatusFilters.overviewRows}
+            loaded
+            kueueAvailable={kueueAvailable}
+            canAccessAdminMetrics={canAccessAdminMetrics}
+            namespace={namespace}
+            refreshTrigger={refreshTrigger}
+            partial
+            onViewInTable={workloadStatusFilters.viewBucketInTable}
+          />
         </StackItem>
         {workloads.length > 0 && (
           <StackItem>
-            <InfrastructureWorkloadsTable
-              workloads={workloads}
-              kueueEnabled={kueueEnabled}
-              notebookStates={notebookStates}
-            />
+            <div ref={workloadsTableRef} data-testid="infrastructure-workloads-table-section">
+              <InfrastructureWorkloadsTable
+                key={namespace}
+                workloads={workloadStatusFilters.workloads}
+                kueueEnabled={kueueEnabled}
+                hardwareProfilesLoading={hardwareProfilesLoading}
+                notebookStates={notebookStates}
+                failedSources={failedSources}
+                overviewStatusFilters={workloadStatusFilters.overviewStatusFilters}
+                onOverviewStatusFiltersChange={workloadStatusFilters.setOverviewStatusFilters}
+              />
+            </div>
           </StackItem>
         )}
       </Stack>
@@ -191,15 +230,46 @@ const InfrastructureWorkloadsContent: React.FC<InfrastructureWorkloadsContentPro
   }
 
   return (
-    <InfrastructureWorkloadsTable
-      workloads={workloads}
-      kueueEnabled={kueueEnabled}
-      notebookStates={notebookStates}
-    />
+    <Stack hasGutter>
+      <StackItem>
+        <WorkloadOverview
+          workloads={workloadStatusFilters.overviewRows}
+          loaded
+          kueueAvailable={kueueAvailable}
+          canAccessAdminMetrics={canAccessAdminMetrics}
+          namespace={namespace}
+          refreshTrigger={refreshTrigger}
+          onViewInTable={workloadStatusFilters.viewBucketInTable}
+        />
+      </StackItem>
+      <StackItem>
+        <div ref={workloadsTableRef} data-testid="infrastructure-workloads-table-section">
+          <InfrastructureWorkloadsTable
+            key={namespace}
+            workloads={workloadStatusFilters.workloads}
+            kueueEnabled={kueueEnabled}
+            hardwareProfilesLoading={hardwareProfilesLoading}
+            notebookStates={notebookStates}
+            failedSources={failedSources}
+            overviewStatusFilters={workloadStatusFilters.overviewStatusFilters}
+            onOverviewStatusFiltersChange={workloadStatusFilters.setOverviewStatusFilters}
+          />
+        </div>
+      </StackItem>
+    </Stack>
   );
 };
 
-const InfrastructureWorkloadsSection: React.FC = () => {
+type InfrastructureWorkloadsSectionProps = {
+  kueueAvailable: boolean;
+  canAccessAdminMetrics: boolean;
+};
+
+const InfrastructureWorkloadsSection: React.FC<InfrastructureWorkloadsSectionProps> = ({
+  kueueAvailable,
+  canAccessAdminMetrics,
+}) => {
+  const workloadsContentRef = React.useRef<HTMLDivElement>(null);
   const {
     projects,
     preferredProject,
@@ -208,8 +278,15 @@ const InfrastructureWorkloadsSection: React.FC = () => {
   } = React.useContext(ProjectsContext);
   const notebooks = useProjectNotebookStates(preferredProject?.metadata.name);
   const { refresh: refreshNotebooks } = notebooks;
-  const { workloads, kueueEnabled, loaded, error, refresh, failedSources } =
-    useInfrastructureWorkloads(preferredProject?.metadata.name, preferredProject);
+  const {
+    workloads,
+    kueueEnabled,
+    loaded,
+    hardwareProfilesLoading,
+    error,
+    refresh,
+    failedSources,
+  } = useInfrastructureWorkloads(preferredProject?.metadata.name, preferredProject);
   const [lastRefreshed, setLastRefreshed] = React.useState(() => new Date());
   const [currentTime, setCurrentTime] = React.useState(() => Date.now());
   const [refreshTrigger, setRefreshTrigger] = React.useState(0);
@@ -219,6 +296,20 @@ const InfrastructureWorkloadsSection: React.FC = () => {
       updatePreferredProject(projects[0]);
     }
   }, [preferredProject, projects, projectsLoaded, updatePreferredProject]);
+
+  const previousProjectName = React.useRef<string | undefined>(undefined);
+  React.useEffect(() => {
+    const projectName = preferredProject?.metadata.name;
+    if (previousProjectName.current && projectName !== previousProjectName.current) {
+      window.requestAnimationFrame(() => {
+        const contentSection = workloadsContentRef.current;
+        if (contentSection) {
+          contentSection.scrollTop = 0;
+        }
+      });
+    }
+    previousProjectName.current = projectName;
+  }, [preferredProject?.metadata.name]);
 
   React.useEffect(() => {
     const interval = window.setInterval(() => setCurrentTime(Date.now()), 20_000);
@@ -248,6 +339,10 @@ const InfrastructureWorkloadsSection: React.FC = () => {
   );
 
   const refreshTime = relativeTime(currentTime, lastRefreshed.getTime());
+  const admissionsAvailable =
+    kueueAvailable &&
+    preferredProject !== null &&
+    isKueueManagedDataScienceProject(preferredProject);
 
   return (
     <Stack className="gpuaas-infrastructure-workloads" hasGutter>
@@ -257,21 +352,29 @@ const InfrastructureWorkloadsSection: React.FC = () => {
         onProjectSelection={handleProjectSelection}
         onRefresh={handleRefresh}
       />
-      <Stack
+      <div
+        ref={workloadsContentRef}
         className="gpuaas-infrastructure-workloads__content-section"
         data-testid="infrastructure-workloads"
       >
-        <StackItem>
-          <InfrastructureWorkloadsContent
-            loaded={loaded}
-            error={error}
-            workloads={workloads}
-            kueueEnabled={kueueEnabled}
-            notebookStates={notebooks.data}
-            failedSources={failedSources}
-          />
-        </StackItem>
-      </Stack>
+        <Stack>
+          <StackItem>
+            <InfrastructureWorkloadsContent
+              loaded={loaded}
+              error={error}
+              workloads={workloads}
+              kueueAvailable={admissionsAvailable}
+              canAccessAdminMetrics={canAccessAdminMetrics}
+              namespace={preferredProject?.metadata.name}
+              refreshTrigger={refreshTrigger}
+              kueueEnabled={kueueEnabled}
+              hardwareProfilesLoading={hardwareProfilesLoading}
+              notebookStates={notebooks.data}
+              failedSources={failedSources}
+            />
+          </StackItem>
+        </Stack>
+      </div>
     </Stack>
   );
 };

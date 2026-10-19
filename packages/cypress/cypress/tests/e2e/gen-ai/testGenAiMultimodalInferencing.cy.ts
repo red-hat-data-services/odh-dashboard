@@ -121,7 +121,7 @@ describe('Verify multimodal inferencing in playground', { testIsolation: false }
       cy.step('Force backend to refresh config from cluster');
       forceDashboardConfigRefresh();
 
-      cy.step('Create and verify the external vision model endpoint in AI Assets');
+      cy.step('Create the external vision model endpoint in AI Assets');
       genAiPlayground.navigateToAssetsWithCustomEndpoints(projectName);
       forceDashboardConfigRefresh();
       genAiPlayground
@@ -142,20 +142,18 @@ describe('Verify multimodal inferencing in playground', { testIsolation: false }
       genAiPlayground.findAddCapabilityButton().click();
       genAiPlayground.findCapabilityMenuItem('vision').click();
       genAiPlayground.findSelectedCapability('vision').should('be.visible');
-      genAiPlayground.findVerifyModelButton().should('be.enabled').click();
-      genAiPlayground.findVerifySuccessAlert({ timeout: 30000 }).should('be.visible');
       genAiPlayground.findCreateEndpointSubmitButton().should('be.enabled').click();
       genAiPlayground.findCreateExternalModelModal().should('not.exist');
       genAiPlayground
         .findAiModelsTable({ timeout: 30000 })
         .should('contain', testData.model.displayName);
 
-      cy.step('Navigate to AI assets and add model to playground');
+      cy.step('Navigate to AI assets and create the playground');
       genAiPlayground.navigateToAssetsWithCustomEndpoints(projectName);
       genAiPlayground
         .findAiModelsTable({ timeout: 30000 })
         .should('contain', testData.model.displayName);
-      genAiPlayground.findAddToPlaygroundButton().should('be.visible').click();
+      genAiPlayground.findCreatePlaygroundButton({ timeout: 30000 }).should('be.visible').click();
       genAiPlayground.findConfigurationTable().should('be.visible');
       genAiPlayground.ensureModelCheckboxIsChecked(testData.model.modelId);
       genAiPlayground.findCreateButtonInDialog().should('be.enabled').click();
@@ -205,7 +203,7 @@ describe('Verify multimodal inferencing in playground', { testIsolation: false }
     },
     () => {
       cy.step('Navigate to Gen AI playground');
-      genAiPlayground.navigateToPlaygroundWithRetry(projectName);
+      genAiPlayground.navigateToMultimodalPlaygroundWithRetry(projectName);
 
       cy.step('Wait for playground to be ready');
       genAiPlayground.findMessageInput({ timeout: 120000 }).should('be.visible');
@@ -318,7 +316,7 @@ describe('Verify multimodal inferencing in playground', { testIsolation: false }
       });
 
       cy.step('Open a fresh Playground conversation with the Gemini chat model');
-      genAiPlayground.navigateToPlaygroundWithRetry(projectName);
+      genAiPlayground.navigateToMultimodalPlaygroundWithRetry(projectName);
       cy.window().its('POLL_INTERVAL').should('eq', 999999);
       genAiPlayground.findMessageInput({ timeout: 120000 }).should('be.visible');
 
@@ -558,9 +556,12 @@ describe('Verify multimodal inferencing in playground', { testIsolation: false }
         .findAllUserMessages()
         .last()
         .should(($message) => {
-          expect($message.text()).to.contain(transcribedText.trim());
           expect($message.text()).to.contain(testData.audio.prompt);
         });
+      genAiPlayground
+        .findSentAudioTile()
+        .should('be.visible')
+        .and('contain', testData.audio.fileName);
       genAiPlayground.findStopButton().should('not.exist');
       genAiPlayground.findChatbotErrorAlerts().should('not.exist');
       genAiPlayground.findAudioFileChip().should('not.exist');

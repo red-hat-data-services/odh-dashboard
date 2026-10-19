@@ -5,6 +5,7 @@ import { MemoryRouter } from 'react-router-dom';
 import RegistryTable from '~/app/components/RegistryTable';
 import { RegistryAsset } from '~/app/hooks/useAssets';
 import { mockAssetResponse } from '~/__mocks__/mockAssetResponse';
+import { mockRhaiConnection } from '~/__mocks__/mockConnection';
 
 const mockAssets: RegistryAsset[] = [
   {
@@ -19,7 +20,7 @@ const mockAssets: RegistryAsset[] = [
     properties: { 'data-domain': 'claims' },
     rawAsset: mockAssetResponse({
       name: 'claims-data',
-      connection_ref: { type: 'rhai', secret_name: 'minio-connection' },
+      connection_ref: { type: 'secret', secret_name: 'minio-connection' },
     }),
   },
   {
@@ -47,12 +48,13 @@ const renderTable = (props?: Partial<React.ComponentProps<typeof RegistryTable>>
         labels={mockLabels}
         project="test-project"
         connections={[
-          {
-            name: 'minio-connection',
-            displayName: 'Minio connection',
+          mockRhaiConnection({
+            secret_name: 'minio-connection',
+            name: 'Minio connection',
             connectionType: 's3',
-          },
+          }),
         ]}
+        connectionsLoaded
         onManageCollections={jest.fn()}
         onManageLabels={jest.fn()}
         onRegisterData={jest.fn()}
@@ -73,6 +75,20 @@ describe('RegistryTable', () => {
     renderTable();
     expect(screen.getByText('Apache Parquet')).toBeTruthy();
     expect(screen.getByText('Documents')).toBeTruthy();
+    expect(screen.getByText('Structured')).toBeTruthy();
+    expect(screen.getByText('Unstructured')).toBeTruthy();
+  });
+
+  it('should explain the asset location column', () => {
+    renderTable();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Asset location information' }));
+
+    expect(
+      screen.getByText(
+        'This column shows the connection or path for each data asset. If both are specified, the connection is shown.',
+      ),
+    ).toBeInTheDocument();
   });
 
   it('should render labels', () => {
@@ -90,12 +106,13 @@ describe('RegistryTable', () => {
     expect(screen.getByTestId('connection-type')).toHaveTextContent('s3');
   });
 
-  it('should fall back to the connection name when display name is unavailable', () => {
+  it('should show unavailable when the connection has no display name', () => {
     renderTable({
-      connections: [{ name: 'minio-connection', connectionType: 's3' }],
+      connections: [mockRhaiConnection({ secret_name: 'minio-connection', name: undefined })],
     });
 
-    expect(screen.getByRole('link', { name: 'minio-connection' })).toBeInTheDocument();
+    expect(screen.getByTestId('connection-ref-label')).toHaveTextContent('Connection unavailable');
+    expect(screen.queryByRole('link', { name: 'Connection unavailable' })).not.toBeInTheDocument();
   });
 
   it('should keep a location-only asset location as plain text', () => {
@@ -119,12 +136,13 @@ describe('RegistryTable', () => {
     expect(screen.getByTestId('registry-empty-state')).toBeTruthy();
     expect(screen.getByTestId('registry-empty-state-image')).toBeTruthy();
     expect(screen.getByTestId('registry-empty-state-description')).toHaveTextContent(
-      'Data assets point to the exact location within a connection where information is located, and can be used across workbenches and pipelines in your project. To get started, create a data asset.',
+      'To help users in your organization discover and understand external data, create a data asset. Data assets are metadata records that store information like location, format, and schema, but not the data itself.',
     );
     expect(screen.getByRole('heading', { name: 'No data assets' })).toBeInTheDocument();
     expect(screen.getByTestId('registry-toolbar')).toHaveClass('pf-v6-u-display-none');
     expect(screen.queryByRole('columnheader', { name: 'Name' })).toBeNull();
     expect(screen.getByTestId('empty-register-data-button')).toBeTruthy();
+    expect(screen.getByTestId('registry-table')).toHaveClass('pf-m-no-border-rows');
   });
 
   it('should show the filtered empty state when filters match no assets', () => {
@@ -144,6 +162,9 @@ describe('RegistryTable', () => {
     expect(screen.getByTestId('filter-value')).toBeTruthy();
     expect(screen.getByTestId('asset-search')).toBeTruthy();
     expect(screen.getByTestId('register-data-button')).toBeTruthy();
+    expect(screen.getByTestId('asset-search')).toHaveClass(
+      'odh-data-registry-registry-table__search',
+    );
     expect(screen.getByTestId('registry-toolbar')).toContainElement(
       screen.getByTestId('registry-pagination'),
     );
@@ -242,6 +263,16 @@ describe('RegistryTable', () => {
     );
     expect(screen.getByTestId('asset-delete-table-analytics-claims-data')).toHaveClass(
       'pf-m-disabled',
+    );
+  });
+
+  it('styles the per-asset delete action as dangerous', () => {
+    renderTable();
+
+    fireEvent.click(screen.getByTestId('asset-actions-table-analytics-claims-data'));
+
+    expect(screen.getByTestId('asset-delete-table-analytics-claims-data')).toHaveClass(
+      'pf-m-danger',
     );
   });
 });
