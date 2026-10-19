@@ -4,7 +4,6 @@ import {
   Alert,
   Breadcrumb,
   BreadcrumbItem,
-  Button,
   Card,
   CardBody,
   CardHeader,
@@ -19,6 +18,7 @@ import {
   FlexItem,
   Label,
   PageSection,
+  Popover,
   Sidebar,
   SidebarContent,
   SidebarPanel,
@@ -31,9 +31,19 @@ import {
   Title,
 } from '@patternfly/react-core';
 import { CubesIcon } from '@patternfly/react-icons';
+import { useExtensions } from '@odh-dashboard/plugin-core';
+import { isActionExtension } from '@odh-dashboard/plugin-core/extension-points';
+import { ExtensibleActions } from '@odh-dashboard/plugin-core/helpers/ui';
 import CodeBlockComponent from '~/app/shared/markdown/components/CodeBlockComponent';
+import { RUNTIME_CATALOG_DETAILS_ACTION_GROUP } from '~/odh/extension-points/runtime-image-install-action';
+import { RUNTIME_CATALOG_TAB_PATH } from '~/odh/routes/runtimeCatalog/runtimeCatalog';
 import { ServingRuntime, ServingRuntimeVersion } from '~/odh/types/servingRuntimeCatalogTypes';
-import { formatRuntimePublishedDate, formatRuntimeTemplate } from './runtimeCatalogDetailsUtils';
+import {
+  buildRuntimeImageInstallActionData,
+  formatRuntimePublishedDate,
+  formatRuntimeTemplate,
+} from './runtimeCatalogDetailsUtils';
+import { getRuntimeCatalogDetailsRoute } from './utils/runtimeCatalogUtils';
 
 export type RuntimeCatalogDetailsViewProps = {
   breadcrumbs: { title: string; href: string }[];
@@ -53,6 +63,7 @@ const RuntimeCatalogDetailsView: React.FC<RuntimeCatalogDetailsViewProps> = ({
   notFound = false,
 }) => {
   const { runtimeId = '' } = useParams<{ runtimeId: string }>();
+  const actionExtensions = useExtensions(isActionExtension);
   const selectedVersion = runtimeVersions.length > 0 ? runtimeVersions[0] : undefined;
   const runtimeNotFound = notFound || (!!runtimeDetails && runtimeId !== runtimeDetails.id);
   const modelFormats = (
@@ -103,17 +114,37 @@ const RuntimeCatalogDetailsView: React.FC<RuntimeCatalogDetailsViewProps> = ({
                     </FlexItem>
                     {(runtimeDetails.versionCount ?? 0) > 0 && (
                       <FlexItem>
-                        <Label color="purple" data-testid="runtime-catalog-details-latest">
-                          Latest
-                        </Label>
+                        <Popover
+                          aria-label="Latest version"
+                          bodyContent="This is the newest version of this runtime image available in the library."
+                          data-testid="runtime-catalog-details-latest-popover"
+                        >
+                          {/* onClick renders the label as a button, so the popover opens from the keyboard. */}
+                          <Label
+                            color="purple"
+                            onClick={() => undefined}
+                            data-testid="runtime-catalog-details-latest"
+                          >
+                            Latest
+                          </Label>
+                        </Popover>
                       </FlexItem>
                     )}
                   </Flex>
                 </FlexItem>
                 <FlexItem>
-                  <Button variant="primary" isDisabled>
-                    Create
-                  </Button>
+                  <ExtensibleActions
+                    actions={actionExtensions}
+                    group={RUNTIME_CATALOG_DETAILS_ACTION_GROUP}
+                    componentProps={{
+                      actionData: buildRuntimeImageInstallActionData({
+                        runtime: runtimeDetails,
+                        version: selectedVersion,
+                        cancelReturnRoute: getRuntimeCatalogDetailsRoute(runtimeDetails.id ?? ''),
+                        libraryReturnRoute: RUNTIME_CATALOG_TAB_PATH,
+                      }),
+                    }}
+                  />
                 </FlexItem>
               </Flex>
             </StackItem>
@@ -132,12 +163,12 @@ const RuntimeCatalogDetailsView: React.FC<RuntimeCatalogDetailsViewProps> = ({
                       </Card>
                     </StackItem>
                     {selectedVersion?.servingRuntimeTemplate ||
-                    selectedVersion?.llmInferenceServiceTemplate ? (
+                    selectedVersion?.llmInferenceServiceConfig ? (
                       <StackItem>
                         <Card>
                           <CardHeader>
                             <Title headingLevel="h2" size="lg">
-                              Available configurations
+                              Runtimes
                             </Title>
                           </CardHeader>
                           <CardBody>
@@ -148,13 +179,13 @@ const RuntimeCatalogDetailsView: React.FC<RuntimeCatalogDetailsViewProps> = ({
                                   ? 'serving-runtime'
                                   : 'llm-inference-service'
                               }
-                              aria-label="Runtime configurations"
+                              aria-label="Runtimes"
                             >
                               {!!selectedVersion.servingRuntimeTemplate && (
                                 <Tab
                                   eventKey="serving-runtime"
                                   data-testid="runtime-serving-runtime-tab"
-                                  title={<TabTitleText>Serving runtime template</TabTitleText>}
+                                  title={<TabTitleText>Serving runtime</TabTitleText>}
                                 >
                                   <Stack
                                     hasGutter
@@ -163,12 +194,11 @@ const RuntimeCatalogDetailsView: React.FC<RuntimeCatalogDetailsViewProps> = ({
                                   >
                                     <StackItem>
                                       <Title headingLevel="h3" size="md">
-                                        Serving runtime template
+                                        Serving runtime
                                       </Title>
                                     </StackItem>
                                     <StackItem>
-                                      Use this configuration for model serving. It appears under
-                                      Serving runtime templates and in the model deployment wizard.
+                                      Use this runtime for serving most model types.
                                     </StackItem>
                                     <StackItem>
                                       <CodeBlockComponent copyTestId="runtime-serving-runtime-copy">
@@ -180,11 +210,11 @@ const RuntimeCatalogDetailsView: React.FC<RuntimeCatalogDetailsViewProps> = ({
                                   </Stack>
                                 </Tab>
                               )}
-                              {!!selectedVersion.llmInferenceServiceTemplate && (
+                              {!!selectedVersion.llmInferenceServiceConfig && (
                                 <Tab
                                   eventKey="llm-inference-service"
                                   data-testid="runtime-llm-inference-service-tab"
-                                  title={<TabTitleText>LLM accelerator configuration</TabTitleText>}
+                                  title={<TabTitleText>LLM runtime</TabTitleText>}
                                 >
                                   <Stack
                                     hasGutter
@@ -193,18 +223,16 @@ const RuntimeCatalogDetailsView: React.FC<RuntimeCatalogDetailsViewProps> = ({
                                   >
                                     <StackItem>
                                       <Title headingLevel="h3" size="md">
-                                        LLM accelerator configuration
+                                        LLM runtime
                                       </Title>
                                     </StackItem>
                                     <StackItem>
-                                      Use this configuration for LLM inference services. It appears
-                                      under LLM accelerator configurations and in the LLM inference
-                                      service deployment wizard.
+                                      Use this runtime for deploying LLM inference services.
                                     </StackItem>
                                     <StackItem>
                                       <CodeBlockComponent copyTestId="runtime-llm-inference-service-copy">
                                         {formatRuntimeTemplate(
-                                          selectedVersion.llmInferenceServiceTemplate,
+                                          selectedVersion.llmInferenceServiceConfig,
                                         )}
                                       </CodeBlockComponent>
                                     </StackItem>
@@ -232,7 +260,7 @@ const RuntimeCatalogDetailsView: React.FC<RuntimeCatalogDetailsViewProps> = ({
                           ['Hardware', hardware],
                           ['Model formats', modelFormats],
                           ['Container image', selectedVersion?.image],
-                          ['Publish on', publishedDate],
+                          ['Published', publishedDate],
                         ].map(([label, value]) => (
                           <DescriptionListGroup key={label}>
                             <DescriptionListTerm>{label}</DescriptionListTerm>

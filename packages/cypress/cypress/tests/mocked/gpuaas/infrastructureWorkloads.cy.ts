@@ -10,8 +10,14 @@ import { mockRayJobK8sResource } from '@odh-dashboard/model-training/__mocks__/m
 import { TrainingJobState } from '@odh-dashboard/model-training/types';
 import { mockInferenceServiceK8sResource } from '@odh-dashboard/model-serving/__mocks__/mockInferenceServiceK8sResource';
 import { mockLLMInferenceServiceK8sResource } from '@odh-dashboard/llmd-serving/__mocks__/mockLLMInferenceServiceK8sResource';
+import { mockHardwareProfile } from '@odh-dashboard/hardware-profiles/__mocks__/mockHardwareProfile';
 import type { WorkloadKind, WorkloadPodSet } from '@odh-dashboard/k8s-core';
-import { LocalQueueModel, PodModel, WorkloadModel } from '@odh-dashboard/k8s-core/api/models';
+import {
+  HardwareProfileModel,
+  LocalQueueModel,
+  PodModel,
+  WorkloadModel,
+} from '@odh-dashboard/k8s-core/api/models';
 import {
   InferenceServiceModel,
   NotebookModel,
@@ -20,9 +26,10 @@ import {
 import { RayJobModel } from '@odh-dashboard/internal/api/models/kubeflow';
 import { LLMInferenceServiceModel } from '@odh-dashboard/internal/api/models/kserve';
 import { initIntercepts } from './infrastructureMocks';
+import type { InitInterceptsOptions } from './infrastructureMocks';
 
 import { ProjectModel } from '../../../utils/models';
-import { asProjectAdminUser } from '../../../utils/mockUsers';
+import { asClusterAdminUser, asProjectAdminUser } from '../../../utils/mockUsers';
 import { infrastructurePage } from '../../../pages/infrastructure';
 
 const PROJECT_A = 'project-a';
@@ -42,13 +49,28 @@ const initWorkloadsIntercepts = (
   workloads = true,
   enableKueue = false,
   includeKueueWorkbenches = false,
+  includeHardwareProfile = false,
+  interceptOptions: InitInterceptsOptions = {},
+  clusterAdmin = false,
 ) => {
-  asProjectAdminUser();
-  initIntercepts();
+  if (clusterAdmin) {
+    asClusterAdminUser();
+  } else {
+    asProjectAdminUser();
+  }
+  initIntercepts(interceptOptions);
   cy.interceptK8sList(
     ProjectModel,
     mockK8sResourceList([enableKueue ? kueueProjectA : projectA, projectB]),
   );
+  if (enableKueue) {
+    cy.interceptK8sList(
+      { model: LocalQueueModel, ns: PROJECT_A },
+      mockK8sResourceList([
+        mockLocalQueueK8sResource({ namespace: PROJECT_A, name: 'user-queue' }),
+      ]),
+    );
+  }
   cy.interceptK8sList(
     { model: NotebookModel, ns: PROJECT_A },
     mockK8sResourceList(
@@ -58,7 +80,16 @@ const initWorkloadsIntercepts = (
               name: 'gpu-workbench',
               displayName: 'GPU Workbench',
               namespace: PROJECT_A,
-              hardwareProfileName: 'NVIDIA A100',
+              ...(includeHardwareProfile && {
+                opts: {
+                  metadata: {
+                    annotations: {
+                      'opendatahub.io/hardware-profile-name': 'nvidia-a100',
+                      'opendatahub.io/hardware-profile-namespace': 'opendatahub',
+                    },
+                  },
+                },
+              }),
             }),
             ...(includeKueueWorkbenches
               ? [
@@ -79,7 +110,7 @@ const initWorkloadsIntercepts = (
           ]
         : [],
     ),
-  );
+  ).as('infrastructureNotebooksRequest');
   cy.interceptK8sList(
     { model: TrainJobModel, ns: PROJECT_A },
     mockK8sResourceList(
@@ -276,6 +307,19 @@ const initHybridWorkloadsIntercepts = () => {
   }
 };
 
+const visitAdmissions = (
+  interceptOptions: InitInterceptsOptions = {},
+  clusterAdmin = false,
+): void => {
+  initWorkloadsIntercepts(true, true, false, false, interceptOptions, clusterAdmin);
+  infrastructurePage.visit(false);
+  infrastructurePage.findWorkloadsTab().click();
+  infrastructurePage.selectProjectByName('Project-A');
+  infrastructurePage.findProjectSelectorToggle().should('contain.text', 'Project-A');
+  infrastructurePage.findAdmissionsTab().should('be.visible');
+  infrastructurePage.findAdmissionsTab().click();
+};
+
 describe('GPUaaS Infrastructure Workloads', () => {
   it('should update the selected project', () => {
     asProjectAdminUser();
@@ -331,6 +375,25 @@ describe('GPUaaS Infrastructure Workloads', () => {
     infrastructurePage.findWorkloadsEmptyState().should('exist');
   });
 
+  it('should show an error when no workloads load after a source failure', () => {
+    initWorkloadsIntercepts(false);
+    cy.interceptK8sList({ model: RayJobModel, ns: PROJECT_A }, { statusCode: 500 }).as(
+      'rayJobsRequest',
+    );
+    infrastructurePage.visit(false);
+    infrastructurePage.findWorkloadsTab().click();
+
+    cy.wait('@rayJobsRequest');
+    infrastructurePage
+      .findWorkloadsError()
+      .should('be.visible')
+      .and('contain.text', 'Unable to load workloads')
+      .and('contain.text', 'Workload data could not be loaded. Refresh to try again.');
+    infrastructurePage.findWorkloadOverview().should('not.exist');
+    infrastructurePage.findWorkloadsTableSection().should('not.exist');
+    infrastructurePage.findWorkloadsEmptyState().should('not.exist');
+  });
+
   it('should show successful workloads with a warning when one workload source fails', () => {
     initWorkloadsIntercepts();
     cy.interceptK8sList({ model: RayJobModel, ns: PROJECT_A }, { statusCode: 500 }).as(
@@ -354,6 +417,37 @@ describe('GPUaaS Infrastructure Workloads', () => {
     infrastructurePage.findWorkloadRow('gpu-training-job').should('exist');
     infrastructurePage.findWorkloadRow('gpu-ray-job').should('not.exist');
     infrastructurePage.findWorkloadsEmptyState().should('not.exist');
+  });
+
+  it('should show Hardware Profile loading after the workloads table is available', () => {
+    initWorkloadsIntercepts(true, false, false, true);
+    cy.interceptK8s(
+      {
+        model: HardwareProfileModel,
+        ns: 'opendatahub',
+        name: 'nvidia-a100',
+      },
+      {
+        statusCode: 200,
+        body: mockHardwareProfile({ name: 'nvidia-a100', displayName: 'NVIDIA A100' }),
+        delay: 5000,
+      },
+    ).as('hardwareProfileRequest');
+
+    infrastructurePage.visit(false);
+    infrastructurePage.findWorkloadsTab().click();
+    infrastructurePage.selectProjectByName('Project-A');
+
+    cy.wait('@infrastructureNotebooksRequest');
+    infrastructurePage.scrollToWorkloadsCard();
+    infrastructurePage.findWorkloadRow('gpu-workbench').should('be.visible');
+    infrastructurePage
+      .findWorkloadRow('gpu-workbench')
+      .findByTestId('hardware-profile-loading')
+      .should('be.visible');
+
+    cy.wait('@hardwareProfileRequest', { timeout: 40000 });
+    infrastructurePage.findWorkloadRow('gpu-workbench').should('contain.text', 'NVIDIA A100');
   });
 
   it('should filter Kueue and non-Kueue workloads in a hybrid project', () => {
@@ -421,5 +515,96 @@ describe('GPUaaS Infrastructure Workloads', () => {
     infrastructurePage.findWorkloadRow('gpu-queued-job').should('not.exist');
     infrastructurePage.findWorkloadRow('gpu-queued-workbench').should('not.exist');
     infrastructurePage.findWorkloadRow('gpu-ray-job').should('not.exist');
+  });
+
+  it('should use time labels when admissions data is on one calendar day', () => {
+    visitAdmissions({ admissionDataSpan: 'same-day' });
+    infrastructurePage.selectAdmissionTimeWindow('7d');
+    infrastructurePage.findAdmissionMetricCharts().should('be.visible');
+
+    infrastructurePage
+      .findAdmissionMetricCharts()
+      .find('.gpuaas-workload-overview__admission-metric')
+      .should('have.length', 2)
+      .each(($metric) => {
+        cy.wrap($metric)
+          .find('svg text')
+          .then(($labels) => {
+            const labels = [...$labels].map((label) => label.textContent.trim()).filter(Boolean);
+            expect(labels.some((label) => label.includes(':'))).to.equal(true);
+            expect(new Set(labels).size).to.equal(labels.length);
+          });
+      });
+    infrastructurePage.findAdmissionMetricCharts().find('svg [stroke-dasharray]').should('exist');
+  });
+
+  it('should show all admission charts for cluster admins', () => {
+    visitAdmissions({ admissionDataSpan: 'same-day' }, true);
+    infrastructurePage.findAdmissionMetricCharts().should('be.visible');
+    infrastructurePage
+      .findAdmissionMetricCharts()
+      .find('.gpuaas-workload-overview__admission-metric')
+      .should('have.length', 4);
+  });
+
+  it('should use date labels when admissions data spans calendar days', () => {
+    visitAdmissions({ admissionDataSpan: 'multi-day' });
+    infrastructurePage.selectAdmissionTimeWindow('7d');
+    infrastructurePage.findAdmissionMetricCharts().should('be.visible');
+
+    infrastructurePage
+      .findAdmissionMetricCharts()
+      .find('.gpuaas-workload-overview__admission-metric')
+      .should('have.length', 2)
+      .each(($metric) => {
+        cy.wrap($metric)
+          .find('svg text')
+          .then(($labels) => {
+            const labels = [...$labels]
+              .map((label) => label.textContent.trim().replace(/\s+/g, ' '))
+              .filter(Boolean);
+            expect(
+              labels.some((label) => /(?:[A-Za-z]{3} \d{1,2}|\d{1,2} [A-Za-z]{3})/.test(label)),
+            ).to.equal(true);
+            expect(labels.some((label) => label.includes(':'))).to.equal(false);
+            expect(new Set(labels).size).to.equal(labels.length);
+          });
+      });
+  });
+
+  it('should render completed all-NaN admission lead-time data without a skeleton', () => {
+    visitAdmissions({ admissionDataSpan: 'same-day', admissionLeadTimeNaN: true }, true);
+    infrastructurePage.findAdmissionMetricCharts().should('be.visible');
+    infrastructurePage.findAdmissionMetricValue('admission-lead-time').should('contain.text', '--');
+    infrastructurePage.findAdmissionMetricChartLoading('admission-lead-time').should('not.exist');
+    infrastructurePage.findAdmissionMetricValueLoading('admission-lead-time').should('not.exist');
+  });
+
+  it('should show an error when admission metrics fail to load', () => {
+    visitAdmissions({ admissionDataSpan: 'same-day', admissionRequestError: true });
+
+    infrastructurePage
+      .findAdmissionMetricsError()
+      .should('be.visible')
+      .and('contain.text', 'Unable to load admission metrics')
+      .and('contain.text', 'Some metrics could not be loaded. Refresh to try again.');
+  });
+
+  it('should hide Admissions when Kueue is disabled', () => {
+    initWorkloadsIntercepts(true, false, false, false, { isKueueInstalled: false });
+    infrastructurePage.visit(false);
+    infrastructurePage.findWorkloadsTab().click();
+    infrastructurePage.selectProjectByName('Project-A');
+
+    infrastructurePage.findAdmissionsTab().should('not.exist');
+  });
+
+  it('should hide Admissions for a project that is not Kueue-managed', () => {
+    initWorkloadsIntercepts(true, false);
+    infrastructurePage.visit(false);
+    infrastructurePage.findWorkloadsTab().click();
+    infrastructurePage.selectProjectByName('Project-A');
+
+    infrastructurePage.findAdmissionsTab().should('not.exist');
   });
 });

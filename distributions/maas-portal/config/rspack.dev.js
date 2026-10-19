@@ -9,12 +9,13 @@ const rspackCommon = require('./rspack.common.js');
 const RELATIVE_DIRNAME = path.resolve(__dirname, '..');
 const DIST_DIR = path.resolve(RELATIVE_DIRNAME, 'public');
 const PORT = process.env.SHELL_PORT || 4020;
-const BASE_PATH = '/maas-consumer-portal';
+const BASE_PATH = '/maas-portal';
 const PORTAL_RESOURCE_NAME = 'maas-portal';
 const portalApiPaths = {
   maas: `${BASE_PATH}/maas/api`,
   genAi: `${BASE_PATH}/gen-ai/api`,
   perses: `${BASE_PATH}/perses/api`,
+  config: `${BASE_PATH}/api/config`,
   k8s: `${BASE_PATH}/api/k8s`,
   k8sWatch: `${BASE_PATH}/wss/k8s`,
   operatorSubscriptionStatus: `${BASE_PATH}/api/operator-subscription-status`,
@@ -217,6 +218,7 @@ const buildProxyConfig = () => {
     { path: portalApiPaths.maas, target: MAAS_BFF_TARGET, pathRewrite: '/api' },
     { path: portalApiPaths.genAi, target: GENAI_BFF_TARGET, pathRewrite: '/api' },
     { path: portalApiPaths.perses, target: PERSES_TARGET, pathRewrite: '' },
+    { path: portalApiPaths.config, target: CORE_BFF_TARGET, pathRewrite: '/api/config' },
     { path: portalApiPaths.k8s, target: CORE_BFF_TARGET, pathRewrite: '/api/k8s' },
     { path: portalApiPaths.k8sWatch, target: CORE_BFF_TARGET, pathRewrite: '/wss/k8s' },
     {
@@ -245,7 +247,14 @@ module.exports = merge(rspackCommon(), {
     host: 'localhost',
     port: PORT,
     compress: true,
-    historyApiFallback: { index: `${BASE_PATH}/` },
+    historyApiFallback: {
+      index: `${BASE_PATH}/`,
+      rewrites: [
+        { from: /^\/maas-portal(?:\/|$)/, to: `${BASE_PATH}/` },
+        // Leave paths outside the portal mount untouched so they return 404.
+        { from: /./, to: ({ parsedUrl }) => parsedUrl.pathname },
+      ],
+    },
     hot: true,
     proxy: buildProxyConfig(),
     client: {
@@ -253,6 +262,7 @@ module.exports = merge(rspackCommon(), {
     },
     static: {
       directory: DIST_DIR,
+      publicPath: `${BASE_PATH}/`,
     },
     onListening: (devServer) => {
       const addr = devServer?.server?.address();

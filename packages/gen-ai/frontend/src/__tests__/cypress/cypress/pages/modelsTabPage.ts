@@ -14,7 +14,7 @@ class ModelsTabRow {
   }
 
   findEndpointCell(): Cypress.Chainable<JQuery<HTMLElement>> {
-    return this.find().find('[data-label="Endpoints"]');
+    return this.find().find('[data-label="Access details"]');
   }
 
   findModelTypeCell(): Cypress.Chainable<JQuery<HTMLElement>> {
@@ -121,6 +121,24 @@ class KebabMenu {
 class EndpointModalPage {
   findModal(): Cypress.Chainable<JQuery<HTMLElement>> {
     return cy.findByTestId('endpoint-detail-modal');
+  }
+
+  findAuthenticationCopy(): Cypress.Chainable<JQuery<HTMLElement>> {
+    return cy.findByTestId('endpoint-modal-authentication-copy');
+  }
+
+  findSubscriptionsToggle(): Cypress.Chainable<JQuery<HTMLElement>> {
+    return cy
+      .findByTestId('endpoint-modal-subscriptions-toggle')
+      .findByRole('button', { name: 'View subscriptions' });
+  }
+
+  findSubscriptionsTable(): Cypress.Chainable<JQuery<HTMLElement>> {
+    return cy.findByTestId('endpoint-modal-subscriptions-table');
+  }
+
+  findSubscriptionLink(name: string): Cypress.Chainable<JQuery<HTMLElement>> {
+    return cy.findByTestId(`endpoint-modal-subscription-link-${name}`);
   }
 }
 

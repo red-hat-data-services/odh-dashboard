@@ -43,7 +43,10 @@ import {
 } from '@odh-dashboard/internal/api/k8s/workloads';
 import { getHardwareProfile } from '@odh-dashboard/internal/api/k8s/hardwareProfiles';
 import { allSettledPromises } from '@odh-dashboard/internal/utilities/allSettledPromises';
+// eslint-disable-next-line @odh-dashboard/no-restricted-imports
+import type { NotebookState } from '@odh-dashboard/internal/pages/projects/notebook/types';
 import { fetchNamespaceWorkloads } from './clusterQueueWorkloads';
+import { mapWorkloadStatusToOverview, type WorkloadOverviewRow } from './workloadOverview';
 import {
   buildHardwareProfileKey,
   getHardwareProfileRefFromAnnotations,
@@ -69,6 +72,10 @@ import type {
 
 type SupportedResource = InfrastructureWorkloadResource;
 type KueueWorkloadByResourceKey = Map<string, WorkloadKind[]>;
+
+export type InfrastructureWorkloadsBaseResult = InfrastructureWorkloadsResult & {
+  resources: SupportedResource[];
+};
 
 const KUEUE_STATUS_OPTIONS: KueueWorkloadStatus[] = [
   KueueWorkloadStatus.Queued,
@@ -260,7 +267,7 @@ export const filterInfrastructureWorkloads = (
     const matchesName = !normalizedSearch || workload.name.toLowerCase().includes(normalizedSearch);
     const filterValue =
       filterType === 'status'
-        ? [workload.status.label, workload.kueueStatus]
+        ? getWorkloadOverviewRow(workload)?.statusFilters ?? [workload.status.label]
         : filterType === 'type'
         ? workload.type
         : workload.hardwareProfile;
@@ -271,6 +278,42 @@ export const filterInfrastructureWorkloads = (
         : filterValue !== undefined && selectedFilterValues.includes(filterValue));
     return matchesName && matchesFilter;
   });
+};
+
+export const getInfrastructureWorkloadsWithWorkbenchStatus = (
+  workloads: InfrastructureWorkloadRow[],
+  notebookStates: NotebookState[],
+): InfrastructureWorkloadRow[] =>
+  workloads.map((workload) => {
+    if (workload.resource.kind !== InfrastructureWorkloadKind.Notebook) {
+      return workload;
+    }
+    const notebookState = notebookStates.find(
+      (state) => state.notebook.metadata.name === workload.resource.metadata.name,
+    );
+    return notebookState
+      ? { ...workload, status: getInfrastructureWorkbenchStatus(notebookState) }
+      : workload;
+  });
+
+export const getWorkloadOverviewRow = (
+  workload: InfrastructureWorkloadRow,
+): WorkloadOverviewRow | undefined => {
+  const { status: workloadResourceStatus, kueueStatus } = workload;
+  const { label: workloadStatus } = workloadResourceStatus;
+  const kueueOverview = kueueStatus ? mapWorkloadStatusToOverview(kueueStatus) : undefined;
+  const workloadOverview = mapWorkloadStatusToOverview(workloadStatus);
+  const kueueOverridesWorkload =
+    kueueOverview?.bucket === 'waiting' || kueueOverview?.bucket === 'blockers';
+  const overview = kueueOverridesWorkload ? kueueOverview : workloadOverview ?? kueueOverview;
+  const primaryStatus = kueueOverridesWorkload || !workloadOverview ? kueueStatus : workloadStatus;
+
+  return overview
+    ? {
+        ...overview,
+        statusFilters: primaryStatus ? [primaryStatus] : [],
+      }
+    : undefined;
 };
 
 /** Builds model-serving deployment status details for an Infrastructure Workloads row. */
@@ -577,12 +620,12 @@ const listResources = async <T extends K8sResourceCommon>(
  * Loads and maps all resources shown in the Infrastructure Workloads tab.
  * Hardware Profiles are resolved independently; Kueue is used only for scheduling metadata.
  */
-export const listInfrastructureWorkloads = async (
+export const listInfrastructureWorkloadsBase = async (
   namespace: string,
   projectName: string | undefined,
   kueueEnabled: boolean,
   dashboardNamespace = '',
-): Promise<InfrastructureWorkloadsResult> => {
+): Promise<InfrastructureWorkloadsBaseResult> => {
   const failedSources: string[] = [];
   const [notebooksResult, trainJobsResult, rayJobsResult, inferenceServicesResult, llmResult] =
     await Promise.all([
@@ -620,7 +663,7 @@ export const listInfrastructureWorkloads = async (
     ...inferenceServices,
     ...llmInferenceServices,
   ];
-  const hardwareProfileByKey = await fetchInfrastructureHardwareProfiles(resources);
+  const hardwareProfileByKey: HardwareProfileByKey = new Map();
 
   let kueueRows: ClusterQueueWorkloadRow[] = [];
   let matchedWorkloads: KueueWorkloadByResourceKey = new Map();
@@ -649,6 +692,7 @@ export const listInfrastructureWorkloads = async (
     }
   }
   return {
+    resources,
     kueueEnabled,
     failedSources,
     workloads: [
@@ -710,3 +754,37 @@ export const listInfrastructureWorkloads = async (
     ],
   };
 };
+
+/** Applies the existing Hardware Profile resolution to already-built Infrastructure rows. */
+export const enrichInfrastructureWorkloads = async (
+  baseResult: InfrastructureWorkloadsBaseResult,
+): Promise<InfrastructureWorkloadsResult> => {
+  const hardwareProfileByKey = await fetchInfrastructureHardwareProfiles(baseResult.resources);
+
+  return {
+    ...baseResult,
+    workloads: baseResult.workloads.map((workload) => {
+      const profileInfo = resolveWorkloadHardwareProfileFromAnnotation(
+        [workload.resource.metadata.annotations],
+        hardwareProfileByKey,
+      );
+
+      return {
+        ...workload,
+        hardwareProfile: profileInfo?.displayName,
+        hardwareProfileResourceType: profileInfo?.acceleratorIdentifier,
+      };
+    }),
+  };
+};
+
+/** Loads Infrastructure Workloads with Hardware Profile enrichment for existing callers. */
+export const listInfrastructureWorkloads = async (
+  namespace: string,
+  projectName: string | undefined,
+  kueueEnabled: boolean,
+  dashboardNamespace = '',
+): Promise<InfrastructureWorkloadsResult> =>
+  enrichInfrastructureWorkloads(
+    await listInfrastructureWorkloadsBase(namespace, projectName, kueueEnabled, dashboardNamespace),
+  );

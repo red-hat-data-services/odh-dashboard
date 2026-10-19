@@ -4397,7 +4397,7 @@ func GetServingRuntimeMocks() []models.ServingRuntime {
 			SourceID:              stringToPointer("redhat-runtimes"),
 			Description:           stringToPointer("Illustrative mock runtime for hardware filtering; not a deployable runtime."),
 			SupportedModelFormats: []models.SupportedModelFormat{{Name: "safetensors"}},
-			Capabilities:          &models.ServingRuntimeCapabilities{RequiresGPU: &gpu, SupportedAccelerators: []string{"ibm.com/spyre"}},
+			Capabilities:          &models.ServingRuntimeCapabilities{RequiresGPU: &gpu, SupportedAccelerators: []string{"ibm.com/spyre_pf"}},
 			VersionCount:          &one,
 		},
 		{
@@ -4475,18 +4475,18 @@ func GetServingRuntimeVersionMocks(runtimeID string) []models.ServingRuntimeVers
 					{Name: "LOG_LEVEL", Description: stringToPointer("Runtime logging verbosity"), Required: boolToPointer(false), DefaultValue: stringToPointer("info"), Secret: boolToPointer(false)},
 					{Name: "HF_TOKEN", Description: stringToPointer("Token for gated models"), Required: boolToPointer(false), Secret: boolToPointer(true)},
 				},
-				ServingRuntimeTemplate:      stringToPointer(`{"apiVersion":"serving.kserve.io/v1alpha1","kind":"ServingRuntime","metadata":{"name":"mock-vllm-0-5-0"},"spec":{"supportedModelFormats":[{"name":"safetensors","version":"1","autoSelect":true,"priority":1}],"protocolVersions":["v2"],"multiModel":false,"containers":[{"name":"kserve-container","image":"registry.example.com/mock/vllm:0.5.0","args":["--max-model-len","4096"],"env":[{"name":"LOG_LEVEL","value":"info"}],"resources":{"requests":{"cpu":"4","memory":"16Gi","nvidia.com/gpu":"1"},"limits":{"nvidia.com/gpu":"1"}}}]}}`),
-				LLMInferenceServiceTemplate: stringToPointer(`{"apiVersion":"serving.kserve.io/v1alpha2","kind":"LLMInferenceServiceConfig","metadata":{"name":"mock-vllm-0-5-0","labels":{"opendatahub.io/config-type":"accelerator","opendatahub.io/dashboard":"true"}},"spec":{"model":{"uri":"hf://example/mock-model","name":"mock-model"},"template":{"containers":[{"name":"main","resources":{"limits":{"cpu":"4","memory":"16Gi"},"requests":{"cpu":"2","memory":"8Gi"}}}]}}}`),
-				Deprecated:                  boolToPointer(false), PublishedDate: stringToPointer("2024-02-01T00:00:00Z"),
+				ServingRuntimeTemplate:    stringToPointer(`{"apiVersion":"serving.kserve.io/v1alpha1","kind":"ServingRuntime","metadata":{"name":"mock-vllm-0-5-0"},"spec":{"supportedModelFormats":[{"name":"safetensors","version":"1","autoSelect":true,"priority":1}],"protocolVersions":["v2"],"multiModel":false,"containers":[{"name":"kserve-container","image":"registry.example.com/mock/vllm:0.5.0","args":["--max-model-len","4096"],"env":[{"name":"LOG_LEVEL","value":"info"}],"resources":{"requests":{"cpu":"4","memory":"16Gi","nvidia.com/gpu":"1"},"limits":{"nvidia.com/gpu":"1"}}}]}}`),
+				LLMInferenceServiceConfig: stringToPointer(`{"apiVersion":"serving.kserve.io/v1alpha2","kind":"LLMInferenceServiceConfig","metadata":{"name":"mock-vllm-0-5-0","labels":{"opendatahub.io/config-type":"accelerator","opendatahub.io/dashboard":"true"}},"spec":{"model":{"uri":"hf://example/mock-model","name":"mock-model"},"template":{"containers":[{"name":"main","resources":{"limits":{"cpu":"4","memory":"16Gi"},"requests":{"cpu":"2","memory":"8Gi"}}}]}}}`),
+				Deprecated:                boolToPointer(false), PublishedDate: stringToPointer("2024-02-01T00:00:00Z"),
 			},
 			{
 				ID: stringToPointer("102"), Name: stringToPointer("vllm-0.6.0"),
 				CreateTimeSinceEpoch: stringToPointer("1711929600000"),
 				ArtifactType:         "serving-runtime-version", Version: "0.6.0", Image: "registry.example.com/mock/vllm:0.6.0", SupportLevel: &preview,
 				SupportedModelFormats: []models.SupportedModelFormat{{Name: "safetensors"}}, ProtocolVersions: []string{"v2"},
-				ServingRuntimeTemplate:      stringToPointer(`{"apiVersion":"serving.kserve.io/v1alpha1","kind":"ServingRuntime","metadata":{"name":"mock-vllm-0-6-0"},"spec":{"supportedModelFormats":[{"name":"safetensors"}],"protocolVersions":["v2"],"containers":[{"name":"kserve-container","image":"registry.example.com/mock/vllm:0.6.0"}]}}`),
-				LLMInferenceServiceTemplate: stringToPointer(`{"apiVersion":"serving.kserve.io/v1alpha2","kind":"LLMInferenceServiceConfig","metadata":{"name":"mock-vllm-0-6-0","labels":{"opendatahub.io/config-type":"accelerator","opendatahub.io/dashboard":"true"}},"spec":{"model":{"uri":"hf://example/mock-model","name":"mock-model"},"template":{"containers":[{"name":"main","resources":{"limits":{"cpu":"4","memory":"16Gi"},"requests":{"cpu":"2","memory":"8Gi"}}}]}}}`),
-				PublishedDate:               stringToPointer("2024-04-01T00:00:00Z"),
+				ServingRuntimeTemplate:    stringToPointer(`{"apiVersion":"serving.kserve.io/v1alpha1","kind":"ServingRuntime","metadata":{"name":"mock-vllm-0-6-0"},"spec":{"supportedModelFormats":[{"name":"safetensors"}],"protocolVersions":["v2"],"containers":[{"name":"kserve-container","image":"registry.example.com/mock/vllm:0.6.0"}]}}`),
+				LLMInferenceServiceConfig: stringToPointer(`{"apiVersion":"serving.kserve.io/v1alpha2","kind":"LLMInferenceServiceConfig","metadata":{"name":"mock-vllm-0-6-0","labels":{"opendatahub.io/config-type":"accelerator","opendatahub.io/dashboard":"true"}},"spec":{"model":{"uri":"hf://example/mock-model","name":"mock-model"},"template":{"containers":[{"name":"main","resources":{"limits":{"cpu":"4","memory":"16Gi"},"requests":{"cpu":"2","memory":"8Gi"}}}]}}}`),
+				PublishedDate:             stringToPointer("2024-04-01T00:00:00Z"),
 			},
 		},
 		"2":  {{ID: stringToPointer("201"), Name: stringToPointer("ovms-2024.1"), ArtifactType: "serving-runtime-version", Version: "2024.1", Image: "registry.example.com/mock/ovms:2024.1", SupportLevel: &supported, SupportedModelFormats: []models.SupportedModelFormat{{Name: "openvino_ir"}, {Name: "onnx"}}, ProtocolVersions: []string{"v2", "grpc-v2"}}},
@@ -4510,27 +4510,35 @@ func GetServingRuntimeVersionMocks(runtimeID string) []models.ServingRuntimeVers
 	return []models.ServingRuntimeVersion{}
 }
 
-func servingRuntimeMockHardware(runtime models.ServingRuntime) []string {
-	values := []string{}
-	for _, tag := range runtime.Tags {
-		if tag == "cpu" || tag == "cpu-or-gpu" {
-			values = append(values, tag)
-		}
+// Filter keys match the catalog's serving_runtimes filter_options and filterQuery fields.
+const (
+	servingRuntimeAcceleratorsFilterKey = "capabilities.supportedAccelerators"
+	servingRuntimeModelFormatsFilterKey = "supportedModelFormats"
+)
+
+func servingRuntimeMockAccelerators(runtime models.ServingRuntime) []string {
+	if runtime.Capabilities == nil {
+		return nil
 	}
-	if runtime.Capabilities != nil {
-		values = append(values, runtime.Capabilities.SupportedAccelerators...)
+	return runtime.Capabilities.SupportedAccelerators
+}
+
+func servingRuntimeMockModelFormats(runtime models.ServingRuntime) []string {
+	formats := make([]string, 0, len(runtime.SupportedModelFormats))
+	for _, format := range runtime.SupportedModelFormats {
+		formats = append(formats, format.Name)
 	}
-	return values
+	return formats
 }
 
 func GetServingRuntimeFilterOptionsListMock() models.FilterOptionsList {
-	values := map[string]map[string]bool{"hardware": {}, "modelFormat": {}}
+	values := map[string]map[string]bool{servingRuntimeAcceleratorsFilterKey: {}, servingRuntimeModelFormatsFilterKey: {}}
 	for _, runtime := range GetServingRuntimeMocks() {
-		for _, hardware := range servingRuntimeMockHardware(runtime) {
-			values["hardware"][hardware] = true
+		for _, accelerator := range servingRuntimeMockAccelerators(runtime) {
+			values[servingRuntimeAcceleratorsFilterKey][accelerator] = true
 		}
-		for _, format := range runtime.SupportedModelFormats {
-			values["modelFormat"][format.Name] = true
+		for _, format := range servingRuntimeMockModelFormats(runtime) {
+			values[servingRuntimeModelFormatsFilterKey][format] = true
 		}
 	}
 	filters := make(map[string]models.FilterOption, len(values))

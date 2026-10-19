@@ -5,16 +5,25 @@ import { MemoryRouter } from 'react-router-dom';
 import TableDetailView from '~/app/pages/TableDetailView';
 import { mockAssetResponse } from '~/__mocks__/mockAssetResponse';
 import { mockVolumeInfo } from '~/__mocks__/mockVolumeInfo';
-import type { AssetResponse, ConnectionModel } from '~/app/types';
+import { mockRhaiConnection } from '~/__mocks__/mockConnection';
+import type { AssetResponse, ConnectionModel, ConnectionWarning } from '~/app/types';
 
 const renderView = (
   asset: AssetResponse,
   project = 'test-project',
   connections: ConnectionModel[] = [],
+  connectionsLoaded = true,
+  connectionWarnings: ConnectionWarning[] = [],
 ) =>
   render(
     <MemoryRouter>
-      <TableDetailView asset={asset} project={project} connections={connections} />
+      <TableDetailView
+        asset={asset}
+        project={project}
+        connections={connections}
+        connectionsLoaded={connectionsLoaded}
+        connectionWarnings={connectionWarnings}
+      />
     </MemoryRouter>,
   );
 
@@ -50,23 +59,54 @@ describe('TableDetailView', () => {
   it('should render connection name as a link to project connections', () => {
     const asset = mockAssetResponse();
     renderView(asset, 'test-project', [
-      { name: 'my-s3-connection', displayName: 'My S3 Connection' },
+      mockRhaiConnection({ secret_name: 'my-s3-connection', name: 'My S3 Connection' }),
     ]);
     const el = screen.getByTestId('connection-ref-link');
     expect(el).toHaveTextContent('My S3 Connection');
     expect(el).toHaveAttribute('href', '/projects/test-project?section=connections');
   });
 
-  it('should fall back to the connection name when display name is unavailable', () => {
+  it('should show unavailable when the connection has no display name', () => {
     const asset = mockAssetResponse();
-    renderView(asset, 'test-project', [{ name: 'my-s3-connection' }]);
+    renderView(asset, 'test-project', [
+      mockRhaiConnection({ secret_name: 'my-s3-connection', name: undefined }),
+    ]);
 
-    expect(screen.getByTestId('connection-ref-link')).toHaveTextContent('my-s3-connection');
+    expect(screen.getByTestId('connection-ref-label')).toHaveTextContent('Connection unavailable');
+    expect(screen.queryByTestId('connection-ref-link')).not.toBeInTheDocument();
+  });
+
+  it('should render the DCH fallback warning as a plain inline alert', () => {
+    renderView(mockAssetResponse(), 'test-project', [], true, [
+      {
+        code: 'DCH_FALLBACK',
+        message: "Couldn't load connections from Data Connect Hub.",
+      },
+    ]);
+
+    const alert = screen.getByTestId('connection-warning-DCH_FALLBACK');
+    expect(alert).toHaveClass('pf-m-plain');
+    expect(alert).toHaveTextContent("Couldn't load connections from Data Connect Hub.");
+  });
+
+  it('should render other connection warnings with a bordered inline alert', () => {
+    renderView(mockAssetResponse(), 'test-project', [], true, [
+      {
+        code: 'RHAI_LOOKUP_FAILED',
+        message: 'Unable to load connection details.',
+      },
+    ]);
+
+    expect(screen.getByTestId('connection-warning-RHAI_LOOKUP_FAILED')).not.toHaveClass(
+      'pf-m-plain',
+    );
   });
 
   it('should render the connection type below the connection name', () => {
     const asset = mockAssetResponse();
-    renderView(asset, 'test-project', [{ name: 'my-s3-connection', connectionType: 's3' }]);
+    renderView(asset, 'test-project', [
+      mockRhaiConnection({ secret_name: 'my-s3-connection', connectionType: 's3' }),
+    ]);
 
     expect(screen.getByTestId('connection-type')).toHaveTextContent('s3');
   });
@@ -109,10 +149,13 @@ describe('TableDetailView', () => {
     expect(screen.getByText('analytics')).toBeTruthy();
   });
 
-  it('should render "No labels" when labels are empty', () => {
+  it('should render subtle italic text when labels are empty', () => {
     const asset = mockAssetResponse({ labels: [] });
     renderView(asset);
-    expect(screen.getByTestId('asset-labels')).toHaveTextContent('No labels');
+
+    expect(screen.getByTestId('asset-labels-empty')).toBeInTheDocument();
+    expect(screen.getByText('No labels')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Create label' })).not.toBeInTheDocument();
   });
 
   it('should render properties below data details with well-known properties first', () => {
@@ -201,7 +244,7 @@ describe('TableDetailView', () => {
     expect(screen.getByTestId('asset-description')).toHaveTextContent('-');
     expect(screen.getByTestId('asset-location')).toHaveTextContent('-');
     expect(screen.getByTestId('asset-owner')).toHaveTextContent('-');
-    expect(screen.getByTestId('asset-labels')).toHaveTextContent('No labels');
+    expect(screen.getByTestId('asset-labels-empty')).toHaveTextContent('No labels');
     expect(screen.getByTestId('asset-created-at')).toHaveTextContent('-');
     expect(screen.getByTestId('asset-updated-at')).toHaveTextContent('-');
     expect(screen.queryByTestId('properties-card')).not.toBeInTheDocument();

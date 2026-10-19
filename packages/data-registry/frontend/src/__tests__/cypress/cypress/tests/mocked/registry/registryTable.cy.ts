@@ -1,5 +1,6 @@
 /* eslint-disable camelcase */
 import { mockModArchResponse } from 'mod-arch-core';
+import { mockRhaiConnection } from '~/__mocks__/mockConnection';
 import { mockNamespace } from '~/__mocks__/mockNamespace';
 import { mockUserSettings } from '~/__mocks__/mockUserSettings';
 
@@ -7,9 +8,17 @@ const REGISTRY_API = '/data-registry/api/v1';
 const MAIN_API = '/data-registry/api/v1';
 
 const mockConnectionsResponse = [
-  { name: 'my-s3-connection', displayName: 'My S3 Connection', connectionType: 's3' },
-  { name: 'my-uri-connection', displayName: 'My URI Connection', connectionType: 'uri' },
-  { name: 'db-connection', displayName: 'Database Connection', connectionType: 'postgresql' },
+  mockRhaiConnection(),
+  mockRhaiConnection({
+    secret_name: 'my-uri-connection',
+    name: 'My URI Connection',
+    connectionType: 'uri',
+  }),
+  mockRhaiConnection({
+    secret_name: 'db-connection',
+    name: 'Database Connection',
+    connectionType: 'postgresql',
+  }),
 ];
 
 const mockCollectionsResponse = {
@@ -150,6 +159,7 @@ describe('Registry Table', () => {
     cy.findByTestId('no-projects-empty-state').should('exist');
     cy.findByRole('img', { name: 'No projects' }).should('be.visible');
     cy.findByRole('heading', { name: 'No projects' }).should('exist');
+    cy.contains('To create and use data assets, first create a project.').should('exist');
     cy.findByRole('button', { name: 'Create project' }).should('exist');
   });
 
@@ -291,10 +301,10 @@ describe('Registry Table', () => {
     cy.findByTestId('registry-kebab').click();
     cy.findByTestId('manage-collections-action').click();
     cy.findByTestId('create-collection-button').click();
-    cy.findByTestId('create-collection-modal').should('exist');
-    cy.findByTestId('collection-name-input').type('new-collection');
-    cy.findByTestId('collection-description-input').type('A new test collection');
-    cy.findByTestId('create-collection-submit').click();
+    cy.findByTestId('create-collection-row').should('exist');
+    cy.findByTestId('new-collection-name-input').type('new-collection');
+    cy.findByTestId('new-collection-description-input').type('A new test collection');
+    cy.findByTestId('confirm-create-collection').click();
     cy.wait('@createCollection').then((interception) => {
       expect(interception.request.body).to.deep.include({
         namespace: ['new-collection'],
@@ -377,10 +387,10 @@ describe('Registration collection management', () => {
 
     cy.findByRole('button', { name: 'Manage collections' }).click();
     cy.findByTestId('create-collection-button').click();
-    cy.findByTestId('collection-name-input').type('new-collection');
-    cy.findByTestId('create-collection-submit').click();
+    cy.findByTestId('new-collection-name-input').type('new-collection');
+    cy.findByTestId('confirm-create-collection').click();
     cy.wait('@createCollectionFromRegistration');
-    cy.findByTestId('create-collection-modal').should('not.exist');
+    cy.findByTestId('create-collection-row').should('not.exist');
 
     cy.findByTestId('manage-collections-close-button').click();
     cy.findByTestId('register-data-modal').should('exist');
@@ -401,7 +411,7 @@ describe('Register Volume', () => {
     cy.findByTestId('register-data-modal').should('exist');
     cy.contains('Register data').should('exist');
     cy.contains(
-      'A data asset points to the exact location within a connection where the information is located. It can also record information about the structure of the data.',
+      'A data asset is a metadata record that helps users discover and understand external data. It stores information like location, format, and schema, but not the data itself.',
     ).should('exist');
   });
 
@@ -570,6 +580,24 @@ describe('Manage Labels', () => {
     cy.findByTestId('label-row-production').should('contain.text', 'embeddings');
   });
 
+  it('should show a creation empty state when there are no labels', () => {
+    cy.intercept('GET', `${REGISTRY_API}/test-project/labels`, {
+      body: { labels: [] },
+    });
+
+    visitWithData();
+    cy.findByTestId('registry-kebab').click();
+    cy.findByTestId('manage-labels-action').click();
+
+    cy.findByTestId('labels-empty-state').should('exist');
+    cy.contains('No labels yet').should('exist');
+    cy.findByTestId('label-filter').should('not.exist');
+    cy.findByTestId('labels-table').should('not.exist');
+
+    cy.findByTestId('create-label-button').click();
+    cy.findByTestId('create-label-row').should('exist');
+  });
+
   it('should show dash for labels with no assets', () => {
     cy.intercept('GET', `${REGISTRY_API}/test-project/labels`, {
       body: { labels: ['orphan-label'] },
@@ -592,6 +620,19 @@ describe('Manage Labels', () => {
     cy.findByTestId('label-row-claims').should('not.exist');
     cy.findByTestId('label-row-source-docs').should('not.exist');
     cy.findByTestId('label-row-embeddings').should('not.exist');
+  });
+
+  it('should show a table no-results empty state when filtering finds no labels', () => {
+    visitWithData();
+    cy.findByTestId('registry-kebab').click();
+    cy.findByTestId('manage-labels-action').click();
+
+    cy.findByTestId('label-filter').find('input').type('missing');
+    cy.findByTestId('labels-no-results-state').should('exist');
+    cy.findByTestId('label-filter').should('exist');
+    cy.findByTestId('labels-table').find('thead').should('exist');
+    cy.findByTestId('clear-label-filters').click();
+    cy.findByTestId('label-row-production').should('exist');
   });
 
   it('should show create label inline row and confirm button disabled until input', () => {
@@ -929,7 +970,7 @@ describe('Connection Selector', () => {
         name: 'connected-volume',
         format: 'other',
         connection_ref: {
-          type: 'rhai',
+          type: 'secret',
           secret_name: 'my-s3-connection',
         },
       });
@@ -946,7 +987,7 @@ describe('Connection Selector', () => {
         format: 'iceberg',
         storage_location: null,
         collection: 'analytics',
-        connection_ref: { type: 'rhai', secret_name: 'my-uri-connection' },
+        connection_ref: { type: 'secret', secret_name: 'my-uri-connection' },
         owner: 'user1',
         created_at: '2026-01-01',
         updated_at: '2026-01-02',
@@ -975,7 +1016,7 @@ describe('Connection Selector', () => {
         name: 'connected-table',
         format: 'iceberg',
         connection_ref: {
-          type: 'rhai',
+          type: 'secret',
           secret_name: 'my-uri-connection',
         },
       });
@@ -1030,9 +1071,9 @@ describe('Create Collection', () => {
     cy.findByTestId('manage-collections-action').click();
     cy.findByTestId('create-collection-button').click();
 
-    cy.findByTestId('collection-name-input').type('new-collection');
+    cy.findByTestId('new-collection-name-input').type('new-collection');
 
-    cy.findByTestId('create-collection-submit').click();
+    cy.findByTestId('confirm-create-collection').click();
 
     cy.wait('@createCollection').then((interception) => {
       expect(interception.request.body).to.deep.include({
