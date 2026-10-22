@@ -33,21 +33,7 @@ spec:
   - name: enable-slack-failure-notification
     value: "false"
   - name: prefetch-input
-    value: |
-      [
-        {
-          "path": ".",
-          "type": "npm"
-        },
-        {
-          "path": "packages/data-registry/frontend",
-          "type": "npm"
-        },
-        {
-          "path": "packages/data-registry/bff",
-          "type": "gomod"
-        }
-      ]
+    value: '[{"path":".","type":"pnpm"},{"path":"prefetch/pnpm","type":"npm"},{"path":"packages/data-registry/bff","type":"gomod"}]'
   - name: hermetic
     value: true
   - name: build-platforms
