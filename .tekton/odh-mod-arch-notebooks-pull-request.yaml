@@ -44,8 +44,6 @@ spec:
     - linux-m2xlarge/arm64
     - linux/ppc64le
     - linux/s390x
-  - name: rhoai-version
-    value: "3.6.0"
   pipelineRef:
     params:
     - name: url

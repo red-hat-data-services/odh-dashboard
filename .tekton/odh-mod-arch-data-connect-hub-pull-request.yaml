@@ -40,8 +40,6 @@ spec:
     value:
     - linux/x86_64
     - linux-m2xlarge/arm64
-  - name: rhoai-version
-    value: "3.6.0"
   pipelineRef:
     params:
     - name: url
