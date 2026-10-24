@@ -11,7 +11,7 @@ ARG CONTROLLER_SOURCE_CODE=./packages/${MODULE_NAME}/upstream/workspaces/control
 # Set the base images for the build stages
 ARG NODE_BASE_IMAGE=registry.access.redhat.com/ubi9/nodejs-22@sha256:1d423d9a54713c59859c77f35ae7d2e61d330993aa4f28fe979c920038c4c867
 ARG GOLANG_BASE_IMAGE=registry.access.redhat.com/ubi9/go-toolset:1.26.5@sha256:f221165cd493d89c13ce384e8e58914571ea353f47a1443698d981494842ff83
-ARG DISTROLESS_BASE_IMAGE=registry.redhat.io/ubi9/ubi-minimal-pqc@sha256:b3a0b012de0c578082e1bc5b01c8bc27461b4eeb571a0b1a2b21a07dbd845a62
+ARG DISTROLESS_BASE_IMAGE=registry.redhat.io/ubi9/ubi-minimal-pqc@sha256:d0fdfb1401ee754872f60c2527563671c16112080e5254139133908178700911
 
 # UI build stage
 FROM ${NODE_BASE_IMAGE} AS ui-builder
