@@ -1,4 +1,5 @@
 import type { Extension } from '@openshift/dynamic-plugin-sdk';
+import { SupportedArea } from '@odh-dashboard/plugin-core/areas';
 
 const PLUGIN_DATA_REGISTRY = 'plugin-data-registry';
 
@@ -8,6 +9,7 @@ const extensions: Extension[] = [
     properties: {
       id: PLUGIN_DATA_REGISTRY,
       featureFlags: ['dataRegistry'],
+      reliantAreas: [SupportedArea.DATA_REGISTRY],
     },
   },
   {
@@ -24,6 +26,7 @@ const extensions: Extension[] = [
       section: 'ai-hub',
       objectType: 'data-registry',
       label: 'Tech Preview',
+      hidePageTitleOnPaths: ['browse/assets', 'browse/collections'],
     },
   },
   {
@@ -35,7 +38,7 @@ const extensions: Extension[] = [
       pageId: 'data-tab-page',
       id: 'browse',
       title: 'Browse',
-      singleTabTitle: 'Data',
+      singleTabTitle: 'Data assets',
       objectType: 'data-registry',
       component: () => import('./DataRegistryWrapper'),
     },

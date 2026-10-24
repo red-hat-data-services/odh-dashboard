@@ -46,6 +46,7 @@ const (
 )
 
 const (
+	observabilityComponent         = "observability"
 	persesServiceName              = "data-science-perses"
 	persesServicePort        int32 = 8080
 	rhoaiMonitoringNamespace       = "redhat-ods-monitoring"
@@ -73,7 +74,7 @@ func (r *DashboardReconciler) autoDetectObservability(ctx context.Context, dashb
 
 	svc := &corev1.Service{}
 	key := types.NamespacedName{Name: persesServiceName, Namespace: monitoringNS}
-	if err := r.Get(ctx, key, svc); err != nil {
+	if err := r.apiReader().Get(ctx, key, svc); err != nil {
 		if k8serrors.IsNotFound(err) {
 			return nil
 		}
@@ -242,7 +243,7 @@ func applyKustomizeParams(dashboard *v1alpha1.Dashboard, manifests []render.Mani
 	return nil
 }
 
-func extractDashboardURL(ctx context.Context, cli client.Client, dashboard *v1alpha1.Dashboard, namespace string, platform cluster.Platform) (string, error) {
+func extractDashboardURL(ctx context.Context, reader client.Reader, dashboard *v1alpha1.Dashboard, namespace string, platform cluster.Platform) (string, error) {
 	if platform == cluster.XKS {
 		return "", nil
 	}
@@ -252,7 +253,7 @@ func extractDashboardURL(ctx context.Context, cli client.Client, dashboard *v1al
 	}
 
 	rl := &routev1.RouteList{}
-	if err := cli.List(ctx, rl,
+	if err := reader.List(ctx, rl,
 		client.InNamespace(namespace),
 		client.MatchingLabels{labels.PlatformPartOf: strings.ToLower(v1alpha1.DashboardKind)},
 	); err != nil {
@@ -284,9 +285,11 @@ func extractDashboardURL(ctx context.Context, cli client.Client, dashboard *v1al
 func deployObservabilityManifests(
 	ctx context.Context,
 	cli client.Client,
+	reader client.Reader,
 	dashboard *v1alpha1.Dashboard,
 	basePath string,
 	platform cluster.Platform,
+	applicationsNamespace string,
 ) error {
 	logger := log.FromContext(ctx)
 
@@ -301,7 +304,7 @@ func deployObservabilityManifests(
 	// Use a discovery-based check to avoid requiring apiextensions.k8s.io RBAC.
 	persesList := &unstructured.UnstructuredList{}
 	persesList.SetGroupVersionKind(persesdashboardGVK)
-	if err := cli.List(ctx, persesList, client.Limit(1)); err != nil {
+	if err := reader.List(ctx, persesList, client.Limit(1)); err != nil {
 		if meta.IsNoMatchError(err) {
 			return ErrPersesCRDNotFound
 		}
@@ -315,11 +318,18 @@ func deployObservabilityManifests(
 	}
 
 	m := observabilityManifestInfo(basePath, platform)
-	engine := kustomize.NewEngine()
-
-	rendered, err := engine.Render(m.String(), kustomize.WithNamespace(obsNamespace))
+	rendered, err := kustomize.NewEngine().Render(m.String(), kustomize.WithNamespace(obsNamespace))
 	if err != nil {
 		return fmt.Errorf("failed to render observability manifests from %s: %w", m, err)
+	}
+
+	if maasPortalSupportedPlatform(platform) {
+		if err := setMaaSPortalPersesIngressNamespace(rendered, applicationsNamespace); err != nil {
+			return err
+		}
+		if err := preserveLegacyMaaSPortalNetworkAccess(ctx, reader, rendered, applicationsNamespace); err != nil {
+			return err
+		}
 	}
 
 	logger.Info("Deploying observability manifests", "namespace", obsNamespace, "resources", len(rendered))
@@ -327,6 +337,7 @@ func deployObservabilityManifests(
 	deployer := deploy.NewDeployer(
 		deploy.WithFieldOwner("dashboard-operator"),
 		deploy.WithLabel(labels.PlatformPartOf, strings.ToLower(v1alpha1.DashboardKind)),
+		deploy.WithLabel(moduleComponentLabel, observabilityComponent),
 		deploy.WithApplyOrder(),
 	)
 

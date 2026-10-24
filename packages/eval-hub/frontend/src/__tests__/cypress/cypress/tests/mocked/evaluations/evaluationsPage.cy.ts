@@ -4,20 +4,14 @@ import { mockNamespace } from '~/__mocks__/mockNamespace';
 import { mockUserSettings } from '~/__mocks__/mockUserSettings';
 import { mockEvaluationJob } from '~/__mocks__/mockEvaluationJob';
 import { mockEvalHubHealth } from '~/__mocks__/mockEvalHubHealth';
-import { mockKueueAvailability } from '~/__mocks__/mockKueueAvailability';
 import {
   mockBenchmarkSuiteCollections,
   mockCollectionsListResponse,
+  mockCuratedBenchmarkSuiteCollections,
 } from '~/__mocks__/mockCollection';
 import { evaluationsPage } from '~/__tests__/cypress/cypress/pages/evaluationsPage';
 import { CLIENT_API_VERSION } from '~/__tests__/cypress/cypress/support/commands/api';
-import type {
-  Collection,
-  EvalHubHealthResponse,
-  EvaluationJob,
-  KueueAvailability,
-  Provider,
-} from '~/app/types';
+import type { Collection, EvalHubHealthResponse, EvaluationJob, Provider } from '~/app/types';
 
 const NAMESPACE = 'test-namespace';
 const API_VERSION = { apiVersion: CLIENT_API_VERSION };
@@ -29,7 +23,6 @@ type InterceptOptions = {
   providers?: Provider[];
   collections?: Collection[];
   collectionsTotalCount?: number;
-  kueueAvailability?: KueueAvailability;
 };
 
 const initIntercepts = ({
@@ -37,9 +30,8 @@ const initIntercepts = ({
   health = mockEvalHubHealth(),
   jobs = [],
   providers = [],
-  collections = [],
+  collections = mockCuratedBenchmarkSuiteCollections(),
   collectionsTotalCount,
-  kueueAvailability = mockKueueAvailability(),
 }: InterceptOptions = {}) => {
   cy.interceptApi(
     'GET /api/:apiVersion/user',
@@ -49,9 +41,13 @@ const initIntercepts = ({
 
   cy.interceptApi('GET /api/:apiVersion/namespaces', { path: API_VERSION }, namespaces);
 
-  cy.interceptApi('GET /api/:apiVersion/evalhub/health', { path: API_VERSION }, health);
+  cy.interceptApi('GET /api/:apiVersion/evalhub/health', { path: API_VERSION }, health).as(
+    'evalHubHealth',
+  );
 
-  cy.interceptApi('GET /api/:apiVersion/evaluations/jobs', { path: API_VERSION }, jobs);
+  cy.interceptApi('GET /api/:apiVersion/evaluations/jobs', { path: API_VERSION }, jobs).as(
+    'evalHubJobs',
+  );
 
   cy.interceptApi('GET /api/:apiVersion/evaluations/providers', { path: API_VERSION }, providers);
 
@@ -59,12 +55,6 @@ const initIntercepts = ({
     'GET /api/:apiVersion/evaluations/collections',
     { path: API_VERSION },
     mockCollectionsListResponse(collections, collectionsTotalCount),
-  );
-
-  cy.interceptApi(
-    'GET /api/:apiVersion/kueue/availability',
-    { path: API_VERSION },
-    kueueAvailability,
   );
 };
 
@@ -75,25 +65,168 @@ describe('Evaluations Page - Tabs', () => {
     });
   });
 
-  it('should default to the Evaluate tab with the benchmark suite create link', () => {
+  it('should default to the Gallery tab with curated model suite filters', () => {
     evaluationsPage.visit(NAMESPACE);
-    evaluationsPage.findEvaluateTab().should('have.attr', 'aria-selected', 'true');
-    evaluationsPage.findEvaluateContent().should('exist');
-    evaluationsPage.findCreateSuiteCard().should('exist');
+    evaluationsPage.findGalleryTab().should('have.attr', 'aria-selected', 'true');
+    evaluationsPage.findGalleryContent().should('exist');
+    evaluationsPage.findCreateSuiteCard().should('not.exist');
+    evaluationsPage.findBenchmarkSuitesCategoryFilter().should('exist');
     evaluationsPage
-      .findCreateSuiteButton()
-      .should('have.attr', 'href', `/evaluation/${NAMESPACE}/create/collections/new`)
-      .and('not.have.attr', 'aria-disabled', 'true');
+      .findBenchmarkSuitesMoreFiltersToggle()
+      .should('contain.text', 'Show more filters');
+    evaluationsPage.findBenchmarkSuitesIndustryFilter().should('not.exist');
+    evaluationsPage.findBenchmarkSuitesTagsFilter().should('not.exist');
+    evaluationsPage.findBenchmarkSuitesTaskFilter().should('not.exist');
+    evaluationsPage.findBenchmarkSuitesModalityFilter().should('not.exist');
+    evaluationsPage.findBenchmarkSuitesEvaluatesFilter().should('not.exist');
+    evaluationsPage.findBenchmarkSuitesPagination().should('not.exist');
+    evaluationsPage
+      .findBenchmarkSuitesNameFilter()
+      .find('input')
+      .should('have.attr', 'placeholder', 'Search collections');
+    evaluationsPage.findBenchmarkSuiteCard('clawbench').should('exist');
+    evaluationsPage.findBenchmarkSuiteCard('curated-open-llm-leaderboard-v2').should('exist');
     evaluationsPage
       .findPageDescription()
       .should(
         'contain.text',
-        'Create benchmark suites and run evaluations to measure model, agent, and dataset performance.',
+        'Evaluate models using curated benchmark collections. Start with a curated collection, customize it, or create your own. Add a collection to your project to use it in your evaluations.',
       );
   });
 
-  it('should navigate to the single benchmark flow from the browse benchmarks section', () => {
+  it('should navigate from a Gallery Customize action to the suite editor', () => {
+    evaluationsPage.visitGallery(NAMESPACE);
+    evaluationsPage.findBenchmarkSuiteDropdownToggle('clawbench').click();
+    evaluationsPage.findBenchmarkSuiteDropdownAction('clawbench').click();
+
+    cy.url().should('include', `/evaluation/${NAMESPACE}/create/collections/clawbench/copy`);
+  });
+
+  it('should show prerequisites and customize-only actions for mapped Gallery suites', () => {
+    const ids = ['trustworthiness-v1', 'tool-use-v1', 'multimodal-v1', 'unmapped-suite'];
+    const collections = mockCuratedBenchmarkSuiteCollections()
+      .slice(0, ids.length)
+      .map((collection, index) => ({
+        ...collection,
+        resource: { ...collection.resource, id: ids[index] },
+        benchmarks: collection.benchmarks?.map((benchmark, benchmarkIndex) =>
+          index === 0 && benchmarkIndex === 0
+            ? { ...benchmark, parameters: { ...benchmark.parameters, judge_model: '' } }
+            : benchmark,
+        ),
+      }));
+    initIntercepts({ collections, collectionsTotalCount: collections.length });
+
+    evaluationsPage.visitGallery(NAMESPACE);
+
+    evaluationsPage
+      .findBenchmarkSuitePrerequisite('trustworthiness-v1')
+      .should('contain.text', 'Requires a judge model.');
+    evaluationsPage
+      .findBenchmarkSuitePrerequisite('tool-use-v1')
+      .should('contain.text', 'Requires a model that supports multiple tool/function calls.');
+    evaluationsPage
+      .findBenchmarkSuitePrerequisite('multimodal-v1')
+      .should('contain.text', 'Requires a vision-language model that supports image inputs.');
+
+    ['trustworthiness-v1', 'tool-use-v1', 'multimodal-v1'].forEach((collectionId) => {
+      evaluationsPage
+        .findBenchmarkSuitePrimaryAction(collectionId)
+        .should('contain.text', 'Customize')
+        .and('have.class', 'pf-m-secondary');
+      evaluationsPage.findBenchmarkSuiteDropdownToggleInCard(collectionId).should('not.exist');
+    });
+
+    evaluationsPage.findBenchmarkSuitePrimaryAction('unmapped-suite').should('contain.text', 'Run');
+    evaluationsPage.findBenchmarkSuiteDropdownToggleInCard('unmapped-suite').should('exist');
+
+    evaluationsPage.findBenchmarkSuiteName('trustworthiness-v1').click();
+    evaluationsPage
+      .findCollectionDrawerPrerequisite()
+      .should(
+        'contain.text',
+        'Requires a judge model in addition to the model you are evaluating.',
+      );
+    evaluationsPage
+      .findCollectionDrawerPanel()
+      .find('[data-testid="use-benchmark-suite-button"]')
+      .should('not.exist');
+    evaluationsPage.findCollectionDrawerCustomizeButton().should('be.visible');
+    evaluationsPage.findCollectionDrawerSection('modalities').should('be.visible');
+    evaluationsPage.findCollectionDrawerSection('tasks').should('be.visible');
+    evaluationsPage.findCollectionDrawerSection('tags').should('be.visible');
+    evaluationsPage.findCollectionDrawerSection('benchmarks').should('be.visible');
+    evaluationsPage.findCollectionDrawerSectionToggle('benchmarks').click();
+    evaluationsPage
+      .findCollectionDrawerSectionToggle('benchmarks')
+      .should('have.attr', 'aria-expanded', 'false');
+    evaluationsPage.findCollectionDrawerCloseFooter().click();
+
+    evaluationsPage.findBenchmarkSuitePrimaryAction('trustworthiness-v1').click();
+    cy.url().should(
+      'include',
+      `/evaluation/${NAMESPACE}/create/collections/trustworthiness-v1/copy`,
+    );
+  });
+
+  it('should hide the Gallery evaluation target filter', () => {
     evaluationsPage.visit(NAMESPACE);
+    evaluationsPage.findBenchmarkSuitesEvaluatesFilter().should('not.exist');
+  });
+
+  it('should filter Gallery suites by category, tags, task, modality, and industry', () => {
+    evaluationsPage.visit(NAMESPACE);
+    evaluationsPage.findBenchmarkSuitesMoreFiltersToggle().click();
+
+    evaluationsPage.findBenchmarkSuitesCategoryFilter().click();
+    evaluationsPage.findBenchmarkSuitesFilterOption('category', 'code').click();
+    evaluationsPage.findBenchmarkSuiteCard('software-engineering-agent-suite').should('exist');
+    evaluationsPage.findBenchmarkSuiteCard('clawbench').should('not.exist');
+
+    evaluationsPage.findBenchmarkSuitesFilterOption('category', 'code').click();
+    evaluationsPage.findBenchmarkSuitesCategoryFilter().click();
+    evaluationsPage.findBenchmarkSuitesTagsFilter().click();
+    evaluationsPage.findBenchmarkSuitesFilterOption('tags', 'code').click();
+    evaluationsPage.findBenchmarkSuiteCard('software-engineering-agent-suite').should('exist');
+    evaluationsPage.findBenchmarkSuiteCard('clawbench').should('not.exist');
+
+    evaluationsPage.findBenchmarkSuitesFilterOption('tags', 'code').click();
+    evaluationsPage.findBenchmarkSuitesTagsFilter().click();
+    evaluationsPage.findBenchmarkSuitesTaskFilter().click();
+    evaluationsPage.findBenchmarkSuitesFilterOption('task', 'code_generation').click();
+    evaluationsPage.findBenchmarkSuiteCard('software-engineering-agent-suite').should('exist');
+    evaluationsPage.findBenchmarkSuiteCard('clawbench').should('not.exist');
+
+    evaluationsPage.findBenchmarkSuitesFilterOption('task', 'code_generation').click();
+    evaluationsPage.findBenchmarkSuitesTaskFilter().click();
+    evaluationsPage.findBenchmarkSuitesModalityFilter().click();
+    evaluationsPage.findBenchmarkSuitesFilterOption('modality', 'code').click();
+    evaluationsPage.findBenchmarkSuiteCard('software-engineering-agent-suite').should('exist');
+    evaluationsPage.findBenchmarkSuiteCard('clawbench').should('not.exist');
+
+    evaluationsPage.findBenchmarkSuitesFilterOption('modality', 'code').click();
+    evaluationsPage.findBenchmarkSuitesModalityFilter().click();
+    evaluationsPage.findBenchmarkSuitesIndustryFilter().click();
+    evaluationsPage.findBenchmarkSuitesFilterOption('industry', 'telco').click();
+    evaluationsPage.findBenchmarkSuiteCard('software-engineering-agent-suite').should('exist');
+    evaluationsPage.findBenchmarkSuiteCard('clawbench').should('not.exist');
+  });
+
+  it('should allow multiple selections within a Gallery filter', () => {
+    evaluationsPage.visit(NAMESPACE);
+    evaluationsPage.findBenchmarkSuitesMoreFiltersToggle().click();
+    evaluationsPage.findBenchmarkSuitesCategoryFilter().click();
+    evaluationsPage.findBenchmarkSuitesFilterOption('category', 'code').click();
+    evaluationsPage.findBenchmarkSuitesFilterOption('category', 'trustworthiness').click();
+
+    evaluationsPage.findBenchmarkSuitesCategoryFilterBadge().should('contain.text', '2');
+    evaluationsPage.findBenchmarkSuiteCard('software-engineering-agent-suite').should('exist');
+    evaluationsPage.findBenchmarkSuiteCard('curated-agent-safety-suite').should('exist');
+  });
+
+  it('should navigate to the single benchmark flow from the browse benchmarks section', () => {
+    evaluationsPage.visitEvaluate(NAMESPACE);
+    evaluationsPage.findEvaluateTab().should('contain.text', 'Benchmark collections');
     evaluationsPage.findBrowseAllBenchmarksExploreButton().click();
     cy.url().should('include', `/evaluation/${NAMESPACE}/create/benchmarks`);
   });
@@ -108,7 +241,7 @@ describe('Evaluations Page - Tabs', () => {
       .findPageDescription()
       .should(
         'contain.text',
-        'Create benchmark suites and run evaluations to measure model, agent, and dataset performance.',
+        'Evaluate models using curated benchmark collections. Start with a curated collection, customize it, or create your own. Add a collection to your project to use it in your evaluations.',
       );
     evaluationsPage
       .findRunsDescription()
@@ -116,12 +249,12 @@ describe('Evaluations Page - Tabs', () => {
     cy.url().should('include', '?tab=runs');
   });
 
-  it('should restore the Evaluate tab when navigating back', () => {
+  it('should restore the Gallery tab when navigating back', () => {
     evaluationsPage.visit(NAMESPACE);
     evaluationsPage.findRunsTab().click();
     cy.go('back');
-    evaluationsPage.findEvaluateTab().should('have.attr', 'aria-selected', 'true');
-    evaluationsPage.findCreateSuiteCard().should('exist');
+    evaluationsPage.findGalleryTab().should('have.attr', 'aria-selected', 'true');
+    evaluationsPage.findGalleryContent().should('exist');
   });
 
   it('should render tenant benchmark suites in the gallery', () => {
@@ -130,16 +263,14 @@ describe('Evaluations Page - Tabs', () => {
       collectionsTotalCount: 8,
     });
 
-    evaluationsPage.visit(NAMESPACE);
+    evaluationsPage.visitEvaluate(NAMESPACE);
 
-    evaluationsPage.findBenchmarkSuiteCard('model-suite-2').should('contain.text', 'Model suite 2');
-    evaluationsPage.findBenchmarkSuiteCard('model-suite-7').should('contain.text', 'Model suite 7');
     evaluationsPage.findBenchmarkSuiteCard('agent-safety-suite').should('exist');
     evaluationsPage.findBenchmarkSuiteCard('code-quality-suite').should('exist');
-    evaluationsPage.findBenchmarkSuiteCard('trace-evaluation-suite').should('exist');
-    evaluationsPage
-      .findBenchmarkSuitesSummary()
-      .should('contain.text', 'Go to All my benchmark suites');
+    evaluationsPage.findBenchmarkSuiteCard('finance-evaluation-suite').should('exist');
+    evaluationsPage.findBenchmarkSuiteCard('guardrails-compliance-suite').should('exist');
+    evaluationsPage.findBenchmarkSuiteCard('model-suite-2').should('contain.text', 'Model suite 2');
+    evaluationsPage.findBenchmarkSuitesViewAllButton().should('contain.text', 'View all');
   });
 
   it('should filter benchmark suites by industry client-side and clear the filter', () => {
@@ -147,54 +278,68 @@ describe('Evaluations Page - Tabs', () => {
     initIntercepts({ collections, collectionsTotalCount: collections.length });
 
     evaluationsPage.visitBenchmarkSuites(NAMESPACE);
+    evaluationsPage.findBenchmarkSuitesMoreFiltersToggle().click();
     evaluationsPage.findBenchmarkSuitesIndustryFilter().click();
     evaluationsPage.findBenchmarkSuitesFilterOption('industry', 'health').click();
 
     evaluationsPage.findBenchmarkSuiteCard('model-suite-2').should('exist');
     evaluationsPage.findBenchmarkSuiteCard('model-suite-7').should('not.exist');
 
+    evaluationsPage.findBenchmarkSuitesFilterOption('industry', 'health').click();
     evaluationsPage.findBenchmarkSuitesIndustryFilter().click();
-    evaluationsPage.findBenchmarkSuitesFilterOption('industry', 'all').click();
     evaluationsPage.findBenchmarkSuiteCard('model-suite-7').should('exist');
   });
 
   it('should open the suite details drawer when selecting a suite name', () => {
     initIntercepts({ collections: mockBenchmarkSuiteCollections() });
 
-    evaluationsPage.visit(NAMESPACE);
+    evaluationsPage.visitEvaluate(NAMESPACE);
     evaluationsPage.findBenchmarkSuiteName('model-suite-2').click();
 
     evaluationsPage.findCollectionDrawerPanel().should('be.visible');
     evaluationsPage.findCollectionDrawerPanel().should('contain.text', 'Model suite 2');
-    evaluationsPage.findCollectionDrawerPanel().should('contain.text', 'Run benchmark suite');
+    evaluationsPage.findCollectionDrawerPanel().should('contain.text', 'Run');
   });
 
-  it('should render curated suite category cards and link to filtered collections', () => {
+  it('should hide Red Hat validated collections until more evaluation targets are available', () => {
     initIntercepts({ collections: mockBenchmarkSuiteCollections() });
 
-    evaluationsPage.visit(NAMESPACE);
+    evaluationsPage.visitEvaluate(NAMESPACE);
 
-    evaluationsPage.findCuratedSuiteCategories().should('exist');
-    evaluationsPage.findCuratedSuiteCategoryCard('agents').should('contain.text', 'Agents');
-    evaluationsPage.findCuratedSuiteCategoryCard('models').click();
-    cy.url().should('include', `/evaluation/${NAMESPACE}/collections/model`);
+    evaluationsPage.findCuratedSuiteCategories().should('not.exist');
+    evaluationsPage.findBrowseAllBenchmarksExploreButton().should('exist');
   });
 
   it('should show suite contextual actions and the delete confirmation modal', () => {
     initIntercepts({ collections: mockBenchmarkSuiteCollections() });
 
-    evaluationsPage.visit(NAMESPACE);
+    evaluationsPage.visitEvaluate(NAMESPACE);
     evaluationsPage.findBenchmarkSuiteMenu('model-suite-2').click();
 
+    evaluationsPage.findBenchmarkSuiteAction('edit', 'model-suite-2').should('not.be.disabled');
     evaluationsPage.findBenchmarkSuiteAction('duplicate', 'model-suite-2').should('be.visible');
     evaluationsPage.findBenchmarkSuiteAction('delete', 'model-suite-2').click();
 
     evaluationsPage.findBenchmarkSuiteDeleteModal().should('be.visible');
     evaluationsPage
       .findBenchmarkSuiteDeleteModal()
-      .should('contain.text', 'The Model suite 2 benchmark suite will be permanently deleted.');
+      .should('contain.text', 'The Model suite 2 collection will be permanently deleted.');
     evaluationsPage.findBenchmarkSuiteDeleteCancel().click();
     evaluationsPage.findBenchmarkSuiteDeleteModal().should('not.exist');
+  });
+
+  it('should disable editing a benchmark suite after it has been run', () => {
+    const collections = mockBenchmarkSuiteCollections().map((collection) =>
+      collection.resource.id === 'model-suite-2'
+        ? { ...collection, state: { run_count: 1 } }
+        : collection,
+    );
+    initIntercepts({ collections });
+
+    evaluationsPage.visitEvaluate(NAMESPACE);
+    evaluationsPage.findBenchmarkSuiteMenu('model-suite-2').click();
+
+    evaluationsPage.findBenchmarkSuiteAction('edit', 'model-suite-2').should('be.disabled');
   });
 });
 
@@ -268,26 +413,6 @@ describe('Evaluations Page - Table', () => {
     evaluationsPage.findCompareButton().should('exist');
     evaluationsPage.findCreateEvaluationButton().should('not.exist');
   });
-
-  it('should offer the Queued status filter when Kueue is enabled before a queued run exists', () => {
-    initIntercepts({
-      jobs: [completedJob, runningJob, failedJob],
-      kueueAvailability: mockKueueAvailability({
-        enabled: true,
-        scheduling_ready: true,
-        cluster_enabled: true,
-        namespace_managed: true,
-        local_queues_available: true,
-        local_queue_names: ['gpu-default'],
-      }),
-    });
-
-    evaluationsPage.visitRuns(NAMESPACE);
-    evaluationsPage.findFilterTypeToggle().click();
-    evaluationsPage.findFilterTypeOption('status').click();
-    evaluationsPage.findStatusFilterToggle().click();
-    evaluationsPage.findStatusFilterOption('queued').should('exist');
-  });
 });
 
 describe('Evaluations Page - Empty state', () => {
@@ -302,11 +427,11 @@ describe('Evaluations Page - Empty state', () => {
       .findEmptyStateBody()
       .should(
         'contain.text',
-        'Start an evaluation run, or select a different project to view its runs.',
+        'Go to collections to create a collection or run an individual benchmark, or select a different project to view its runs.',
       );
   });
 
-  it('should navigate to the Evaluate tab when clicking the empty state action', () => {
+  it('should navigate to the Benchmark collections tab when clicking the empty state action', () => {
     evaluationsPage.visitRuns(NAMESPACE);
     evaluationsPage.findCreateEvaluationButton().click();
     evaluationsPage.findEvaluateTab().should('have.attr', 'aria-selected', 'true');

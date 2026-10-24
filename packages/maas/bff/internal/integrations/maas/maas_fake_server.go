@@ -29,8 +29,18 @@ func CreateMaasFakeServer() *httptest.Server {
 				sendFakeResponse("maas-models-list.json", http.StatusOK, w)
 				return
 			}
+			if r.URL.Path == "/v1/me" {
+				sendFakeResponse("me-response.json", http.StatusOK, w)
+				return
+			}
 			if r.URL.Path == "/v1/subscriptions" {
 				sendFakeResponse("subscriptions-list.json", http.StatusOK, w)
+				return
+			}
+			if r.URL.Path == "/v1/api-keys/config" {
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(http.StatusOK)
+				_, _ = w.Write([]byte(`{"max_expiration_days":90,"ephemeral_max_expiration":"1h"}`))
 				return
 			}
 			if strings.HasPrefix(r.URL.Path, "/v1/api-keys/") {

@@ -3,10 +3,13 @@ package evalhub
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"strconv"
 	"strings"
+	"sync/atomic"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -141,6 +144,8 @@ func TestEvalHubClient_ListEvaluationJobs(t *testing.T) {
 		assert.Equal(t, "/api/v1/evaluations/jobs", r.URL.Path)
 		assert.Equal(t, "Bearer test-token", r.Header.Get("Authorization"))
 		assert.Equal(t, "my-ns", r.Header.Get("X-Tenant"))
+		assert.Equal(t, "100", r.URL.Query().Get("limit"))
+		assert.Equal(t, "0", r.URL.Query().Get("offset"))
 		w.Header().Set("Content-Type", "application/json")
 		_ = json.NewEncoder(w).Encode(resp)
 	}))
@@ -150,10 +155,140 @@ func TestEvalHubClient_ListEvaluationJobs(t *testing.T) {
 	result, err := client.ListEvaluationJobs(context.Background(), ListEvaluationJobsParams{Namespace: "my-ns"})
 
 	require.NoError(t, err)
-	assert.Len(t, result, 2)
-	assert.Equal(t, "job-1", result[0].Resource.ID)
-	assert.Equal(t, "completed", result[0].Status.State)
-	assert.Equal(t, "test-model", result[0].Model.Name)
+	assert.Len(t, result.Items, 2)
+	assert.Equal(t, 2, result.TotalCount)
+	assert.False(t, result.Truncated)
+	assert.Equal(t, "job-1", result.Items[0].Resource.ID)
+	assert.Equal(t, "completed", result.Items[0].Status.State)
+	assert.Equal(t, "test-model", result.Items[0].Model.Name)
+}
+
+func TestEvalHubClient_ListEvaluationJobs_FetchesAllPages(t *testing.T) {
+	firstPage := EvaluationJobsResponse{
+		TotalCount: 3,
+		Limit:      2,
+		Next:       &PaginationLink{Href: "/api/v1/evaluations/jobs?limit=2&offset=2"},
+		Items: []EvaluationJob{
+			{Resource: JobResource{ID: "job-1"}},
+			{Resource: JobResource{ID: "job-2"}},
+		},
+	}
+	secondPage := EvaluationJobsResponse{
+		TotalCount: 3,
+		Limit:      2,
+		Items:      []EvaluationJob{{Resource: JobResource{ID: "job-3"}}},
+	}
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "/api/v1/evaluations/jobs", r.URL.Path)
+		assert.Equal(t, "my-ns", r.Header.Get("X-Tenant"))
+		assert.Equal(t, "100", r.URL.Query().Get("limit"))
+		w.Header().Set("Content-Type", "application/json")
+		if r.URL.Query().Get("offset") == "0" {
+			_ = json.NewEncoder(w).Encode(firstPage)
+			return
+		}
+		assert.Equal(t, "2", r.URL.Query().Get("offset"))
+		_ = json.NewEncoder(w).Encode(secondPage)
+	}))
+	defer server.Close()
+
+	client := NewEvalHubClient(server.URL, "", false, nil, "/api/v1")
+	result, err := client.ListEvaluationJobs(context.Background(), ListEvaluationJobsParams{Namespace: "my-ns"})
+
+	require.NoError(t, err)
+	require.Len(t, result.Items, 3)
+	assert.Equal(t, 3, result.TotalCount)
+	assert.False(t, result.Truncated)
+	assert.Equal(t, []string{"job-1", "job-2", "job-3"}, []string{
+		result.Items[0].Resource.ID,
+		result.Items[1].Resource.ID,
+		result.Items[2].Resource.ID,
+	})
+}
+
+func TestEvalHubClient_ListEvaluationJobs_TruncatesAtMaxItems(t *testing.T) {
+	const upstreamTotal = 2500
+	var requestCount atomic.Int32
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "100", r.URL.Query().Get("limit"))
+		offset, err := strconv.Atoi(r.URL.Query().Get("offset"))
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		items := make([]EvaluationJob, 0, evaluationJobsPageSize)
+		for i := 0; i < evaluationJobsPageSize; i++ {
+			items = append(items, EvaluationJob{Resource: JobResource{ID: fmt.Sprintf("job-%d", offset+i)}})
+		}
+		requestCount.Add(1)
+
+		resp := EvaluationJobsResponse{
+			TotalCount: upstreamTotal,
+			Limit:      evaluationJobsPageSize,
+			Next:       &PaginationLink{Href: "/api/v1/evaluations/jobs"},
+			Items:      items,
+		}
+		w.Header().Set("Content-Type", "application/json")
+		_ = json.NewEncoder(w).Encode(resp)
+	}))
+	defer server.Close()
+
+	client := NewEvalHubClient(server.URL, "", false, nil, "/api/v1")
+	result, err := client.ListEvaluationJobs(context.Background(), ListEvaluationJobsParams{Namespace: "my-ns"})
+
+	require.NoError(t, err)
+	assert.Len(t, result.Items, evaluationJobsMaxItems)
+	assert.Equal(t, upstreamTotal, result.TotalCount)
+	assert.True(t, result.Truncated)
+	assert.Equal(t, "job-999", result.Items[evaluationJobsMaxItems-1].Resource.ID)
+	// No further pages are requested once the cap is reached.
+	assert.Equal(t, evaluationJobsMaxItems/evaluationJobsPageSize, int(requestCount.Load()))
+}
+
+func TestEvalHubClient_ListEvaluationJobs_StopsAtPageBudget(t *testing.T) {
+	// Misbehaving upstream: always signals a next page, reports total_count 0,
+	// and re-serves the same items so dedup keeps the aggregate below the item
+	// cap. The offset budget must terminate the loop.
+	var requestCount atomic.Int32
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "100", r.URL.Query().Get("limit"))
+		offset, err := strconv.Atoi(r.URL.Query().Get("offset"))
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		items := make([]EvaluationJob, 0, evaluationJobsPageSize)
+		for i := 0; i < evaluationJobsPageSize; i++ {
+			items = append(items, EvaluationJob{Resource: JobResource{ID: fmt.Sprintf("job-%d", offset%(2*evaluationJobsPageSize)+i)}})
+		}
+		requestCount.Add(1)
+
+		resp := EvaluationJobsResponse{
+			TotalCount: 0,
+			Limit:      evaluationJobsPageSize,
+			Next:       &PaginationLink{Href: "/api/v1/evaluations/jobs"},
+			Items:      items,
+		}
+		w.Header().Set("Content-Type", "application/json")
+		_ = json.NewEncoder(w).Encode(resp)
+	}))
+	defer server.Close()
+
+	client := NewEvalHubClient(server.URL, "", false, nil, "/api/v1")
+	result, err := client.ListEvaluationJobs(context.Background(), ListEvaluationJobsParams{Namespace: "my-ns"})
+
+	require.NoError(t, err)
+	assert.True(t, result.Truncated)
+	assert.Equal(t, 0, result.TotalCount)
+	// The loop stops once the offset reaches the item cap, i.e. after
+	// maxItems/pageSize requests, even though every page re-serves duplicates.
+	assert.Equal(t, evaluationJobsMaxItems/evaluationJobsPageSize, int(requestCount.Load()))
+	assert.NotEmpty(t, result.Items)
 }
 
 func TestEvalHubClient_ListEvaluationJobs_EmptyNamespace(t *testing.T) {
@@ -203,8 +338,8 @@ func TestEvalHubClient_ListEvaluationJobs_WithParams(t *testing.T) {
 	})
 
 	require.NoError(t, err)
-	assert.Len(t, result, 1)
-	assert.Equal(t, "job-1", result[0].Resource.ID)
+	assert.Len(t, result.Items, 1)
+	assert.Equal(t, "job-1", result.Items[0].Resource.ID)
 }
 
 func TestEvalHubClient_ListEvaluationJobs_ServerError(t *testing.T) {
@@ -234,7 +369,7 @@ func TestEvalHubClient_ListCollections(t *testing.T) {
 				},
 				Name:              "Safety Suite",
 				Description:       "Safety benchmarks",
-				Domains:           []string{"safety"},
+				Domains:           []string{"trustworthiness"},
 				Tasks:             []string{"classification"},
 				Modalities:        []string{"text"},
 				Industries:        []string{"healthcare"},
@@ -279,7 +414,7 @@ func TestEvalHubClient_ListCollections(t *testing.T) {
 	assert.Equal(t, "col-1", result.Items[0].Resource.ID)
 	assert.Equal(t, "Safety Suite", result.Items[0].Name)
 	assert.Equal(t, 3, result.Items[0].Resource.VersionCounter)
-	assert.Equal(t, []string{"safety"}, result.Items[0].Domains)
+	assert.Equal(t, []string{"trustworthiness"}, result.Items[0].Domains)
 	assert.Equal(t, []string{"classification"}, result.Items[0].Tasks)
 	assert.Equal(t, []string{"text"}, result.Items[0].Modalities)
 	assert.Equal(t, []string{"healthcare"}, result.Items[0].Industries)
@@ -289,6 +424,28 @@ func TestEvalHubClient_ListCollections(t *testing.T) {
 	assert.Equal(t, "curated-suite", result.Items[0].State.DerivedFrom)
 	assert.Equal(t, 2, result.Items[0].State.RunCount)
 	assert.Equal(t, 1, result.Items[0].State.PinnedOrder)
+}
+
+func TestEvalHubClient_ListCollections_ParsesTopLevelDerivedFrom(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "/api/v1/evaluations/collections", r.URL.Path)
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{
+			"items": [{
+				"resource": {"id": "tenant-copy"},
+				"name": "Knowledge & Reasoning v1",
+				"derived_from": "knowledge-reasoning-v1"
+			}]
+		}`))
+	}))
+	defer server.Close()
+
+	client := NewEvalHubClient(server.URL, "", false, nil, "/api/v1")
+	result, err := client.ListCollections(context.Background(), ListCollectionsParams{Namespace: "evalhub"})
+
+	require.NoError(t, err)
+	require.Len(t, result.Items, 1)
+	assert.Equal(t, "knowledge-reasoning-v1", result.Items[0].DerivedFrom)
 }
 
 func TestEvalHubClient_DeleteCollection(t *testing.T) {
@@ -427,7 +584,7 @@ func TestEvalHubClient_CreateCollection(t *testing.T) {
 	request := CreateCollectionRequest{
 		Name:              "My New Suite",
 		Description:       "A custom suite",
-		Domains:           []string{"safety"},
+		Domains:           []string{"trustworthiness"},
 		Tasks:             []string{"classification"},
 		Modalities:        []string{"text"},
 		Industries:        []string{"technology"},
@@ -447,7 +604,7 @@ func TestEvalHubClient_CreateCollection(t *testing.T) {
 		assert.JSONEq(t, `{
 			"name": "My New Suite",
 			"description": "A custom suite",
-			"domains": ["safety"],
+			"domains": ["trustworthiness"],
 			"tasks": ["classification"],
 			"modalities": ["text"],
 			"industries": ["technology"],
@@ -861,7 +1018,7 @@ func TestEvalHubClient_GetEvaluationJobLogs_RejectsOversizedResponse(t *testing.
 }
 
 func TestEvalHubClient_CloneCollection_WithCustomMetadata(t *testing.T) {
-	domains := []string{"safety", "reasoning"}
+	domains := []string{"trustworthiness", "knowledge_and_reasoning"}
 	tasks := []string{"classification"}
 	modalities := []string{"text"}
 	industries := []string{"technology"}
@@ -902,7 +1059,7 @@ func TestEvalHubClient_CloneCollection_WithCustomMetadata(t *testing.T) {
 			"description": "Custom collection settings",
 			"category": "Safety",
 			"tags": ["custom", "agent"],
-			"domains": ["safety", "reasoning"],
+			"domains": ["trustworthiness", "knowledge_and_reasoning"],
 			"tasks": ["classification"],
 			"modalities": ["text"],
 			"industries": ["technology"],
@@ -942,7 +1099,7 @@ func TestEvalHubClient_CloneCollection_WithCustomMetadata(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, "collection-001-clone", result.Resource.ID)
 	assert.Equal(t, []string{"custom", "agent"}, result.Tags)
-	assert.Equal(t, []string{"safety", "reasoning"}, result.Domains)
+	assert.Equal(t, []string{"trustworthiness", "knowledge_and_reasoning"}, result.Domains)
 	assert.Equal(t, []string{"classification"}, result.Tasks)
 	assert.Equal(t, []string{"text"}, result.Modalities)
 	assert.Equal(t, []string{"technology"}, result.Industries)
