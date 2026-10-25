@@ -1,7 +1,7 @@
 # Build arguments
 ARG SOURCE_CODE=.
 
-FROM registry.access.redhat.com/ubi9/nodejs-22@sha256:1d423d9a54713c59859c77f35ae7d2e61d330993aa4f28fe979c920038c4c867 AS builder
+FROM registry.access.redhat.com/ubi9/nodejs-22@sha256:78e3970b218eeb5870efc098e6dec31d6b17eccb949f000f5c4004df625e1989 AS builder
 
 ## Build args to be used at this step
 ARG SOURCE_CODE
@@ -41,7 +41,7 @@ RUN pnpm run build
 USER 0
 RUN update-crypto-policies --set DEFAULT:PQ --no-reload
 
-FROM registry.access.redhat.com/ubi9/nodejs-22-minimal@sha256:254080e3c058143c592f708e4ca78691449349fc79f03ee678c717aa4b6222b6 AS runtime
+FROM registry.access.redhat.com/ubi9/nodejs-22-minimal@sha256:61318c7c1d5d5a5a5f7190d842223ab27815876a060c55f15d03c3981311573b AS runtime
 
 COPY --from=builder /etc/crypto-policies /etc/crypto-policies
 
