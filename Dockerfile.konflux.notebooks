@@ -9,7 +9,7 @@ ARG BFF_SOURCE_CODE=./packages/${MODULE_NAME}/upstream/workspaces/backend
 ARG CONTROLLER_SOURCE_CODE=./packages/${MODULE_NAME}/upstream/workspaces/controller
 
 # Set the base images for the build stages
-ARG NODE_BASE_IMAGE=registry.access.redhat.com/ubi9/nodejs-22@sha256:966b87b2022147cee9f43ad4c7c6a3c719b2a072255d04427445d8fa9f496eea
+ARG NODE_BASE_IMAGE=registry.access.redhat.com/ubi9/nodejs-22@sha256:b66295c1b3ef39cc5adcf7f0459f7ec9111014e1dce8f565ed4339c760862418
 ARG GOLANG_BASE_IMAGE=registry.access.redhat.com/ubi9/go-toolset:1.26.5@sha256:f221165cd493d89c13ce384e8e58914571ea353f47a1443698d981494842ff83
 ARG DISTROLESS_BASE_IMAGE=registry.redhat.io/ubi9/ubi-minimal-pqc@sha256:72187ec58a94bd958ff48e41881d7c5d8bc0b49586cc1661da5ba4d92374c206
 
