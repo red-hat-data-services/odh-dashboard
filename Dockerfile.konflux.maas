@@ -8,9 +8,9 @@ ARG UI_SOURCE_CODE=./packages/${MODULE_NAME}/frontend
 ARG BFF_SOURCE_CODE=./packages/${MODULE_NAME}/bff
 
 # Set the base images for the build stages
-ARG NODE_BASE_IMAGE=registry.access.redhat.com/ubi9/nodejs-22@sha256:e52f879096f28d9a6cfb308b3bf2c71c0fc35caec613060bbe41dac054002831
-ARG GOLANG_BASE_IMAGE=registry.access.redhat.com/ubi9/go-toolset:1.26@sha256:6f246e8913d082df463b62a74c72f0d2b410583e1b2ac48add39cd7ede59ce62
-ARG DISTROLESS_BASE_IMAGE=registry.redhat.io/ubi9/ubi-minimal-pqc@sha256:d34666200b64d5a183c867487fd2f48ee8547eb18134e5647099970e26f08af9
+ARG NODE_BASE_IMAGE=registry.access.redhat.com/ubi9/nodejs-22@sha256:06f5f49a1f94a0ff6822de8b99a62717945ec227883c914d9371a84103612ea4
+ARG GOLANG_BASE_IMAGE=registry.access.redhat.com/ubi9/go-toolset:1.26@sha256:cab9089469c52029e4d8a4e9f717e87c51ab22eed448ebcada101b811f97dfe7
+ARG DISTROLESS_BASE_IMAGE=registry.redhat.io/ubi9/ubi-minimal-pqc@sha256:58d09489b1d9123e24d691e47af6c390fe5e08f50c7f4f2967bb64df7ab72aa0
 
 # UI build stage
 FROM ${NODE_BASE_IMAGE} AS ui-builder
@@ -21,6 +21,9 @@ ARG DEPLOYMENT_MODE
 ARG PLATFORM_MODE
 
 WORKDIR /usr/src/workspace
+
+# Install the pinned pnpm CLI from the npm-prefetched bootstrap package.
+COPY --chown=default:root prefetch/pnpm/package.json prefetch/pnpm/package-lock.json ./prefetch/pnpm/
 
 ### Workspace setup
 # Copy root workspace manifest and lockfile for pnpm workspace resolution
@@ -55,9 +58,10 @@ USER default
 
 # Install pnpm and workspace dependencies. Lifecycle scripts are restricted by
 # pnpm-workspace.yaml allowBuilds; Cypress binary installation is disabled explicitly.
-RUN mkdir -p /tmp/pnpm && tar -xzf /cachi2/output/deps/generic/pnpm-11.22.0.tgz -C /tmp/pnpm --strip-components=1 # NOSONAR
-RUN mkdir -p /opt/app-root/src/.npm-global/bin
-RUN ln -s /tmp/pnpm/bin/pnpm.mjs /opt/app-root/src/.npm-global/bin/pnpm && ln -s /tmp/pnpm/bin/pnpx.mjs /opt/app-root/src/.npm-global/bin/pnpx # NOSONAR
+# Install the pinned pnpm CLI from the npm-prefetched bootstrap package.
+ENV PATH="/usr/src/workspace/prefetch/pnpm/node_modules/.bin:${PATH}"
+RUN npm ci --prefix ./prefetch/pnpm --prefer-offline --ignore-scripts --no-audit --no-fund --no-progress \
+    && test "$(pnpm --version)" = "11.22.0" # NOSONAR
 RUN CYPRESS_INSTALL_BINARY=0 pnpm install --frozen-lockfile --offline # NOSONAR
 
 # Build the module

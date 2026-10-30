@@ -1,7 +1,7 @@
 # Build arguments
 ARG SOURCE_CODE=.
 
-FROM registry.access.redhat.com/ubi9/nodejs-22@sha256:e52f879096f28d9a6cfb308b3bf2c71c0fc35caec613060bbe41dac054002831 AS builder
+FROM registry.access.redhat.com/ubi9/nodejs-22@sha256:06f5f49a1f94a0ff6822de8b99a62717945ec227883c914d9371a84103612ea4 AS builder
 
 ## Build args to be used at this step
 ARG SOURCE_CODE
@@ -16,9 +16,10 @@ USER default
 
 # Lifecycle scripts are restricted by pnpm-workspace.yaml allowBuilds; Cypress
 # binary installation is disabled explicitly.
-RUN mkdir -p /tmp/pnpm && tar -xzf /cachi2/output/deps/generic/pnpm-11.22.0.tgz -C /tmp/pnpm --strip-components=1 # NOSONAR
-RUN mkdir -p /opt/app-root/src/.npm-global/bin
-RUN ln -s /tmp/pnpm/bin/pnpm.mjs /opt/app-root/src/.npm-global/bin/pnpm && ln -s /tmp/pnpm/bin/pnpx.mjs /opt/app-root/src/.npm-global/bin/pnpx # NOSONAR
+# Install the pinned pnpm CLI from the npm-prefetched bootstrap package.
+ENV PATH="/usr/src/app/prefetch/pnpm/node_modules/.bin:${PATH}"
+RUN npm ci --prefix ./prefetch/pnpm --prefer-offline --ignore-scripts --no-audit --no-fund --no-progress \
+    && test "$(pnpm --version)" = "11.22.0" # NOSONAR
 RUN CYPRESS_INSTALL_BINARY=0 pnpm install --frozen-lockfile --offline # NOSONAR
 
 ENV TURBO_TELEMETRY_DISABLED=1
@@ -40,7 +41,7 @@ RUN pnpm run build
 USER 0
 RUN update-crypto-policies --set DEFAULT:PQ --no-reload
 
-FROM registry.access.redhat.com/ubi9/nodejs-22-minimal@sha256:03b7dd64cafaaca5019c4cc1c36e05140b1650dab6cd5c4ab1fde9d88c0537ca AS runtime
+FROM registry.access.redhat.com/ubi9/nodejs-22-minimal@sha256:9bc9d54f10843939a83296f618f826ce7532071d6d99136bd27b475a2696d568 AS runtime
 
 COPY --from=builder /etc/crypto-policies /etc/crypto-policies
 

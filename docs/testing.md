@@ -162,6 +162,28 @@ Use the custom command `cy.visitWithLogin` to visit a page and perform the login
 
 Cypress mocked tests run against a standalone frontend while mocking all network requests.
 
+#### Selective mock tests
+
+The main test workflow compares the Git change with the generated Cypress matrix.
+Documentation-only changes skip the Cypress mock matrix. Changes to individual specs and
+transitively imported Cypress helpers run only their affected groups.
+
+Application and build inputs remain on the complete matrix because every mock suite executes
+against the complete dashboard host. Non-code fixtures, unresolved imports, missing consumers,
+and deleted or renamed files also fall back to the complete matrix.
+
+The `cypress-mock` Codecov flag is updated only when the complete matrix runs; selective runs use
+the configured carryforward coverage.
+
+To inspect a selection locally, compare any two Git revisions:
+
+```bash
+pnpm run plan:cypress-mock-impact -- \
+  --base <base-revision> \
+  --head <head-revision> \
+  --matrix /tmp/cypress-mock-matrix.json
+```
+
 Single command to run all Cypress mock tests or a specific test (build frontend, start HTTP server, run Cypress):
 
 ```bash
@@ -252,6 +274,15 @@ Cypress uses several environment variables to control test behavior and configur
 - **Effect**: Loads test variables and configuration from a YAML file
 - **Usage**: `export CY_TEST_CONFIG='PATH_TO_YOUR_TEST_VARIABLES'`
 - **Required**: Yes, for e2e tests
+
+#### CYPRESS_DSPA_S3_ENDPOINT
+
+- **Purpose**: Overrides the S3 endpoint used by AutoX end-to-end provisioning
+- **Values**: A complete HTTP or HTTPS endpoint, such as `http://minio.<namespace>.svc.cluster.local:9000`
+- **Effect**: Uses the endpoint for the AutoX DSPA configuration, AutoX data-connection Secret, and AutoX S3 cleanup. This keeps disconnected-cluster tests on the cluster-internal MinIO service instead of the external route. Feature Store `BUCKET_1` operations use their own S3 endpoint and CA-bundle configuration.
+- **Fallback**: Uses the selected bucket's `S3.*.ENDPOINT` value when the variable is unset or blank
+- **Usage**: `export CYPRESS_DSPA_S3_ENDPOINT='http://minio.<namespace>.svc.cluster.local:9000'`
+- **Required**: No
 
 #### CY_MOCK
 

@@ -2,13 +2,22 @@
 import * as React from 'react';
 import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import { fireFormTrackingEvent } from '@odh-dashboard/internal/concepts/analyticsTracking/segmentIOUtils';
+import {
+  fireFormTrackingEvent,
+  fireMiscTrackingEvent,
+} from '@odh-dashboard/internal/concepts/analyticsTracking/segmentIOUtils';
 import { TrackingOutcome } from '@odh-dashboard/ui-core';
 import { mockEvaluationJob } from '~/__tests__/unit/testUtils/mockEvaluationData';
 import { createEvaluationJob } from '~/app/api/k8s';
 import StartEvaluationRunModal from '~/app/components/StartEvaluationRunModal';
 import { EVAL_HUB_EVENTS } from '~/app/tracking/evalhubTrackingConstants';
-import type { Collection, HardwareProfile, KueueAvailability, SourceMode } from '~/app/types';
+import type {
+  Collection,
+  CollectionResolution,
+  HardwareProfile,
+  KueueAvailability,
+  SourceMode,
+} from '~/app/types';
 
 const mockNavigate = jest.fn();
 const mockMlflowSelectorMounted = jest.fn();
@@ -107,6 +116,10 @@ const clonedCollection: Collection = {
   ...collection,
   resource: { id: 'cloned-suite' },
   name: 'Copied suite',
+};
+const clonedCollectionResolution: CollectionResolution = {
+  collection: clonedCollection,
+  wasCreated: true,
 };
 
 const kueueAvailability: KueueAvailability = {
@@ -210,6 +223,20 @@ describe('StartEvaluationRunModal', () => {
     mockCreateEvaluationJob.mockReturnValue(() => Promise.resolve(mockEvaluationJob()));
   });
 
+  it('should track job create opened when the modal opens', () => {
+    renderModal();
+
+    expect(jest.mocked(fireMiscTrackingEvent)).toHaveBeenCalledTimes(1);
+    expect(jest.mocked(fireMiscTrackingEvent)).toHaveBeenCalledWith(
+      EVAL_HUB_EVENTS.JOB_CREATE_OPENED,
+      expect.objectContaining({
+        surface: 'copy_suite',
+        collection_type: 'custom',
+        provider_type: 'provider-a',
+      }),
+    );
+  });
+
   it('shows a required HardwareProfile before collapsed advanced configuration for Kueue', () => {
     mockUseKueueAvailability.mockReturnValue({
       availability: kueueAvailability,
@@ -237,15 +264,14 @@ describe('StartEvaluationRunModal', () => {
     ).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
   });
 
-  it('should preselect and hide evaluating when a collection has one evaluation target', () => {
+  it('should open in model mode without a source selector for an agent-only collection', () => {
     renderModal(undefined, undefined, {
       collection: { ...collection, evaluation_targets: ['agent'] },
-      defaultSourceMode: 'model',
     });
 
     expect(screen.queryByTestId('source-mode-toggle')).not.toBeInTheDocument();
-    expect(screen.getByTestId('agent-name-input')).toBeInTheDocument();
-    expect(screen.queryByTestId('model-picker-toggle')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('agent-name-input')).not.toBeInTheDocument();
+    expect(screen.getByTestId('model-picker-toggle')).toBeInTheDocument();
   });
 
   it('should not render benchmark parameters in any modal view', () => {
@@ -260,30 +286,26 @@ describe('StartEvaluationRunModal', () => {
     expect(screen.queryByTestId('additional-args-upload')).not.toBeInTheDocument();
   });
 
-  it('should show evaluating when a collection has one unknown evaluation target', () => {
+  it('should not render a source selector for a collection with one unknown evaluation target', () => {
     renderModal(undefined, undefined, {
       collection: { ...collection, evaluation_targets: ['unknown'] },
-      defaultSourceMode: 'model',
     });
 
-    expect(screen.getByTestId('source-mode-toggle')).toHaveTextContent('Model');
+    expect(screen.queryByTestId('source-mode-toggle')).not.toBeInTheDocument();
+    expect(screen.getByTestId('model-picker-toggle')).toBeInTheDocument();
   });
 
-  it('should show evaluating when a collection has multiple evaluation targets', () => {
+  it('should not render a source selector for a collection with multiple evaluation targets', () => {
     renderModal(undefined, undefined, {
       collection: { ...collection, evaluation_targets: ['model', 'agent'] },
-      defaultSourceMode: 'agent',
     });
 
-    expect(screen.getByTestId('source-mode-toggle')).toHaveTextContent('Agent');
-    fireEvent.click(screen.getByTestId('source-mode-toggle'));
-
-    expect(screen.getByRole('option', { name: 'Model', hidden: true })).toBeInTheDocument();
-    expect(screen.getByRole('option', { name: 'Agent', hidden: true })).toBeInTheDocument();
+    expect(screen.queryByTestId('source-mode-toggle')).not.toBeInTheDocument();
+    expect(screen.getByTestId('model-picker-toggle')).toBeInTheDocument();
   });
 
   it('should disable fields and prevent a deferred clone from submitting after cancel', async () => {
-    const deferredClone = createDeferred<Collection | undefined>();
+    const deferredClone = createDeferred<CollectionResolution | undefined>();
     let cloneSignal: AbortSignal | undefined;
     const resolveCollection = jest.fn((signal?: AbortSignal) => {
       cloneSignal = signal;
@@ -319,7 +341,7 @@ describe('StartEvaluationRunModal', () => {
     );
 
     await act(async () => {
-      deferredClone.resolve(clonedCollection);
+      deferredClone.resolve(clonedCollectionResolution);
       await deferredClone.promise;
     });
 
@@ -327,7 +349,7 @@ describe('StartEvaluationRunModal', () => {
   });
 
   it('should replace the MLflow selector with a disabled instance while cloning', async () => {
-    const deferredClone = createDeferred<Collection | undefined>();
+    const deferredClone = createDeferred<CollectionResolution | undefined>();
     const resolveCollection = jest.fn(() => deferredClone.promise);
     renderModal(resolveCollection);
 
@@ -351,13 +373,13 @@ describe('StartEvaluationRunModal', () => {
 
     fireEvent.click(screen.getByTestId('start-evaluation-cancel'));
     await act(async () => {
-      deferredClone.resolve(clonedCollection);
+      deferredClone.resolve(clonedCollectionResolution);
       await deferredClone.promise;
     });
   });
 
   it('should prevent a deferred clone from submitting when the modal close control is used', async () => {
-    const deferredClone = createDeferred<Collection | undefined>();
+    const deferredClone = createDeferred<CollectionResolution | undefined>();
     const resolveCollection = jest.fn(() => deferredClone.promise);
     const { onClose } = renderModal(resolveCollection);
 
@@ -375,7 +397,7 @@ describe('StartEvaluationRunModal', () => {
     );
 
     await act(async () => {
-      deferredClone.resolve(clonedCollection);
+      deferredClone.resolve(clonedCollectionResolution);
       await deferredClone.promise;
     });
 
@@ -383,7 +405,7 @@ describe('StartEvaluationRunModal', () => {
   });
 
   it('should submit the evaluation using the cloned collection', async () => {
-    const resolveCollection = jest.fn(() => Promise.resolve(clonedCollection));
+    const resolveCollection = jest.fn(() => Promise.resolve(clonedCollectionResolution));
     renderModal(resolveCollection);
 
     await selectClusterModel();
@@ -401,7 +423,7 @@ describe('StartEvaluationRunModal', () => {
   });
 
   it('should resolve a deferred collection before submitting a create run', async () => {
-    const resolveCollection = jest.fn(() => Promise.resolve(clonedCollection));
+    const resolveCollection = jest.fn(() => Promise.resolve(clonedCollectionResolution));
     renderModal(resolveCollection, undefined, { omitCollection: true });
 
     await selectClusterModel();

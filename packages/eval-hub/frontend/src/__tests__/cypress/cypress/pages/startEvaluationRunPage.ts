@@ -17,6 +17,10 @@ class StartEvaluationRunPage {
     return cy.findByTestId('benchmark-name-display');
   }
 
+  findRunDescription() {
+    return cy.findByTestId('start-evaluation-run-description');
+  }
+
   findEvaluationNameInput() {
     return cy.findByTestId('evaluation-name-input');
   }
@@ -41,14 +45,6 @@ class StartEvaluationRunPage {
     return cy.findByTestId('source-mode-toggle');
   }
 
-  findSourceModeSelect() {
-    return cy.findByTestId('source-mode-select');
-  }
-
-  findSourceModeOption(mode: 'model' | 'agent' | 'prerecorded') {
-    return cy.get(`[data-testid="source-mode-option-${mode}"]`);
-  }
-
   findModelPickerToggle() {
     return cy.findByTestId('model-picker-toggle');
   }
@@ -57,12 +53,12 @@ class StartEvaluationRunPage {
     return cy.findByTestId('model-picker-select');
   }
 
-  findModelNameInput() {
-    return cy.findByTestId('model-name-input');
+  findExternalModelOption() {
+    return cy.findByTestId('model-option-external');
   }
 
-  findAgentNameInput() {
-    return cy.findByTestId('agent-name-input');
+  findModelNameInput() {
+    return cy.findByTestId('model-name-input');
   }
 
   findEndpointUrlInput() {
@@ -131,6 +127,14 @@ class StartEvaluationRunPage {
 
   findLoadError() {
     return cy.findByTestId('start-evaluation-load-error');
+  }
+
+  findNotificationTitle(title: string) {
+    return cy.findByTestId('toast-notification-alert').findByText(title);
+  }
+
+  findNotificationMessage(message: string | RegExp) {
+    return cy.findByTestId('toast-notification-alert').findByText(message);
   }
 }
 
