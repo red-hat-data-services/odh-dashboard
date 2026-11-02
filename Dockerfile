@@ -69,6 +69,8 @@ ENV NODE_ENV=production
 ENV IP=127.0.0.1
 CMD ["node", "./dist/server.js"]
 
+RUN echo "debug"
+
 LABEL io.opendatahub.component="odh-dashboard" \
       io.k8s.display-name="odh-dashboard" \
       name="open-data-hub/odh-dashboard-ubi9" \
