@@ -11,7 +11,7 @@ metadata:
     pipelinesascode.tekton.dev/cancel-in-progress: "true"
     pipelinesascode.tekton.dev/on-cel-expression: |-
       event == "pull_request"
-      && ("packages/gen-ai/**".pathChanged() || ".tekton/odh-mod-arch-gen-ai-pull-request.yaml".pathChanged() || "Dockerfile.konflux.genai".pathChanged())
+      && ("packages/gen-ai/**".pathChanged() || "prefetch/pnpm/**".pathChanged() || ".tekton/odh-mod-arch-gen-ai-pull-request.yaml".pathChanged() || "Dockerfile.konflux.genai".pathChanged())
   labels:
     appstudio.openshift.io/application: rhoai-v3-6
     appstudio.openshift.io/component: odh-mod-arch-gen-ai-v3-6

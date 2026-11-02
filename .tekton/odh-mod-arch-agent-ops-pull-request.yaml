@@ -11,7 +11,7 @@ metadata:
     pipelinesascode.tekton.dev/cancel-in-progress: "true"
     pipelinesascode.tekton.dev/on-cel-expression: |-
       event == "pull_request"
-      && ("packages/agent-ops/**".pathChanged() || ".tekton/odh-mod-arch-agent-ops-pull-request.yaml".pathChanged() || "Dockerfile.konflux.agent-ops".pathChanged())
+      && ("packages/agent-ops/**".pathChanged() || "prefetch/pnpm/**".pathChanged() || ".tekton/odh-mod-arch-agent-ops-pull-request.yaml".pathChanged() || "Dockerfile.konflux.agent-ops".pathChanged())
   labels:
     appstudio.openshift.io/application: rhoai-v3-6
     appstudio.openshift.io/component: odh-mod-arch-agent-ops-v3-6
