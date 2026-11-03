@@ -146,6 +146,7 @@
     },
     "soft-assert": {
       "brace-expansion": "2.1.7"
-    }
+    },
+    "undici": "^7.30.1"
   }
 }
