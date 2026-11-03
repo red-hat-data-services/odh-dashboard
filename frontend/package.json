@@ -255,6 +255,8 @@
     },
     "soft-assert": {
       "brace-expansion": "2.1.7"
-    }
+    },
+    "handlebars": "4.7.10",
+    "proxy-addr": "2.0.8"
   }
 }
