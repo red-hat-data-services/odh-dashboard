@@ -128,6 +128,24 @@
     "tmp": "^0.2.6",
     "nanoid": ">=3.3.12",
     "joi": ">=17.13.7",
-    "fflate": ">=0.8.3"
+    "fflate": ">=0.8.3",
+    "npm-run-all": {
+      "brace-expansion": "1.1.21"
+    },
+    "@typescript-eslint/typescript-estree": {
+      "brace-expansion": "2.1.7"
+    },
+    "eslint-plugin-no-barrel-files": {
+      "brace-expansion": "2.1.7"
+    },
+    "fastify-cli": {
+      "brace-expansion": "2.1.7"
+    },
+    "mocha": {
+      "brace-expansion": "2.1.7"
+    },
+    "soft-assert": {
+      "brace-expansion": "2.1.7"
+    }
   }
 }
