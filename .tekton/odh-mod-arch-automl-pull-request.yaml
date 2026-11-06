@@ -13,8 +13,8 @@ metadata:
       event == "pull_request"
       && ("packages/automl/**".pathChanged() || "prefetch/pnpm/**".pathChanged() || ".tekton/odh-mod-arch-automl-pull-request.yaml".pathChanged() || "Dockerfile.konflux.automl".pathChanged())
   labels:
-    appstudio.openshift.io/application: rhoai-v3-6
-    appstudio.openshift.io/component: odh-mod-arch-automl-v3-6
+    appstudio.openshift.io/application: rhoai-v3-7-ea-1
+    appstudio.openshift.io/component: odh-mod-arch-automl-v3-7-ea-1
     pipelines.appstudio.openshift.io/type: build
   name: odh-mod-arch-automl-on-pull-request-75628
   namespace: rhoai-tenant
@@ -55,7 +55,7 @@ spec:
   - name: enable-slack-failure-notification
     value: "false"
   - name: rhoai-version
-    value: "3.6.0"
+    value: "3.7.0-ea.1"
   pipelineRef:
     resolver: git
     params:
@@ -66,7 +66,7 @@ spec:
     - name: pathInRepo
       value: pipelines/multi-arch-container-build.yaml
   taskRunTemplate:
-    serviceAccountName: build-pipeline-odh-mod-arch-automl-v3-6
+    serviceAccountName: build-pipeline-odh-mod-arch-automl-v3-7-ea-1
   workspaces:
   - name: git-auth
     secret:
