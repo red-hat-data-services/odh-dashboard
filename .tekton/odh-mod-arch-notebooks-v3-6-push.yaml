@@ -66,3 +66,14 @@ spec:
       secretName: '{{ git_auth_secret }}'
   timeouts:
     pipeline: 2h
+  taskRunSpecs:
+  - pipelineTaskName: rpms-signature-scan
+    stepSpecs:
+    - name: rpms-signature-scan
+      computeResources:
+        requests:
+          cpu: "500m"
+          memory: "1Gi"
+        limits:
+          cpu: "500m"
+          memory: "1Gi"
