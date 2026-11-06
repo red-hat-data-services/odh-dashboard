@@ -44,6 +44,7 @@ module.exports = (env) => ({
                 transform: {
                   react: {
                     runtime: 'classic',
+                    development: env === 'development',
                     refresh: env === 'development',
                   },
                 },
@@ -247,7 +248,7 @@ module.exports = (env) => ({
       '~': path.resolve(SRC_DIR),
       '@odh-dashboard/internal': path.resolve(RELATIVE_DIRNAME, '../../../frontend/src'),
     },
-    symlinks: false,
+    symlinks: true,
     cacheWithContext: false,
   },
 });

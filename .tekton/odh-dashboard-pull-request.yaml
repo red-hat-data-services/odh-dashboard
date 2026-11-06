@@ -50,7 +50,7 @@ spec:
     value: |
       [
         {"type": "pnpm", "path": "."},
-        {"type": "generic", "path": "."}
+        {"type": "npm", "path": "prefetch/pnpm"}
       ]
   - name: build-image-index
     value: true

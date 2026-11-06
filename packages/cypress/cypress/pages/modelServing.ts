@@ -1,3 +1,4 @@
+import { queryByTestId } from '@testing-library/dom';
 import { appChrome } from './appChrome';
 import { Modal } from './components/Modal';
 import { TableRow } from './components/table';
@@ -8,6 +9,8 @@ import { Wizard } from './components/Wizard';
 import { DeleteModal } from './components/DeleteModal';
 import { DashboardCodeEditor } from './components/DashboardCodeEditor';
 import { mixin } from '../utils/mixin';
+import { ModelLocationSelectOption } from '../utils/modelServingConstants';
+import { OOTBConnectionTypes } from '../types';
 
 type DeploymentMethodKey =
   | 'legacy'
@@ -31,6 +34,10 @@ class ModelServingGlobal {
   visit(project?: string) {
     cy.visitWithLogin(`/ai-hub/models/deployments${project ? `/${project}` : ''}`);
     this.wait();
+  }
+
+  assertPathname(pathname: string) {
+    return cy.location('pathname').should('eq', pathname);
   }
 
   navigate() {
@@ -152,6 +159,10 @@ class ModelServingGlobal {
       return cy.findAllByTestId('token-secret').findAllByRole('button').eq(0);
     }
     return cy.findAllByTestId('token-secret').eq(index).findAllByRole('button').eq(0);
+  }
+
+  findMaaSPublishedPostDeployAlert() {
+    return cy.findByTestId('maas-published-post-deploy-alert');
   }
 }
 
@@ -356,9 +367,12 @@ class InferenceServiceModal extends ServingModal {
         cy.wrap($el).contains(nameToCheck).should('exist');
         cy.log(`Dropdown is disabled with value: ${nameToCheck}`);
       } else {
-        // If enabled, proceed with selection as before using the full display name
         dropdown.click();
-        cy.findByRole('option', { name: profileDisplayName }).click();
+        if (profileName) {
+          cy.findByTestId(profileName).click();
+        } else {
+          cy.findByRole('option', { name: profileDisplayName }).click();
+        }
       }
     });
   }
@@ -751,6 +765,14 @@ class KServeRow extends ModelServingRow {
     return this.find().next('tr').find(`dt:contains("${itemName}")`);
   }
 
+  findHardwareProfileDRADetails() {
+    return this.findExpansion().findByTestId('hardware-profile-dra-details');
+  }
+
+  findHardwareProfileDRATemplate() {
+    return this.findHardwareProfileDRADetails().findByTestId('hardware-profile-dra-template');
+  }
+
   findProjectScopedLabel() {
     return this.find().findByTestId('project-scoped-label');
   }
@@ -970,6 +992,43 @@ class ModelServingWizard extends Wizard {
     cy.visitWithLogin(`/ai-hub/models/deployments/deploy`);
   }
 
+  /**
+   * Open the deploy wizard with React Router location state that sets
+   * `requiresHuggingFaceApiKey: true` (same flag catalog private/gated deploy
+   * prefill uses). Needed because the HF API key field is not shown for a
+   * blank URI wizard without that initialData flag.
+   *
+   * Does not pre-select a project (avoids races while ProjectsContext loads);
+   * callers select the project on the Preconfigure step.
+   *
+   * Uses createBrowserRouter's `usr` history-state shape (React Router 7).
+   */
+  visitRequiringHuggingFaceApiKey(returnRoute = '/ai-hub/models/deployments/') {
+    const routeState = {
+      initialData: {
+        requiresHuggingFaceApiKey: true,
+      },
+      returnRoute,
+      cancelReturnRoute: returnRoute,
+    };
+
+    cy.visit('/ai-hub/models/deployments/deploy', {
+      onBeforeLoad(win) {
+        win.history.replaceState(
+          {
+            usr: routeState,
+            key: 'hf-api-key-e2e',
+            idx: 0,
+          },
+          '',
+          '/ai-hub/models/deployments/deploy',
+        );
+      },
+    });
+
+    cy.location('pathname').should('include', '/ai-hub/models/deployments/deploy');
+  }
+
   findSpinner() {
     return cy.findByTestId('spinner');
   }
@@ -1031,7 +1090,17 @@ class ModelServingWizard extends Wizard {
   }
 
   findModelTypeSelectOption(name: string) {
-    return this.findModelTypeSelect().findSelectOption(name);
+    return this.findModelTypeSelect().then(($el) => {
+      if ($el.attr('aria-expanded') === 'false') {
+        cy.wrap($el).click();
+      }
+      return cy.findByRole('option', { name }).scrollIntoView();
+    });
+  }
+
+  selectModelTypeOption(name: string) {
+    // Cypress misidentifies the clickable menu above the wizard footer as clipped.
+    return this.findModelTypeSelectOption(name).click({ force: true });
   }
 
   findModelDeploymentProjectSelector() {
@@ -1073,6 +1142,14 @@ class ModelServingWizard extends Wizard {
 
   findModelFormatSelect() {
     return cy.findByTestId('model-framework-select');
+  }
+
+  openModelFormatSelect() {
+    this.findModelFormatSelect().then(($el) => {
+      if ($el.attr('aria-expanded') === 'false') {
+        cy.wrap($el).click();
+      }
+    });
   }
 
   findModelFormatSelectOption(name: string) {
@@ -1127,7 +1204,7 @@ class ModelServingWizard extends Wizard {
     });
   }
 
-  selectServingRuntimeOption(name: string) {
+  selectServingRuntimeOption(name: string, scope: 'global' | 'project' = 'global') {
     this.findModelServerAutoSelectRadio().then(($radio) => {
       if ($radio.is(':checked')) {
         // Auto-select the best runtime for my model based on model type, model format, and hardware profile
@@ -1137,7 +1214,7 @@ class ModelServingWizard extends Wizard {
         this.findServingRuntimeTemplateSearchSelector().click();
         // Duplicate display names can match multiple menu items; pick the first for E2E stability
         this.findServingRuntimeTemplateSelectionSearchInputBox().type(name);
-        cy.findByTestId('global-scoped-serving-runtimes')
+        cy.findByTestId(`${scope}-scoped-serving-runtimes`)
           .find('[data-testid^="servingRuntime"]')
           .first()
           .click();
@@ -1203,6 +1280,23 @@ class ModelServingWizard extends Wizard {
 
   findModelLocationSelectOption(name: string) {
     return this.findModelLocationSelect().findSelectOption(name);
+  }
+
+  /** Select a location and its built-in connection type when a configuration choice is needed. */
+  selectModelLocationOption(name: string) {
+    const builtInTypes: Partial<Record<string, OOTBConnectionTypes>> = {
+      [ModelLocationSelectOption.URI]: OOTBConnectionTypes.uri,
+      [ModelLocationSelectOption.S3]: OOTBConnectionTypes.s3,
+      [ModelLocationSelectOption.OCI]: OOTBConnectionTypes.oci,
+    };
+
+    this.findModelLocationSelectOption(name).click();
+    return cy.document().then((document) => {
+      const connectionType = builtInTypes[name];
+      if (connectionType && queryByTestId(document.body, 'custom-type-select')) {
+        this.findCustomModelLocationSelectOption(connectionType).click();
+      }
+    });
   }
 
   findCustomModelLocationSelect() {
@@ -1551,8 +1645,43 @@ class ModelServingWizard extends Wizard {
     return cy.findByTestId('gateway-select');
   }
 
+  getGatewaySelectOptionTestId(name: string) {
+    return `select-multi-typeahead-${name.replace(/[^a-zA-Z0-9]+/g, '-')}`;
+  }
+
+  openGatewaySelect() {
+    this.findGatewaySelect().within(() => {
+      cy.get('[role="combobox"]').then(($input) => {
+        if ($input.attr('aria-expanded') !== 'true') {
+          cy.wrap($input).click();
+        }
+      });
+    });
+    return this.findGatewaySelect();
+  }
+
+  /**
+   * Opens the MultiSelection gateway menu if needed, then returns the option.
+   * Uses MultiSelection option test ids because:
+   * - aria-expanded lives on the inner combobox (not the toggle testid)
+   * - with hasCheckbox, items use role=menuitem rather than option
+   */
   findGatewaySelectOption(name: string) {
-    return this.findGatewaySelect().findSelectOption(name);
+    this.openGatewaySelect();
+    return cy.findByTestId(this.getGatewaySelectOptionTestId(name));
+  }
+
+  findGatewaySelectRemoveChip(name: string) {
+    return cy.findByLabelText(`Remove ${name}`);
+  }
+
+  /** MenuToggle is a div with pf-m-disabled, not a native disabled control. */
+  assertGatewaySelectDisabled() {
+    return this.findGatewaySelect().should('have.class', 'pf-m-disabled');
+  }
+
+  assertGatewaySelectEnabled() {
+    return this.findGatewaySelect().should('not.have.class', 'pf-m-disabled');
   }
 
   findGatewaySelectTooltip() {
@@ -1609,6 +1738,14 @@ class ModelServingWizard extends Wizard {
 
   findReviewStepModelDetailsSection() {
     return cy.findByTestId('review-step-model-details');
+  }
+
+  findReviewHuggingFaceApiKey() {
+    return cy.findByTestId('review-item-huggingFaceApiKey');
+  }
+
+  findReviewHuggingFaceApiKeyValue() {
+    return cy.findByTestId('review-item-huggingFaceApiKey-value');
   }
 
   findYAMLViewerToggle(toggle: string) {

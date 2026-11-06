@@ -12,7 +12,11 @@ import {
   mySubscriptionsPage,
   subscriptionsTab,
 } from '../../../pages/modelsAsAService';
-import { mockAPIKeys, mockSubscriptionListItems } from '../../../utils/maasUtils';
+import {
+  mockAPIKeys,
+  mockSubscriptionListItems,
+  mockSubscriptions,
+} from '../../../utils/maasUtils';
 
 describe('API keys - Subscription Tab', () => {
   beforeEach(() => {
@@ -24,10 +28,11 @@ describe('API keys - Subscription Tab', () => {
       }),
     );
 
+    cy.interceptOdh('GET /maas/api/v1/whoami', { data: { sub: 'test-user', isAdmin: true } });
+    cy.interceptOdh('GET /maas/api/v1/is-maas-admin', { data: { allowed: true } });
     cy.interceptOdh('GET /maas/api/v1/user', {
       data: { userId: 'test-user', clusterAdmin: false },
     });
-    cy.interceptOdh('GET /maas/api/v1/is-maas-admin', { data: { allowed: true } });
     cy.interceptOdh('GET /maas/api/v1/namespaces', { data: [] });
 
     cy.interceptOdh(
@@ -40,7 +45,7 @@ describe('API keys - Subscription Tab', () => {
       }),
     );
 
-    cy.intercept('POST', '/maas/api/v1/api-keys/search', (req) => {
+    cy.intercept('POST', '/maas/api/v1/api-keys/search/tenant', (req) => {
       const subscriptionFilter = req.body?.data?.filters?.subscription as string | undefined;
       const keys = mockAPIKeys().filter(
         (key) =>
@@ -53,6 +58,18 @@ describe('API keys - Subscription Tab', () => {
     cy.interceptOdh('GET /maas/api/v1/subscriptions', {
       data: mockSubscriptionListItems(),
     }).as('getSubscriptions');
+    cy.interceptOdh('GET /maas/api/v1/all-subscriptions', {
+      data: mockSubscriptions(),
+    }).as('getAllSubscriptions');
+
+    cy.interceptOdh('GET /maas/api/v1/api-keys-config', {
+      data: {
+        // eslint-disable-next-line camelcase
+        max_expiration_days: 365,
+        // eslint-disable-next-line camelcase
+        ephemeral_max_expiration: '1h',
+      },
+    }).as('getApiKeyConfig');
 
     cy.intercept('GET', '/maas/api/v1/subscriptions/*', (req) => {
       const id = req.url.split('/').pop();
@@ -178,7 +195,8 @@ describe('API keys - Subscription Tab', () => {
           subscription_description: 'Subscription with no keys',
           // eslint-disable-next-line camelcase
           display_name: 'No Keys Sub',
-          priority: 1,
+          // eslint-disable-next-line camelcase
+          inference_priority: 1,
           // eslint-disable-next-line camelcase
           key_count: 0,
           // eslint-disable-next-line camelcase
@@ -285,7 +303,7 @@ describe('API keys - Subscription Tab', () => {
         new Date(a.expirationDate ?? 0).getTime() - new Date(b.expirationDate ?? 0).getTime(),
     );
 
-    cy.intercept('POST', '/maas/api/v1/api-keys/search', (req) => {
+    cy.intercept('POST', '/maas/api/v1/api-keys/search/tenant', (req) => {
       req.reply(mockSearchResponse(nameAsc));
     }).as('sortNameAsc');
     mySubscriptionsPage.findColumnSortButton('Name').click();
@@ -304,7 +322,7 @@ describe('API keys - Subscription Tab', () => {
       .eq(1)
       .should('contain.text', 'production-backend');
 
-    cy.intercept('POST', '/maas/api/v1/api-keys/search', (req) => {
+    cy.intercept('POST', '/maas/api/v1/api-keys/search/tenant', (req) => {
       req.reply(mockSearchResponse(expiresAsc));
     }).as('sortExpiresAsc');
     mySubscriptionsPage.findColumnSortButton('Expires').click();
@@ -325,7 +343,7 @@ describe('API keys - Subscription Tab', () => {
 
     const mockReply = () => mockSearchResponse(premiumKeys);
 
-    cy.intercept('POST', '/maas/api/v1/api-keys/search', (req) => {
+    cy.intercept('POST', '/maas/api/v1/api-keys/search/tenant', (req) => {
       req.reply(mockReply());
     }).as('sortCreated');
     mySubscriptionsPage.findColumnSortButton('Created').click();
@@ -333,7 +351,7 @@ describe('API keys - Subscription Tab', () => {
       expect(interception.request.body.data).to.have.nested.property('sort.by', 'created_at');
     });
 
-    cy.intercept('POST', '/maas/api/v1/api-keys/search', (req) => {
+    cy.intercept('POST', '/maas/api/v1/api-keys/search/tenant', (req) => {
       req.reply(mockReply());
     }).as('sortLastUsed');
     mySubscriptionsPage.findColumnSortButton('Last used').click();
