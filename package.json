@@ -136,6 +136,7 @@
     "@types/ws": "^8.18.1",
     "dompurify": "^3.4.17",
     "@types/tar": "^6.1.13",
+    "tar": "^7.5.22",
     "jsonpath-plus": "^10.4.0",
     "tough-cookie": "^4.1.4",
     "redux": "^4.2.1",
