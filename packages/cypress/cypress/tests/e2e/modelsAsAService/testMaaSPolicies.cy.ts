@@ -43,6 +43,7 @@ import { loadMaaSFixture } from '../../../utils/dataLoader';
 import { createDataConnectionUri } from '../../../utils/oc_commands/dataConnection';
 import { checkLLMInferenceServiceState } from '../../../utils/oc_commands/modelServing';
 import { getClipboardContent } from '../../../utils/clipboardUtils';
+import { formatApiKeyDisplayDate, formatApiKeyExpirationDate } from '../../../utils/dateUtils';
 
 const uuid = generateTestUUID();
 let testData: ModelAsAServiceTestData;
@@ -61,12 +62,6 @@ let apiKeyExpirationTime: string;
 let policiesModelsCount: number;
 let policiesGroupsCount: number;
 let tokenLimit: string;
-const today = new Date().toLocaleDateString('en-US', {
-  month: 'short',
-  day: 'numeric',
-  year: 'numeric',
-});
-let expiryDate: string;
 
 const CLIPBOARD_WRITE_TEXT_STUB_ALIAS = 'clipboardWriteText';
 
@@ -90,9 +85,6 @@ describe('An admin can manage MaaS authorization policies and control model acce
         tokenLimit = `${tokenRateLimit.limit} / ${tokenRateLimit.window} ${tokenRateLimit.unit}`;
         apiKeyName = `${subscriptionName}-api-key`;
         apiKeyExpirationTime = testData.apiKeyExpirationTime;
-        expiryDate = new Date(
-          new Date().setDate(new Date().getDate() + parseInt(apiKeyExpirationTime, 10)),
-        ).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
       })
       .then(() => {
         cy.log(`Create clean project`);
@@ -341,8 +333,15 @@ describe('An admin can manage MaaS authorization policies and control model acce
           apiKeyRow.findStatus().should('contain.text', ApiKeyStatus.active);
           apiKeyRow.findSubscription().should('contain.text', subscriptionName);
           apiKeyRow.findOwner().should('contain.text', LDAP_ADMIN_USER.USERNAME);
-          apiKeyRow.findCreationDate().should('contain.text', today);
-          apiKeyRow.findExpirationDate().should('contain.text', expiryDate);
+          // Clock is read inside the assertion. A Date taken at spec load is the previous local day after setup.
+          apiKeyRow.findCreationDate().should(($date) => {
+            expect($date.text()).to.contain(formatApiKeyDisplayDate(new Date()));
+          });
+          apiKeyRow.findExpirationDate().should(($date) => {
+            expect($date.text()).to.contain(
+              formatApiKeyExpirationDate(apiKeyExpirationTime, new Date()),
+            );
+          });
 
           cy.step('Try and inference with the model using the copied API key');
           verifyMaaSModelInferenceUsingCopiedApiKeyFromModal(
