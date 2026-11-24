@@ -1,0 +1,9 @@
+apiVersion: tekton.dev/v1
+kind: PipelineRun
+metadata:
+  name: odh-e2e-onboard-test-dummy
+  annotations:
+    pipelinesascode.tekton.dev/on-cel-expression: "false"
+spec:
+  pipelineRef:
+    name: dummy-pipeline
