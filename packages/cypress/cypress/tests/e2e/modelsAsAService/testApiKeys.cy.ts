@@ -49,7 +49,6 @@ let tokenRateLimit: { limit: string; window: string; unit: string };
 let tokenLimit: string;
 let apiKeyCount: number;
 let secondApiKeyName: string;
-const keyCreatedAt = new Date();
 
 describe('A user can view subscriptions and manage API keys on the Keys and Subscriptions page', () => {
   retryableBefore(() => {
@@ -191,11 +190,16 @@ describe('A user can view subscriptions and manage API keys on the Keys and Subs
         .findDescription()
         .should('contain.text', `${testData.apiKeyDescription} ${subscriptionName}`);
       apiKeyRow.findStatus().should('contain.text', ApiKeyStatus.active);
-      apiKeyRow.findCreationDate().should('contain.text', formatApiKeyDisplayDate(keyCreatedAt));
+      // Clock is read inside the assertion. A Date taken at spec load is the previous local day after setup.
+      apiKeyRow.findCreationDate().should(($date) => {
+        expect($date.text()).to.contain(formatApiKeyDisplayDate(new Date()));
+      });
       apiKeyRow.findLastUsedAt().should('not.be.empty');
-      apiKeyRow
-        .findExpirationDate()
-        .should('contain.text', formatApiKeyExpirationDate(apiKeyExpirationTimeId, keyCreatedAt));
+      apiKeyRow.findExpirationDate().should(($date) => {
+        expect($date.text()).to.contain(
+          formatApiKeyExpirationDate(apiKeyExpirationTimeId, new Date()),
+        );
+      });
 
       cy.step('Verify active key counts is updated in the Subscriptions tab');
       mySubscriptionsPage.findMySubscriptionsLink().click();
