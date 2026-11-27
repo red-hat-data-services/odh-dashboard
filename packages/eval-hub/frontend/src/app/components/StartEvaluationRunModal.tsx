@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Controller, FormProvider } from 'react-hook-form';
 import {
+  Alert,
   Button,
   Content,
   Divider,
@@ -40,7 +41,7 @@ import {
   useStartEvaluationRunForm,
 } from '~/app/pages/useStartEvaluationRunForm';
 import type { Collection, CollectionResolution, FlatBenchmark, SourceMode } from '~/app/types';
-import { trackEvalHubEvent } from '~/app/tracking/evalhubTracking';
+import { useEvalHubTracking } from '~/app/tracking/useEvalHubTracking';
 import { EVAL_HUB_EVENTS } from '~/app/tracking/evalhubTrackingConstants';
 import { getIncompatibleModelReason } from '~/app/utils/modelCompatibility';
 import './StartEvaluationRunModal.scss';
@@ -62,6 +63,7 @@ type StartEvaluationRunModalProps = {
   trackingSource?: string;
   onSuccess?: () => void;
   description?: React.ReactNode;
+  prerequisite?: string;
   onRunFailure?: (
     error: unknown,
     collection?: Collection,
@@ -83,8 +85,11 @@ const StartEvaluationRunModal: React.FC<StartEvaluationRunModalProps> = ({
   trackingSource,
   onSuccess,
   description,
+  prerequisite,
   onRunFailure,
 }) => {
+  const { trackEvalHubEvent } = useEvalHubTracking();
+
   const [isAdvancedOpen, setIsAdvancedOpen] = React.useState(false);
   const [isCloning, setIsCloning] = React.useState(false);
   const [isModelOpen, setIsModelOpen] = React.useState(false);
@@ -110,7 +115,7 @@ const StartEvaluationRunModal: React.FC<StartEvaluationRunModalProps> = ({
       );
     }
     wasOpenRef.current = isOpen;
-  }, [benchmark, collection, isOpen, trackingSource]);
+  }, [trackEvalHubEvent, benchmark, collection, isOpen, trackingSource]);
 
   const { data: experiments, loaded: experimentsLoaded } = useMlflowExperiments({
     workspace: namespace ?? '',
@@ -285,6 +290,16 @@ const StartEvaluationRunModal: React.FC<StartEvaluationRunModalProps> = ({
           >
             {description}
           </Content>
+        ) : null}
+        {prerequisite ? (
+          <Alert
+            variant="warning"
+            isInline
+            isPlain
+            title={prerequisite}
+            className="pf-v6-u-mb-md"
+            data-testid="start-evaluation-run-prerequisite"
+          />
         ) : null}
         <FormProvider {...form.form}>
           <Form data-testid="start-evaluation-form" aria-busy={isCloning}>
